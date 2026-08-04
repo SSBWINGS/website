@@ -6,7 +6,7 @@ import Faq from "@/components/Faq";
 export const metadata: Metadata = {
   title: "Contact Us — Book Free SSB Counselling",
   description:
-    "Get in touch with SSB Wings, Noida Sector 62. Book a free counselling call, WhatsApp our team, or visit our campus. Mentors will map your entry, timeline and preparation plan.",
+    "Get in touch with SSBWINGS, Noida Sector 62. Book a free counselling call, WhatsApp our team, or visit our campus. Mentors will map your entry, timeline and preparation plan.",
 };
 
 export default function ContactPage() {
@@ -25,7 +25,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           <div className="photo-frame overflow-hidden">
             <iframe
-              title="SSB Wings location — Noida Sector 62"
+              title="SSBWINGS location — Noida Sector 62"
               src="https://www.google.com/maps?q=Sector+62+Noida&output=embed"
               className="h-[380px] w-full rounded-xl"
               loading="lazy"

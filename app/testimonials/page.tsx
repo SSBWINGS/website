@@ -9,7 +9,7 @@ import CtaBanner from "@/components/CtaBanner";
 export const metadata: Metadata = {
   title: "Testimonials — Success Stories from Recommended Cadets",
   description:
-    "Read and watch success stories from SSB Wings cadets — from repeated conference-outs to AIR-1 recommendations. Real written testimonials, YouTube interviews and our live Instagram feed.",
+    "Read and watch success stories from SSBWINGS cadets — from repeated conference-outs to AIR-1 recommendations. Real written testimonials, YouTube interviews and our live Instagram feed.",
 };
 
 export default function TestimonialsPage() {

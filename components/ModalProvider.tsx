@@ -81,7 +81,7 @@ export default function ModalProvider({ children }: { children: ReactNode }) {
 
             <div className="max-h-[90vh] overflow-y-auto p-5 sm:p-6">
               <div className="flex items-center gap-3">
-                <Image src="/logo.webp" alt="" width={44} height={44} className="h-10 w-10 object-contain" />
+                <Image src="/logo-black.png" alt="" width={44} height={44} className="h-10 w-10 object-contain" />
                 <div>
                   <p className="font-display text-xl font-extrabold uppercase leading-none tracking-wide gold-text">
                     Book Free Counselling

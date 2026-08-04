@@ -141,7 +141,7 @@ export default function EntriesPage() {
               <h2 className="section-title mt-4 text-3xl sm:text-4xl">Every Route Ends at the <span className="tricolour-text">SSB</span></h2>
               <p className="mx-auto mt-4 max-w-2xl text-ink-soft">
                 No matter the entry — written exam or direct shortlist — the final gate is the same
-                5-day Services Selection Board. That is exactly what SSB Wings prepares you for.
+                5-day Services Selection Board. That is exactly what SSBWINGS prepares you for.
               </p>
             </div>
           </Reveal>

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-const WORD = "SSB WINGS";
+const WORD = "SSBWINGS";
 const MIN_SHOW_MS = 2900;
 
 export default function Preloader() {
@@ -42,7 +42,7 @@ export default function Preloader() {
   if (removed) return null;
 
   return (
-    <div className={`preloader ${done ? "is-done" : ""}`} role="status" aria-label="SSB Wings is loading">
+    <div className={`preloader ${done ? "is-done" : ""}`} role="status" aria-label="SSBWINGS is loading">
       <div className="h-64 w-64 sm:h-80 sm:w-80">
         <DotLottieReact src="/preloader.lottie" loop autoplay />
       </div>

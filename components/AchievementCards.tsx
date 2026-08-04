@@ -11,14 +11,14 @@ export default function AchievementCards() {
           center
           kicker="All India Rank Holders"
           title={<>The <span className="tricolour-text">AIR-1</span> Wall</>}
-          subtitle="Toppers who trained with SSB Wings and finished first in the merit list. Discipline, dedication and determination — measured in ranks."
+          subtitle="Toppers who trained with SSBWINGS and finished first in the merit list. Discipline, dedication and determination — measured in ranks."
         />
         <div className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
           {AIR_CARDS.map((src, i) => (
             <Reveal key={src} delay={(i % 5) * 70}>
               <div className="photo-frame card-lift">
                 <div>
-                  <Image src={src} alt="SSB Wings All India Rank holder achievement card" width={500} height={700} sizes="(min-width:1024px) 18vw, 45vw" className="h-auto w-full" />
+                  <Image src={src} alt="SSBWINGS All India Rank holder achievement card" width={500} height={700} sizes="(min-width:1024px) 18vw, 45vw" className="h-auto w-full" />
                 </div>
               </div>
             </Reveal>

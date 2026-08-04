@@ -15,7 +15,7 @@ export default function InstagramFeed() {
           center
           kicker="@ssbwings on Instagram"
           title={<>Live from the <span className="tricolour-text">Feed</span></>}
-          subtitle="84K+ aspirants follow SSB Wings for daily reels, results, tips and motivation. Follow along and never miss a batch announcement."
+          subtitle="84K+ aspirants follow SSBWINGS for daily reels, results, tips and motivation. Follow along and never miss a batch announcement."
         />
 
         <div className="mt-14 grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
@@ -49,7 +49,7 @@ export default function InstagramFeed() {
               <div className="tricolour-bar mb-3 h-1 w-full rounded" aria-hidden />
               <iframe
                 src="https://www.instagram.com/ssbwings/embed/"
-                title="SSB Wings Instagram feed"
+                title="SSBWINGS Instagram feed"
                 className="h-[560px] w-full rounded-xl bg-white"
                 loading="lazy"
                 scrolling="no"

@@ -16,7 +16,7 @@ export default function WhatsAppButton() {
       href={SITE.whatsapp}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat with SSB Wings on WhatsApp"
+      aria-label="Chat with SSBWINGS on WhatsApp"
       className={`wa-float group flex items-center gap-3 transition-all duration-500 ${
         show ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
       }`}

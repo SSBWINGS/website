@@ -9,7 +9,7 @@ import SectionHeading from "@/components/SectionHeading";
 export const metadata: Metadata = {
   title: "Gallery — Wall of Honour & Recommended Cadets",
   description:
-    "The SSB Wings Wall of Honour: photographs of our recommended cadets, All India Rank holders and commissioned officers across the Army, Navy and Air Force.",
+    "The SSBWINGS Wall of Honour: photographs of our recommended cadets, All India Rank holders and commissioned officers across the Army, Navy and Air Force.",
 };
 
 export default function GalleryPage() {
@@ -19,7 +19,7 @@ export default function GalleryPage() {
         crumb="Gallery"
         kicker="Wall of Honour"
         title={<>Faces of <span className="tricolour-text">Recommendation</span></>}
-        subtitle="Every photograph here is a real SSB Wings aspirant who walked out of the Board recommended. Discipline, dedication and determination — made visible."
+        subtitle="Every photograph here is a real SSBWINGS aspirant who walked out of the Board recommended. Discipline, dedication and determination — made visible."
         image="/images/women-officers.jpg"
       />
 

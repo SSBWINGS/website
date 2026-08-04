@@ -12,7 +12,7 @@ import { STATS } from "@/lib/data";
 export const metadata: Metadata = {
   title: "About Us — Mentored by Ex-SSB Officers",
   description:
-    "SSB WINGS is an SSB coaching academy in Noida founded and mentored by ex-SSB assessors. Learn our story, our mission and the directors behind 677+ recommendations.",
+    "SSBWINGS is an SSB coaching academy in Noida founded and mentored by ex-SSB assessors. Learn our story, our mission and the directors behind 677+ recommendations.",
 };
 
 const VALUES = [
@@ -39,14 +39,14 @@ export default function AboutPage() {
             <h2 className="section-title mt-4 text-4xl sm:text-5xl">From Aspirant to <span className="tricolour-text">Officer</span></h2>
             <div className="mt-6 space-y-4 text-lg leading-relaxed text-ink-soft">
               <p>India has more than 1.4 billion people, yet the Armed Forces remain short of officers. The gap isn&apos;t talent — it&apos;s <strong className="text-ink">preparation that understands the Board</strong>.</p>
-              <p>SSB WINGS was founded to close that gap. Our director <strong className="text-ink">Vishal Kaushik</strong>, alongside a bench of retired Interviewing Officers, GTOs and DIPR-trained psychologists, built an academy that mirrors the real SSB — a full GTO ground, honest psychology feedback and one-on-one mock interviews.</p>
+              <p>SSBWINGS was founded to close that gap. Our director <strong className="text-ink">Vishal Kaushik</strong>, alongside a bench of retired Interviewing Officers, GTOs and DIPR-trained psychologists, built an academy that mirrors the real SSB — a full GTO ground, honest psychology feedback and one-on-one mock interviews.</p>
               <p>The result: <strong className="text-ink">677+ recommendations</strong>, cadets marching into IMA, INA, AFA and OTA — many after repeated setbacks that we helped them turn around.</p>
             </div>
           </Reveal>
           <Reveal direction="right" delay={120}>
             <div className="photo-frame">
               <div>
-                <Image src="/images/campus/imagestwo-20.jpg" alt="SSB Wings commissioned officer alumnus" width={900} height={300} sizes="(min-width:1024px) 45vw, 90vw" className="h-auto w-full" />
+                <Image src="/images/campus/imagestwo-20.jpg" alt="SSBWINGS commissioned officer alumnus" width={900} height={300} sizes="(min-width:1024px) 45vw, 90vw" className="h-auto w-full" />
               </div>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-4">

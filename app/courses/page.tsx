@@ -8,7 +8,7 @@ import CtaBanner from "@/components/CtaBanner";
 export const metadata: Metadata = {
   title: "SSB Courses — 15-Day Offline, 20-Day Online & Smart Learning App",
   description:
-    "Explore SSB Wings courses: 15-day offline residential immersion at Noida, 20-day live online masterclass, and the AI-powered SSB Smart Learning App. Built by ex-SSB assessors for NDA, CDS, AFCAT & all entries.",
+    "Explore SSBWINGS courses: 15-day offline residential immersion at Noida, 20-day live online masterclass, and the AI-powered SSB Smart Learning App. Built by ex-SSB assessors for NDA, CDS, AFCAT & all entries.",
 };
 
 export default function CoursesPage() {

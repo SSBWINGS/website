@@ -62,7 +62,7 @@ export async function POST(req: Request) {
 
   const resend = new Resend(apiKey);
   const to = process.env.CONTACT_ADMIN_EMAIL || "marketing@ssbwings.com";
-  const from = process.env.CONTACT_FROM_EMAIL || "SSB Wings Website <onboarding@resend.dev>";
+  const from = process.env.CONTACT_FROM_EMAIL || "SSBWINGS Website <onboarding@resend.dev>";
 
   const rows = [
     ["Name", name],
@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;">
           <div style="background:#0a1524;padding:20px 24px;">
-            <h1 style="margin:0;color:#f2d519;font-size:20px;letter-spacing:2px;">SSB WINGS</h1>
+            <h1 style="margin:0;color:#f2d519;font-size:20px;letter-spacing:2px;">SSBWINGS</h1>
             <p style="margin:4px 0 0;color:#c1d5ea;font-size:12px;">New callback request from the website</p>
           </div>
           <table style="width:100%;border-collapse:collapse;font-size:14px;">${rows}</table>

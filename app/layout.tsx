@@ -7,6 +7,7 @@ import ModalProvider from "@/components/ModalProvider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ChatBot from "@/components/ChatBot";
 import BackToTop from "@/components/BackToTop";
 
 const barlow = Barlow_Condensed({
@@ -22,31 +23,31 @@ const SITE_URL = "https://www.ssbwings.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "SSB WINGS — Best SSB Coaching in India | We Give Shape to Your Dreams",
-    template: "%s | SSB WINGS",
+    default: "SSBWINGS — Best SSB Coaching in India | We Give Shape to Your Dreams",
+    template: "%s | SSBWINGS",
   },
   description:
-    "SSB WINGS, Noida — India's trusted SSB interview coaching academy mentored by ex-SSB officers. 677+ recommendations, 3450+ alumni. 15-day offline & 20-day online courses for NDA, CDS, AFCAT, TES & all entries. Master the 5-day SSB: Screening, Psychology, GTO, Interview & Conference.",
+    "SSBWINGS, Noida — India's trusted SSB interview coaching academy mentored by ex-SSB officers. 677+ recommendations, 3450+ alumni. 15-day offline & 20-day online courses for NDA, CDS, AFCAT, TES & all entries. Master the 5-day SSB: Screening, Psychology, GTO, Interview & Conference.",
   keywords: [
     "SSB coaching", "best SSB coaching in India", "SSB interview preparation",
     "SSB coaching in Noida", "NDA SSB coaching", "CDS SSB coaching", "AFCAT SSB coaching",
-    "5 day SSB process", "GTO training", "SSB psychology tests", "ex SSB officer mentors", "SSB Wings",
+    "5 day SSB process", "GTO training", "SSB psychology tests", "ex SSB officer mentors", "SSBWINGS",
   ],
-  authors: [{ name: "SSB WINGS" }],
-  creator: "SSB WINGS",
+  authors: [{ name: "SSBWINGS" }],
+  creator: "SSBWINGS",
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: SITE_URL,
-    siteName: "SSB WINGS",
-    title: "SSB WINGS — Best SSB Coaching in India",
+    siteName: "SSBWINGS",
+    title: "SSBWINGS — Best SSB Coaching in India",
     description: "Mentored by ex-SSB officers. 677+ recommendations. Master all 5 days of the SSB.",
-    images: [{ url: "/logo.webp", width: 512, height: 512, alt: "SSB WINGS logo" }],
+    images: [{ url: "/logo.webp", width: 512, height: 512, alt: "SSBWINGS logo" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SSB WINGS — Best SSB Coaching in India",
+    title: "SSBWINGS — Best SSB Coaching in India",
     description: "Mentored by ex-SSB officers. 677+ recommendations. Your journey to the Armed Forces begins here.",
     images: ["/logo.webp"],
   },
@@ -60,7 +61,7 @@ const jsonLd = {
     {
       "@type": "EducationalOrganization",
       "@id": `${SITE_URL}/#organization`,
-      name: "SSB WINGS",
+      name: "SSBWINGS",
       url: SITE_URL,
       logo: `${SITE_URL}/logo.webp`,
       slogan: "We give shape to your Dreams",
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
           <Footer />
           <WhatsAppButton />
+          <ChatBot />
           <BackToTop />
         </ModalProvider>
       </body>

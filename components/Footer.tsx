@@ -11,10 +11,10 @@ export default function Footer() {
           <div>
             <Link href="/" className="flex items-center gap-3">
               <span className="medal">
-                <Image src="/logo.webp" alt="SSB WINGS logo" width={56} height={56} className="h-14 w-14 rounded-full bg-navy-950 object-contain p-1.5" />
+                <Image src="/logo.webp" alt="SSBWINGS logo" width={56} height={56} className="h-14 w-14 rounded-full bg-navy-950 object-contain p-1.5" />
               </span>
               <span>
-                <span className="block font-display text-2xl font-extrabold uppercase tracking-widest gold-text">SSB Wings</span>
+                <span className="block font-display text-2xl font-extrabold uppercase tracking-widest gold-text">SSBWINGS</span>
                 <span className="block text-[10px] uppercase tracking-[0.26em] text-navy-200/80">We give shape to your dreams</span>
               </span>
             </Link>
@@ -35,6 +35,11 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <a href={SITE.brochure} download className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1">
+                  ⬇ Download 2026 Brochure
+                </a>
+              </li>
             </ul>
           </nav>
 
@@ -82,7 +87,7 @@ export default function Footer() {
 
       <div className="border-t border-navy-800">
         <div className="mx-auto flex max-w-[1840px] flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-navy-200/70 sm:flex-row sm:px-8">
-          <p>© {new Date().getFullYear()} SSB WINGS. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SSBWINGS. All rights reserved.</p>
           <p>Champions of Discipline, Dedication &amp; Determination 🇮🇳</p>
         </div>
         <p className="mx-auto max-w-[1840px] px-4 pb-5 text-center text-xs text-navy-200/70 sm:px-8">

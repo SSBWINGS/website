@@ -13,7 +13,7 @@ export default function OfficerBanners() {
         {[...items, ...items].map((src, i) => (
           <div key={i} className="photo-frame mx-3 w-[340px] shrink-0 sm:w-[420px]">
             <div>
-              <Image src={src} alt="Commissioned officer — SSB Wings alumnus" width={420} height={140} sizes="420px" className="h-auto w-full" />
+              <Image src={src} alt="Commissioned officer — SSBWINGS alumnus" width={420} height={140} sizes="420px" className="h-auto w-full" />
             </div>
           </div>
         ))}

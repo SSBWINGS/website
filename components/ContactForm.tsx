@@ -102,7 +102,7 @@ export default function ContactForm({ compact = false }: { compact?: boolean }) 
           </p>
         )}
       </div>
-      <p className="text-center text-xs text-ink-soft">🔒 Your details stay with SSB Wings. We never share them.</p>
+      <p className="text-center text-xs text-ink-soft">🔒 Your details stay with SSBWINGS. We never share them.</p>
     </form>
   );
 }

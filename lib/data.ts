@@ -4,19 +4,45 @@
  */
 
 export const SITE = {
-  name: "SSB WINGS",
+  name: "SSBWINGS",
   tagline: "We give shape to your Dreams",
   phone1: "+91 95605 10035",
   phone1Href: "tel:+919560510035",
   phone2: "+91 95605 10036",
   phone2Href: "tel:+919560510036",
-  whatsapp: "https://wa.me/919560510035?text=Jai%20Hind!%20I%20want%20to%20know%20more%20about%20SSB%20Wings%20courses.",
+  whatsapp: "https://wa.me/919560510035?text=Jai%20Hind!%20I%20want%20to%20know%20more%20about%20SSBWINGS%20courses.",
   email: "marketing@ssbwings.com",
   address: "C-56/43, Institutional Area, Phase 2, Sector 62, Noida, Delhi NCR — 201309",
   instagram: "https://www.instagram.com/ssbwings",
   youtube: "https://www.youtube.com/@ssbwings",
   telegram: "https://t.me/ssbwings",
   url: "https://www.ssbwings.com",
+  brochure: "/SSB-Wings-Brochure-2026.pdf",
+  enrollOffline: "https://pages.razorpay.com/ssbwings",
+  enrollOnline: "https://pages.razorpay.com/ssbwingsonlinebatch",
+};
+
+/** Batch cadence — exact upcoming dates are confirmed on enrolment / WhatsApp. */
+export const BATCH_INFO = {
+  offline: "Two fresh 15-day offline batches begin every month at our Noida Sector 62 campus (typically around the 1st and 15th). Exact dates for the next batch are confirmed at enrolment.",
+  online: "20-day online batches run live from 8:00–10:00 PM IST and start every month. The next start date is shared on enrolment or over WhatsApp.",
+};
+
+/** Book by Director & GTO mentor Vishal Kaushik (Flipkart). */
+export const BOOK = {
+  title: "Victor Kilo",
+  subtitle: "The Hustle Behind Earning the Stars",
+  author: "Vishal Kaushik",
+  publisher: "SSBWINGS Leadership LLP",
+  price: "₹259",
+  mrp: "₹399",
+  rating: "4.9★ (57 ratings)",
+  edition: "Paperback · First Edition, 2026",
+  isbn: "9789356927520",
+  blurb:
+    "Written by our Director & GTO mentor Vishal Kaushik, this book takes you inside the grit, mindset and everyday hustle behind earning the officer's stars — real lessons from the journey to the Armed Forces.",
+  buyUrl:
+    "https://www.flipkart.com/victor-kilo-hustle-behind-earning-stars/p/itmf5ee8bd3badf7?pid=9789356927520",
 };
 
 export const STATS = [
@@ -57,7 +83,7 @@ export const DAYS = [
       { name: "Group Discussion", detail: "Assert your story without drowning the group" },
     ],
     drill:
-      "At SSB WINGS: weekly mock screenings with real-time narration practice, camera-recorded GD reviews and OIR speed drills until Stage-1 feels like home turf.",
+      "At SSBWINGS: weekly mock screenings with real-time narration practice, camera-recorded GD reviews and OIR speed drills until Stage-1 feels like home turf.",
   },
   {
     day: "Day 2",
@@ -74,7 +100,7 @@ export const DAYS = [
       { name: "SD", detail: "What your parents, friends & you truly think of you" },
     ],
     drill:
-      "At SSB WINGS: 13 days of psychology immersion, 10 full-length dossier practice sets, each one personally evaluated with written feedback by our psych mentors.",
+      "At SSBWINGS: 13 days of psychology immersion, 10 full-length dossier practice sets, each one personally evaluated with written feedback by our psych mentors.",
   },
   {
     day: "Day 3",
@@ -91,7 +117,7 @@ export const DAYS = [
       { name: "Lecturette", detail: "3 minutes, one topic, all eyes on you" },
     ],
     drill:
-      "At SSB WINGS: a real GTO ground on campus with full-scale obstacles — you don't imagine PGT, you sweat through it under an ex-GTO's whistle.",
+      "At SSBWINGS: a real GTO ground on campus with full-scale obstacles — you don't imagine PGT, you sweat through it under an ex-GTO's whistle.",
   },
   {
     day: "Day 4",
@@ -108,7 +134,7 @@ export const DAYS = [
       { name: "Personal Interview", detail: "Rapid-fire life questions — coherence is character" },
     ],
     drill:
-      "At SSB WINGS: one-on-one mock interviews with a retired Interviewing Officer, PIQ-based grilling and recorded playback so you hear yourself as the Board hears you.",
+      "At SSBWINGS: one-on-one mock interviews with a retired Interviewing Officer, PIQ-based grilling and recorded playback so you hear yourself as the Board hears you.",
   },
   {
     day: "Day 5",
@@ -124,11 +150,24 @@ export const DAYS = [
       { name: "Medicals", detail: "5-day medical examination at Command Hospital follows" },
     ],
     drill:
-      "At SSB WINGS: conference etiquette, borderline-case handling and the mindset work that keeps you steady whether it's your first attempt or your ninth.",
+      "At SSBWINGS: conference etiquette, borderline-case handling and the mindset work that keeps you steady whether it's your first attempt or your ninth.",
   },
 ];
 
-export const COURSES = [
+export type CourseItem = {
+  tag: string;
+  highlight: boolean;
+  title: string;
+  where: string;
+  service: Service;
+  desc: string;
+  features: string[];
+  cta: string;
+  enrollUrl?: string;
+  image?: { src: string; alt: string };
+};
+
+export const COURSES: CourseItem[] = [
   {
     tag: "Flagship · Most Popular",
     highlight: true,
@@ -143,7 +182,8 @@ export const COURSES = [
       "Mock PPDT screenings & group discussions every week",
       "2 fresh batches every month · optional AC hostel @ ₹500/day with meals",
     ],
-    cta: "Reserve Offline Seat",
+    cta: "Enrol in Offline Batch",
+    enrollUrl: "https://pages.razorpay.com/ssbwings",
   },
   {
     tag: "For Working Aspirants",
@@ -159,7 +199,8 @@ export const COURSES = [
       "Live doubt-clearing with mentors after every session",
       "Recordings available — never miss a class",
     ],
-    cta: "Join Online Batch",
+    cta: "Enrol in Online Batch",
+    enrollUrl: "https://pages.razorpay.com/ssbwingsonlinebatch",
   },
   {
     tag: "Train Anywhere",
@@ -169,7 +210,7 @@ export const COURSES = [
     service: "navy" as Service,
     image: {
       src: "/images/app-gto-ground.webp",
-      alt: "SSB Wings Smart Learning App — AI virtual GTO ground gameplay on a tablet",
+      alt: "SSBWINGS Smart Learning App — AI virtual GTO ground gameplay on a tablet",
     },
     desc: "India's first AI-powered virtual GTO ground in your pocket — practice the Board's toughest day from anywhere in the country.",
     features: [
@@ -212,25 +253,25 @@ export const TESTIMONIALS = [
     name: "NC. Khushvant Sharma",
     rank: "INA · 10+2 Navy B.Tech",
     photo: "/images/testimonials/nc-khushvant-sharma.jpg",
-    text: "I enrolled in the SACA program at SSB WINGS and received valuable feedback from Vishal Sir on communication, personality development and expression. Over 6–7 months I stayed in close contact with my mentors and attended numerous practice sessions. Despite three setbacks, I persevered — and was finally recommended from 12 SSB Bangalore for the 10+2 Indian Navy B.Tech entry.",
+    text: "I enrolled in the SACA program at SSBWINGS and received valuable feedback from Vishal Sir on communication, personality development and expression. Over 6–7 months I stayed in close contact with my mentors and attended numerous practice sessions. Despite three setbacks, I persevered — and was finally recommended from 12 SSB Bangalore for the 10+2 Indian Navy B.Tech entry.",
   },
   {
     name: "GC. Ashok Suthar",
     rank: "OTA Gaya · SSC Tech · AIR-1",
     photo: "/images/testimonials/gc-ashok-suthar.jpg",
-    text: "After two setbacks I joined SSB WINGS' online workshop. I then achieved AIR-1 and AIR-8 consecutively — but was declared medically unfit. Determined, I sought guidance from Vishal Sir and made a comeback. In January 2024 I received my third recommendation from 32 SSB Jalandhar, securing AIR-1, and joined OTA Gaya.",
+    text: "After two setbacks I joined SSBWINGS' online workshop. I then achieved AIR-1 and AIR-8 consecutively — but was declared medically unfit. Determined, I sought guidance from Vishal Sir and made a comeback. In January 2024 I received my third recommendation from 32 SSB Jalandhar, securing AIR-1, and joined OTA Gaya.",
   },
   {
     name: "GC. Maan Singh",
     rank: "IMA · ACC Entry",
     photo: "/images/testimonials/gc-maan-singh.jpg",
-    text: "I served as a Sipahi in the Army Medical Corps. My mentors met me whenever duty allowed — and took my calls even at midnight or 1 AM before my Board. On my third attempt I was recommended from 14 SSB Allahabad. From Sipahi to officer training at Army Cadet College — I owe a great deal to SSB WINGS.",
+    text: "I served as a Sipahi in the Army Medical Corps. My mentors met me whenever duty allowed — and took my calls even at midnight or 1 AM before my Board. On my third attempt I was recommended from 14 SSB Allahabad. From Sipahi to officer training at Army Cadet College — I owe a great deal to SSBWINGS.",
   },
   {
     name: "GC. Chandan Sahani",
     rank: "IMA · CDS Entry",
     photo: "/images/testimonials/gc-chandan-sahani.jpg",
-    text: "I went from Constable in the UP Police to Gentleman Cadet. Working full time, I had failed five attempts. After SSB WINGS' online workshop and mock interviews — sometimes travelling Allahabad to Meerut for extra guidance — I was recommended for CDS-IMA from 14 SSB Allahabad. Soon I'll be commissioned.",
+    text: "I went from Constable in the UP Police to Gentleman Cadet. Working full time, I had failed five attempts. After SSBWINGS' online workshop and mock interviews — sometimes travelling Allahabad to Meerut for extra guidance — I was recommended for CDS-IMA from 14 SSB Allahabad. Soon I'll be commissioned.",
   },
 ];
 
@@ -280,7 +321,7 @@ export const AIR_CARDS = Array.from({ length: 15 }, (_, i) => `/images/campus/im
 /** Commissioned-officer banners from ssbwings.com (wide) */
 export const OFFICER_BANNERS = Array.from({ length: 25 }, (_, i) => `/images/campus/imagestwo-${i + 15}.jpg`);
 
-/** Real recommendation-interview videos from the SSB Wings YouTube channel */
+/** Real recommendation-interview videos from the SSBWINGS YouTube channel */
 export const YT_VIDEOS = ["2m14ob1OUHo", "XlmVnxhg2IY", "JeuWNbPZC4U", "waAzH9vHnFc", "OqcBtRKJqEA", "cIpcpexNiO4"];
 
 export const FAQS = [

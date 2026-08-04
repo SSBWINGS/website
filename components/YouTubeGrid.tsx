@@ -14,7 +14,7 @@ function Facade({ id }: { id: string }) {
           <iframe
             className="absolute inset-0 h-full w-full"
             src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
-            title="SSB Wings recommendation interview"
+            title="SSBWINGS recommendation interview"
             allow="accelerated-motion; autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
           />

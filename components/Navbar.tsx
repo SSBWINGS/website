@@ -53,11 +53,11 @@ export default function Navbar() {
         className="relative border-b border-[rgba(43,36,22,0.12)] bg-[linear-gradient(180deg,#fffdf7,#f4ecd8)] shadow-[0_6px_18px_-10px_rgba(43,36,22,0.4)]"
       >
         <div className="mx-auto flex max-w-[1840px] items-center justify-between px-4 py-2.5 sm:px-8">
-          <Link href="/" className="flex items-center gap-3" aria-label="SSB Wings home">
+          <Link href="/" className="flex items-center gap-3" aria-label="SSBWINGS home">
             <span className="medal">
               <Image
                 src="/logo.webp"
-                alt="SSB WINGS logo"
+                alt="SSBWINGS logo"
                 width={48}
                 height={48}
                 className="h-12 w-12 rounded-full bg-navy-950 object-contain p-1"
@@ -66,7 +66,7 @@ export default function Navbar() {
             </span>
             <span className="leading-tight">
               <span className="block whitespace-nowrap font-display text-xl font-extrabold uppercase tracking-widest gold-text sm:text-2xl">
-                SSB Wings
+                SSBWINGS
               </span>
               <span className="hidden whitespace-nowrap text-[10px] uppercase tracking-[0.28em] text-ink-soft sm:block">
                 We give shape to your dreams

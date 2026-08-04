@@ -18,7 +18,7 @@ export default function WhyUs() {
         <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.6fr]">
           <div className="lg:sticky lg:top-32">
             <SectionHeading
-              kicker="The SSB Wings Edge"
+              kicker="The SSBWINGS Edge"
               title={<>Why Aspirants Trust the <span className="tricolour-text">Wings</span></>}
               subtitle="Coaching factories teach tricks. We run a personality forge — the same standards, ground realities and honest assessment you'll face at Allahabad, Bhopal or Bengaluru."
             />

@@ -8,7 +8,7 @@ import CtaBanner from "@/components/CtaBanner";
 export const metadata: Metadata = {
   title: "The 5-Day SSB Process — Screening to Conference",
   description:
-    "A complete guide to the 5-day SSB interview: Day 1 Screening (OIR, PPDT), Day 2 Psychology (TAT, WAT, SRT, SD), Days 3–4 GTO tasks & Personal Interview, Day 5 Conference. Learn what to expect and how SSB Wings prepares you.",
+    "A complete guide to the 5-day SSB interview: Day 1 Screening (OIR, PPDT), Day 2 Psychology (TAT, WAT, SRT, SD), Days 3–4 GTO tasks & Personal Interview, Day 5 Conference. Learn what to expect and how SSBWINGS prepares you.",
 };
 
 export default function SsbProcessPage() {

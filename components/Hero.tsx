@@ -4,9 +4,24 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Counter from "./Counter";
+import PhotoCarousel from "./PhotoCarousel";
 import { useContactModal } from "./ModalProvider";
 
 const ROLES = ["an Officer", "a Leader", "a Warrior", "Recommended"];
+
+/** Recommended-candidate photos that auto-rotate in the hero collage. */
+const RECO_PHOTOS = [
+  "/images/students/tanishq.png",
+  "/images/students/tejas.jpg",
+  "/images/students/yash.jpg",
+  "/images/students/rahul.jpg",
+  "/images/students/tanya.jpg",
+  "/images/students/harshvardhan.jpg",
+  "/images/students/khushi.jpg",
+  "/images/students/chaitanya.jpg",
+  "/images/students/harsh.jpg",
+  "/images/students/aditya.png",
+];
 
 function useTypewriter(words: string[]) {
   const [text, setText] = useState("");
@@ -68,7 +83,7 @@ export default function Hero() {
 
           <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-soft">
             Five days at the Services Selection Board decide who wears the stars.
-            At <strong className="text-ink">SSB WINGS</strong>, ex-SSB assessors rebuild you for
+            At <strong className="text-ink">SSBWINGS</strong>, ex-SSB assessors rebuild you for
             every one of them — Screening, Psychology, GTO, Interview and Conference —
             until the Board sees what we see: <em>an officer</em>.
           </p>
@@ -105,16 +120,13 @@ export default function Hero() {
               />
             </div>
           </div>
-          {/* Secondary — marching contingent, overlapping */}
+          {/* Secondary — auto carousel of recommended candidates, overlapping */}
           <div className="photo-frame card-lift absolute -bottom-6 left-0 z-20 w-[58%] rotate-3 sm:-bottom-10 sm:w-[52%]">
             <div>
-              <Image
-                src="/images/hero-parade.jpg"
-                alt="Indian Army contingent marching on the Kartavya Path during the Republic Day parade"
-                width={640}
-                height={400}
+              <PhotoCarousel
+                images={RECO_PHOTOS}
+                alt="An SSBWINGS recommended candidate"
                 sizes="(min-width: 1024px) 26vw, 55vw"
-                className="h-auto w-full"
               />
             </div>
           </div>
