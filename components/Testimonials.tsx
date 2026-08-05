@@ -1,66 +1,24 @@
-"use client";
-
-import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Reveal from "./Reveal";
-import SectionHeading from "./SectionHeading";
 import { TESTIMONIALS } from "@/lib/data";
+import { getCollection } from "@/lib/content";
+import { mediaUrl } from "@/lib/supabase/media";
+import TestimonialsCarousel, { type TItem } from "./TestimonialsCarousel";
 
-const AUTOPLAY_MS = 7000;
+type Row = { name: string; rank: string; body: string; image_path: string; sort_order: number };
 
-export default function Testimonials({ heading = true }: { heading?: boolean }) {
-  const [idx, setIdx] = useState(0);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const go = useCallback((n: number) => setIdx((i) => (i + n + TESTIMONIALS.length) % TESTIMONIALS.length), []);
-
-  useEffect(() => {
-    timer.current = setInterval(() => go(1), AUTOPLAY_MS);
-    return () => { if (timer.current) clearInterval(timer.current); };
-  }, [go, idx]);
-
-  const s = TESTIMONIALS[idx];
-
-  return (
-    <section id="testimonials" className="relative py-20 sm:py-24">
-      <div className="mx-auto max-w-5xl px-4 sm:px-8">
-        {heading && (
-          <SectionHeading
-            center
-            kicker="Stories in Uniform"
-            title={<>They Were Told <span className="tricolour-text">No.</span> They Answered <span className="tricolour-text">Again.</span></>}
-          />
-        )}
-
-        <Reveal delay={120}>
-          <figure key={idx} className="journey-panel skeu-panel relative mt-12 grid gap-8 p-8 sm:grid-cols-[auto_1fr] sm:p-10">
-            <div className="mx-auto sm:mx-0">
-              <div className="medal h-32 w-32">
-                <Image src={s.photo} alt={s.name} width={200} height={200} className="h-full w-full rounded-full object-cover" />
-              </div>
-            </div>
-            <div>
-              <span aria-hidden className="font-display text-6xl leading-none text-gold-400">&ldquo;</span>
-              <blockquote className="-mt-4 text-lg leading-relaxed text-ink-soft">{s.text}</blockquote>
-              <figcaption className="mt-5">
-                <p className="font-display text-xl font-bold uppercase text-ink">{s.name}</p>
-                <p className="text-sm font-semibold text-saffron-700">{s.rank}</p>
-              </figcaption>
-            </div>
-          </figure>
-        </Reveal>
-
-        <div className="mt-8 flex items-center justify-center gap-4">
-          <button onClick={() => go(-1)} aria-label="Previous" className="flex h-11 w-11 items-center justify-center rounded-full text-ink shadow-[var(--shadow-raised)] transition hover:text-saffron-600" style={{ background: "linear-gradient(180deg,#fffdf7,#e6d29a)" }}>←</button>
-          <div className="flex gap-2" role="tablist">
-            {TESTIMONIALS.map((_, i) => (
-              <button key={i} onClick={() => setIdx(i)} aria-label={`Story ${i + 1}`} aria-selected={i === idx} role="tab"
-                className={`h-2.5 rounded-full transition-all duration-300 ${i === idx ? "w-8 bg-saffron-500" : "w-2.5 bg-ink-soft/30 hover:bg-ink-soft/50"}`} />
-            ))}
-          </div>
-          <button onClick={() => go(1)} aria-label="Next" className="flex h-11 w-11 items-center justify-center rounded-full text-ink shadow-[var(--shadow-raised)] transition hover:text-saffron-600" style={{ background: "linear-gradient(180deg,#fffdf7,#e6d29a)" }}>→</button>
-        </div>
-      </div>
-    </section>
-  );
+export default async function Testimonials({ heading = true }: { heading?: boolean }) {
+  const fallback: Row[] = TESTIMONIALS.map((t, i) => ({
+    name: t.name,
+    rank: t.rank,
+    body: t.text,
+    image_path: t.photo,
+    sort_order: i,
+  }));
+  const rows = await getCollection<Row>("published_testimonials", fallback);
+  const items: TItem[] = rows.map((r) => ({
+    name: r.name,
+    rank: r.rank,
+    body: r.body,
+    image: mediaUrl(r.image_path),
+  }));
+  return <TestimonialsCarousel items={items} heading={heading} />;
 }

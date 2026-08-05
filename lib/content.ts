@@ -1,5 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { SITE } from "@/lib/data";
+
+export type SiteSettings = typeof SITE;
+
+/** Site-wide settings (contact, socials, footer), CMS-overridable with defaults. */
+export async function getSettings(): Promise<SiteSettings> {
+  return getPublished<SiteSettings>("settings", SITE);
+}
+
+/** tel: href from a display phone number. */
+export const telHref = (p: string) => `tel:${(p || "").replace(/[^\d+]/g, "")}`;
 
 /**
  * Content layer with graceful fallback.

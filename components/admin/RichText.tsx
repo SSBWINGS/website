@@ -1,0 +1,108 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+const FONTS = ["Inter", "Barlow Condensed", "Georgia", "Arial", "Courier New"];
+const SIZES: { label: string; cmd: string }[] = [
+  { label: "S", cmd: "2" },
+  { label: "M", cmd: "3" },
+  { label: "L", cmd: "5" },
+  { label: "XL", cmd: "6" },
+];
+const WORD_ART: { label: string; cls: string; sample: string }[] = [
+  { label: "Tricolour", cls: "wa-tri", sample: "linear-gradient(100deg,#d95d00,#c39407,#0f6d06)" },
+  { label: "Gold", cls: "wa-gold", sample: "linear-gradient(180deg,#f2d519,#9c6a0a)" },
+  { label: "Saffron", cls: "wa-saffron", sample: "linear-gradient(180deg,#ff9f43,#d95d00)" },
+  { label: "Outline", cls: "wa-outline", sample: "#334155" },
+  { label: "Shadow", cls: "wa-shadow", sample: "#334155" },
+];
+
+function exec(cmd: string, value?: string) {
+  // execCommand is deprecated but universally supported and ideal for a lightweight admin editor.
+  document.execCommand(cmd, false, value);
+}
+
+export default function RichText({
+  value,
+  onChange,
+  minHeight = 120,
+}: {
+  value: string;
+  onChange: (html: string) => void;
+  minHeight?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== value) {
+      ref.current.innerHTML = value || "";
+    }
+    // Only set once on mount / when switching records (value identity change).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const emit = () => onChange(ref.current?.innerHTML ?? "");
+
+  const applyWordArt = (cls: string) => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const text = sel.toString();
+    exec("insertHTML", `<span class="${cls}">${text}</span>`);
+    emit();
+  };
+
+  const Btn = ({ onClick, title, children }: { onClick: () => void; title: string; children: React.ReactNode }) => (
+    <button type="button" title={title} onMouseDown={(e) => e.preventDefault()} onClick={onClick}
+      className="rounded px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-200">{children}</button>
+  );
+
+  return (
+    <div className="rounded-lg border border-slate-300 bg-white">
+      <div className="flex flex-wrap items-center gap-1 border-b border-slate-200 bg-slate-50 px-2 py-1.5">
+        <Btn title="Bold" onClick={() => { exec("bold"); emit(); }}><b>B</b></Btn>
+        <Btn title="Italic" onClick={() => { exec("italic"); emit(); }}><i>I</i></Btn>
+        <Btn title="Underline" onClick={() => { exec("underline"); emit(); }}><u>U</u></Btn>
+        <span className="mx-1 h-4 w-px bg-slate-300" />
+        <select title="Font" onMouseDown={(e) => e.stopPropagation()} onChange={(e) => { exec("fontName", e.target.value); emit(); }}
+          className="rounded border border-slate-200 bg-white px-1 py-0.5 text-xs text-slate-700">
+          {FONTS.map((f) => <option key={f} value={f}>{f}</option>)}
+        </select>
+        {SIZES.map((s) => (
+          <Btn key={s.cmd} title={`Size ${s.label}`} onClick={() => { exec("fontSize", s.cmd); emit(); }}>{s.label}</Btn>
+        ))}
+        <span className="mx-1 h-4 w-px bg-slate-300" />
+        <label title="Text colour" className="flex items-center gap-1 text-xs text-slate-600">
+          <span aria-hidden>🎨</span>
+          <input type="color" onChange={(e) => { exec("foreColor", e.target.value); emit(); }} className="h-5 w-6 cursor-pointer border-0 bg-transparent p-0" />
+        </label>
+        <label title="Highlight" className="flex items-center gap-1 text-xs text-slate-600">
+          <span aria-hidden>🖊</span>
+          <input type="color" defaultValue="#fff3b0" onChange={(e) => { exec("hiliteColor", e.target.value); emit(); }} className="h-5 w-6 cursor-pointer border-0 bg-transparent p-0" />
+        </label>
+        <span className="mx-1 h-4 w-px bg-slate-300" />
+        <Btn title="Align left" onClick={() => { exec("justifyLeft"); emit(); }}>⇤</Btn>
+        <Btn title="Align centre" onClick={() => { exec("justifyCenter"); emit(); }}>≡</Btn>
+        <Btn title="Align right" onClick={() => { exec("justifyRight"); emit(); }}>⇥</Btn>
+        <span className="mx-1 h-4 w-px bg-slate-300" />
+        <span className="text-[10px] font-bold uppercase text-slate-400">Word art:</span>
+        {WORD_ART.map((w) => (
+          <button key={w.cls} type="button" title={`Word art: ${w.label}`} onMouseDown={(e) => e.preventDefault()} onClick={() => applyWordArt(w.cls)}
+            className="rounded border border-slate-200 px-2 py-0.5 text-[11px] font-bold hover:bg-slate-200"
+            style={w.cls === "wa-outline" ? { color: "transparent", WebkitTextStroke: "0.8px #334155" } : { background: w.sample, WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
+            {w.label}
+          </button>
+        ))}
+        <Btn title="Clear formatting" onClick={() => { exec("removeFormat"); emit(); }}>✕ clear</Btn>
+      </div>
+      <div
+        ref={ref}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={emit}
+        onBlur={emit}
+        className="rich-html px-3 py-2.5 text-sm text-slate-900 outline-none"
+        style={{ minHeight }}
+      />
+    </div>
+  );
+}

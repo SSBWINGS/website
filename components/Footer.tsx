@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { NAV_LINKS, SITE, ENTRIES } from "@/lib/data";
+import { NAV_LINKS, ENTRIES } from "@/lib/data";
+import { getSettings, telHref } from "@/lib/content";
 
-export default function Footer() {
+export default async function Footer() {
+  const SITE = await getSettings();
   return (
     <footer className="relative bg-navy-950 text-paper">
       <div className="tricolour-bar h-1.5 w-full" aria-hidden />
@@ -59,8 +61,8 @@ export default function Footer() {
             <address className="mt-5 space-y-3 text-sm not-italic text-navy-100/85">
               <p>{SITE.address}</p>
               <p>
-                <a href={SITE.phone1Href} className="transition-colors hover:text-gold-300">{SITE.phone1}</a><br />
-                <a href={SITE.phone2Href} className="transition-colors hover:text-gold-300">{SITE.phone2}</a>
+                <a href={telHref(SITE.phone1)} className="transition-colors hover:text-gold-300">{SITE.phone1}</a><br />
+                <a href={telHref(SITE.phone2)} className="transition-colors hover:text-gold-300">{SITE.phone2}</a>
               </p>
               <p><a href={`mailto:${SITE.email}`} className="transition-colors hover:text-gold-300">{SITE.email}</a></p>
             </address>

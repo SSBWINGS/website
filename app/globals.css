@@ -169,6 +169,26 @@ body {
 }
 .admin-root ::selection { background: #2563eb; color: #fff; }
 
+/* ── Word-art presets (used by the CMS rich-text editor & public render) ── */
+.wa-tri {
+  background: linear-gradient(100deg, #d95d00, #c39407 45%, #0f6d06);
+  -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800;
+}
+.wa-gold {
+  background: linear-gradient(180deg, #f2d519, #9c6a0a);
+  -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800;
+}
+.wa-saffron {
+  background: linear-gradient(180deg, #ff9f43, #d95d00);
+  -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800;
+}
+.wa-outline { color: transparent; -webkit-text-stroke: 1.1px currentColor; font-weight: 800; }
+.wa-shadow { text-shadow: 0 2px 6px rgba(0,0,0,0.35); font-weight: 700; }
+/* Rich-text content spacing on the public site */
+.rich-html p { margin: 0 0 0.6em; }
+.rich-html p:last-child { margin-bottom: 0; }
+.rich-html a { color: #d95d00; text-decoration: underline; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

@@ -2,8 +2,22 @@ import Image from "next/image";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 import { MENTORS } from "@/lib/data";
+import { getCollection } from "@/lib/content";
+import { mediaUrl } from "@/lib/supabase/media";
 
-export default function Mentors({ heading = true }: { heading?: boolean }) {
+type Row = { name: string; role: string; specialty: string; bio: string; image_path: string; sort_order: number };
+
+export default async function Mentors({ heading = true }: { heading?: boolean }) {
+  const fallback: Row[] = MENTORS.map((m, i) => ({
+    name: m.name,
+    role: m.role,
+    specialty: m.specialty,
+    bio: m.bio,
+    image_path: m.photo,
+    sort_order: i,
+  }));
+  const mentors = await getCollection<Row>("published_mentors", fallback);
+
   return (
     <section id="mentors" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
@@ -17,12 +31,12 @@ export default function Mentors({ heading = true }: { heading?: boolean }) {
         )}
 
         <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {MENTORS.map((m, i) => (
-            <Reveal key={m.name} delay={i * 110}>
+          {mentors.map((m, i) => (
+            <Reveal key={m.name + i} delay={i * 110}>
               <article className="card-lift group skeu-panel h-full overflow-hidden p-0">
                 <div className="relative h-52 overflow-hidden bg-navy-950">
                   <Image
-                    src={m.photo}
+                    src={mediaUrl(m.image_path)}
                     alt={m.name}
                     fill
                     sizes="(min-width:1024px) 22vw, 90vw"
@@ -34,7 +48,7 @@ export default function Mentors({ heading = true }: { heading?: boolean }) {
                   <h3 className="font-display text-xl font-extrabold uppercase text-ink">{m.name}</h3>
                   <p className="font-display text-sm font-bold uppercase tracking-[0.16em] text-saffron-700">{m.role}</p>
                   <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-ink-soft/70">{m.specialty}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-ink-soft">{m.bio}</p>
+                  <p className="rich-html mt-3 text-sm leading-relaxed text-ink-soft" dangerouslySetInnerHTML={{ __html: m.bio }} />
                 </div>
               </article>
             </Reveal>

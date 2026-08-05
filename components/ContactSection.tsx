@@ -1,8 +1,9 @@
 import Reveal from "./Reveal";
 import ContactForm from "./ContactForm";
-import { SITE } from "@/lib/data";
+import { getSettings, telHref } from "@/lib/content";
 
-export default function ContactSection() {
+export default async function ContactSection() {
+  const SITE = await getSettings();
   return (
     <section id="contact" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
@@ -28,7 +29,7 @@ export default function ContactSection() {
                 <div>
                   <p className="font-display font-bold uppercase tracking-wide text-ink">Call the Ops Room</p>
                   <p className="text-sm text-ink-soft">
-                    <a href={SITE.phone1Href} className="hover:text-saffron-700">{SITE.phone1}</a> · <a href={SITE.phone2Href} className="hover:text-saffron-700">{SITE.phone2}</a>
+                    <a href={telHref(SITE.phone1)} className="hover:text-saffron-700">{SITE.phone1}</a> · <a href={telHref(SITE.phone2)} className="hover:text-saffron-700">{SITE.phone2}</a>
                   </p>
                 </div>
               </li>
