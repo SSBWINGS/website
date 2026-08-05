@@ -1,0 +1,42 @@
+import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+
+/**
+ * Content layer with graceful fallback.
+ *
+ * `getPublished(key, fallback)` returns the PUBLISHED document for a section
+ * from Supabase, or the provided `fallback` (the built-in defaults in
+ * lib/data.ts) when Supabase isn't configured or the row doesn't exist yet.
+ *
+ * This lets the public site keep working before the CMS is populated.
+ */
+export async function getPublished<T>(key: string, fallback: T): Promise<T> {
+  if (!isSupabaseConfigured()) return fallback;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("published_content")
+      .select("published")
+      .eq("key", key)
+      .maybeSingle();
+    if (error || !data?.published || Object.keys(data.published).length === 0) {
+      return fallback;
+    }
+    return { ...fallback, ...(data.published as Partial<T>) } as T;
+  } catch {
+    return fallback;
+  }
+}
+
+/** Fetch a published collection view (e.g. 'published_candidates'), else fallback. */
+export async function getCollection<T>(view: string, fallback: T[]): Promise<T[]> {
+  if (!isSupabaseConfigured()) return fallback;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from(view).select("*").order("sort_order", { ascending: true });
+    if (error || !data || data.length === 0) return fallback;
+    return data as T[];
+  } catch {
+    return fallback;
+  }
+}

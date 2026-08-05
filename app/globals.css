@@ -160,6 +160,15 @@ body {
   * { cursor: none !important; }
 }
 
+/* Admin CMS: restore the normal cursor and use a clean, neutral surface. */
+.admin-root, .admin-root * { cursor: auto !important; }
+.admin-root {
+  background: #eef1f5;
+  color: #1e2532;
+  background-image: none;
+}
+.admin-root ::selection { background: #2563eb; color: #fff; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "**.supabase.co" },
+    ],
   },
 };
 
