@@ -1,6 +1,17 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SITE } from "@/lib/data";
+
+/** True when an authenticated admin is previewing drafts (cookie set by the editor). */
+async function isPreview(): Promise<boolean> {
+  try {
+    const c = await cookies();
+    return c.get("ssbw-preview")?.value === "1";
+  } catch {
+    return false;
+  }
+}
 
 export type SiteSettings = typeof SITE;
 
@@ -25,6 +36,20 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
   if (!isSupabaseConfigured()) return fallback;
   try {
     const supabase = await createClient();
+
+    // Preview: an authenticated admin sees the DRAFT (RLS on site_content
+    // restricts this to admins; everyone else silently gets published).
+    if (await isPreview()) {
+      const { data: draftRow } = await supabase
+        .from("site_content")
+        .select("draft")
+        .eq("key", key)
+        .maybeSingle();
+      if (draftRow?.draft && Object.keys(draftRow.draft).length > 0) {
+        return { ...fallback, ...(draftRow.draft as Partial<T>) } as T;
+      }
+    }
+
     const { data, error } = await supabase
       .from("published_content")
       .select("published")

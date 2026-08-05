@@ -15,7 +15,7 @@ const ITEMS: Item[] = [
   { href: "/admin/mentors", label: "Mentors", icon: "🎓" },
   { href: "/admin/settings", label: "Footer & Contact", icon: "▤" },
   { href: "/admin/media", label: "Media Library", icon: "🖼" },
-  { href: "/admin/pages", label: "Pages & Sections", icon: "✎", soon: true },
+  { href: "/admin/sections", label: "Pages & Sections", icon: "✎" },
   { href: "/admin/users", label: "Users", icon: "👤", superOnly: true },
   { href: "/admin/account", label: "My Account", icon: "⚙" },
 ];

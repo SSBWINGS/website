@@ -1,4 +1,4 @@
-import Hero from "@/components/Hero";
+import HeroSection from "@/components/HeroSection";
 import EntriesTicker from "@/components/EntriesTicker";
 import StudentWall from "@/components/StudentWall";
 import ServicesStrip from "@/components/ServicesStrip";
@@ -17,7 +17,7 @@ import CtaBanner from "@/components/CtaBanner";
 export default function Home() {
   return (
     <main>
-      <Hero />
+      <HeroSection />
       <EntriesTicker />
       <StudentWall limit={24} showCta />
       <ServicesStrip />

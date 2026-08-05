@@ -9,6 +9,23 @@ import { useContactModal } from "./ModalProvider";
 
 const ROLES = ["an Officer", "a Leader", "a Warrior", "Recommended"];
 
+export type HeroContent = {
+  badge: string;
+  headingLine1: string;
+  headingLine2: string;
+  paragraph: string; // HTML
+  rating: string;
+};
+
+export const HERO_DEFAULT: HeroContent = {
+  badge: "Noida Sector 62 · Mentored by Ex-SSB Officers",
+  headingLine1: "The Uniform Doesn't",
+  headingLine2: "Choose Everyone.",
+  paragraph:
+    "Five days at the Services Selection Board decide who wears the stars. At <strong>SSBWINGS</strong>, ex-SSB assessors rebuild you for every one of them — Screening, Psychology, GTO, Interview and Conference — until the Board sees what we see: <em>an officer</em>.",
+  rating: "Rated 5.0 on Google by aspirants across India",
+};
+
 /** Recommended-candidate photos that auto-rotate in the hero collage. */
 const RECO_PHOTOS = [
   "/images/students/tanishq.png",
@@ -40,7 +57,7 @@ function useTypewriter(words: string[]) {
   return text;
 }
 
-export default function Hero() {
+export default function Hero({ content = HERO_DEFAULT }: { content?: HeroContent }) {
   const typed = useTypewriter(ROLES);
   const { open } = useContactModal();
 
@@ -70,23 +87,21 @@ export default function Hero() {
         {/* Left — copy (below the images on mobile) */}
         <div className="order-2 lg:order-1">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[rgba(43,36,22,0.14)] bg-white/70 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-ink-soft shadow-[var(--shadow-raised)]">
-            <span className="chakra text-[14px]" aria-hidden /> Noida Sector 62 · Mentored by Ex-SSB Officers
+            <span className="chakra text-[14px]" aria-hidden /> {content.badge}
           </div>
 
           <h1 className="section-title text-4xl leading-[0.98] sm:text-5xl lg:text-6xl">
-            The Uniform Doesn&apos;t
-            <br /> Choose Everyone.
+            {content.headingLine1}
+            <br /> {content.headingLine2}
             <br />
             <span className="tricolour-text">Become {typed}</span>
             <span className="animate-pulse text-saffron-600">|</span>
           </h1>
 
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-ink-soft">
-            Five days at the Services Selection Board decide who wears the stars.
-            At <strong className="text-ink">SSBWINGS</strong>, ex-SSB assessors rebuild you for
-            every one of them — Screening, Psychology, GTO, Interview and Conference —
-            until the Board sees what we see: <em>an officer</em>.
-          </p>
+          <p
+            className="rich-html mt-4 max-w-xl text-base leading-relaxed text-ink-soft [&_strong]:text-ink"
+            dangerouslySetInnerHTML={{ __html: content.paragraph }}
+          />
 
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <button onClick={open} className="btn btn-saffron btn-shine text-base">
@@ -100,7 +115,7 @@ export default function Hero() {
 
           <div className="mt-5 flex items-center gap-2 text-sm text-ink-soft">
             <span className="flex text-gold-500" aria-hidden>★★★★★</span>
-            Rated 5.0 on Google by aspirants across India
+            {content.rating}
           </div>
         </div>
 
