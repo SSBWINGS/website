@@ -10,7 +10,7 @@ type Item = { href: string; label: string; icon: string; soon?: boolean; superOn
 
 const ITEMS: Item[] = [
   { href: "/admin", label: "Dashboard", icon: "▦" },
-  { href: "/admin/candidates", label: "Recommended Candidates", icon: "🎖", soon: true },
+  { href: "/admin/candidates", label: "Recommended Candidates", icon: "🎖" },
   { href: "/admin/pages", label: "Pages & Sections", icon: "✎", soon: true },
   { href: "/admin/footer", label: "Footer", icon: "▤", soon: true },
   { href: "/admin/media", label: "Media Library", icon: "🖼", soon: true },

@@ -3,8 +3,12 @@ import Link from "next/link";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 import { STUDENTS } from "@/lib/data";
+import { getCollection } from "@/lib/content";
+import { mediaUrl } from "@/lib/supabase/media";
 
-export default function StudentWall({
+type Candidate = { name: string; exam: string; image_path: string; sort_order: number };
+
+export default async function StudentWall({
   heading = true,
   limit,
   showCta = false,
@@ -13,7 +17,15 @@ export default function StudentWall({
   limit?: number;
   showCta?: boolean;
 }) {
-  const list = limit ? STUDENTS.slice(0, limit) : STUDENTS;
+  // CMS-managed candidates, with fallback to the bundled defaults.
+  const fallback: Candidate[] = STUDENTS.map((s, i) => ({
+    name: s.name,
+    exam: s.exam,
+    image_path: `/images/students/${s.file}`,
+    sort_order: i,
+  }));
+  const rows = await getCollection<Candidate>("published_candidates", fallback);
+  const list = limit ? rows.slice(0, limit) : rows;
 
   return (
     <section id="wall-of-honour" className="relative py-20 sm:py-24">
@@ -33,7 +45,7 @@ export default function StudentWall({
               <figure className="card-lift group skeu-panel overflow-hidden p-3 text-center">
                 <div className="relative aspect-square overflow-hidden rounded-lg">
                   <Image
-                    src={`/images/students/${s.file}`}
+                    src={mediaUrl(s.image_path)}
                     alt={`${s.name} — recommended for ${s.exam}`}
                     fill
                     sizes="(min-width:1024px) 15vw, 45vw"
