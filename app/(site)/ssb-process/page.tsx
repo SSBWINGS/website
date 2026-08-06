@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import PageHero from "@/components/PageHero";
 import Journey from "@/components/Journey";
 import ServicesStrip from "@/components/ServicesStrip";
 import Faq from "@/components/Faq";
 import CtaBanner from "@/components/CtaBannerSection";
 
-export const metadata: Metadata = {
-  title: "The 5-Day SSB Process — Screening to Conference",
-  description:
-    "A complete guide to the 5-day SSB interview: Day 1 Screening (OIR, PPDT), Day 2 Psychology (TAT, WAT, SRT, SD), Days 3–4 GTO tasks & Personal Interview, Day 5 Conference. Learn what to expect and how SSBWINGS prepares you.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("ssb-process");
+}
 
 export default function SsbProcessPage() {
   return (

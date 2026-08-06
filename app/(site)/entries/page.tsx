@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
@@ -6,11 +7,9 @@ import Reveal from "@/components/Reveal";
 import CtaBanner from "@/components/CtaBannerSection";
 import { JOIN_ROUTES } from "@/lib/data";
 
-export const metadata: Metadata = {
-  title: "Entries — How to Become an Officer in the Indian Armed Forces",
-  description:
-    "Every officer-entry route into the Indian Army, Navy, Air Force and Coast Guard — NDA, TES, CDS, AFCAT, 10+2 B.Tech, TGC, SSC, NCC Special, JAG and more. Eligibility, selection process and commission type for each.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("entries");
+}
 
 const STAGE_STYLE: Record<string, string> = {
   "After 10+2": "bg-saffron-500 text-white",

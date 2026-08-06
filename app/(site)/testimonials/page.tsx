@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import PageHero from "@/components/PageHero";
 import Testimonials from "@/components/Testimonials";
 import YouTubeGrid from "@/components/YouTubeGrid";
@@ -6,11 +7,9 @@ import InstagramFeed from "@/components/InstagramFeed";
 import StudentWall from "@/components/StudentWall";
 import CtaBanner from "@/components/CtaBannerSection";
 
-export const metadata: Metadata = {
-  title: "Testimonials — Success Stories from Recommended Cadets",
-  description:
-    "Read and watch success stories from SSBWINGS cadets — from repeated conference-outs to AIR-1 recommendations. Real written testimonials, YouTube interviews and our live Instagram feed.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("testimonials");
+}
 
 export default function TestimonialsPage() {
   return (

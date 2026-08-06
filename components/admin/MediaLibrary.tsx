@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { mediaUrl } from "@/lib/supabase/media";
+import { compressImage } from "@/lib/image-client";
 
 const FOLDERS = ["library", "candidates", "testimonials", "mentors", "students", "services", "campus"];
 
@@ -22,9 +23,10 @@ export default function MediaLibrary() {
   useEffect(() => { load(folder); }, [folder, load]);
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
+    const raw = e.target.files?.[0];
+    if (!raw) return;
     setBusy(true);
+    const f = await compressImage(raw);
     const path = `library/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
     const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
     setBusy(false);

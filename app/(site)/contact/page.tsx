@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import PageHero from "@/components/PageHero";
 import ContactSection from "@/components/ContactSection";
 import Faq from "@/components/Faq";
 
-export const metadata: Metadata = {
-  title: "Contact Us — Book Free SSB Counselling",
-  description:
-    "Get in touch with SSBWINGS, Noida Sector 62. Book a free counselling call, WhatsApp our team, or visit our campus. Mentors will map your entry, timeline and preparation plan.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("contact");
+}
 
 export default function ContactPage() {
   return (

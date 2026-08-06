@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { mediaUrl } from "@/lib/supabase/media";
+import { compressImage } from "@/lib/image-client";
 import RichText from "./RichText";
 
 export type Field = { key: string; label: string; type: "text" | "rich" | "image" };
@@ -47,9 +48,10 @@ export default function RecordManager({
   };
 
   async function upload(f: File): Promise<string> {
-    const ext = f.name.split(".").pop()?.toLowerCase() || "jpg";
+    const c = await compressImage(f);
+    const ext = c.name.split(".").pop()?.toLowerCase() || "webp";
     const path = `${table}/${Date.now()}-${slug(form[titleKey] || "item")}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
+    const { error } = await supabase.storage.from("media").upload(path, c, { upsert: true, contentType: c.type });
     if (error) throw new Error(error.message);
     return path;
   }

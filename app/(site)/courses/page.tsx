@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import PageHero from "@/components/PageHero";
 import Courses from "@/components/Courses";
 import WhyUs from "@/components/WhyUs";
 import Faq from "@/components/Faq";
 import CtaBanner from "@/components/CtaBannerSection";
 
-export const metadata: Metadata = {
-  title: "SSB Courses — 15-Day Offline, 20-Day Online & Smart Learning App",
-  description:
-    "Explore SSBWINGS courses: 15-day offline residential immersion at Noida, 20-day live online masterclass, and the AI-powered SSB Smart Learning App. Built by ex-SSB assessors for NDA, CDS, AFCAT & all entries.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("courses");
+}
 
 export default function CoursesPage() {
   return (

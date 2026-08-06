@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import HeroSection from "@/components/HeroSection";
 import EntriesTicker from "@/components/EntriesTicker";
 import StudentWall from "@/components/StudentWall";
@@ -13,6 +15,10 @@ import Testimonials from "@/components/Testimonials";
 import InstagramFeed from "@/components/InstagramFeed";
 import Faq from "@/components/Faq";
 import CtaBanner from "@/components/CtaBannerSection";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("home");
+}
 
 export default function Home() {
   return (

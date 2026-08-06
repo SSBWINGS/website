@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import PageHero from "@/components/PageHero";
 import StudentWall from "@/components/StudentWall";
 import AchievementCards from "@/components/AchievementCards";
@@ -6,11 +7,9 @@ import OfficerBanners from "@/components/OfficerBanners";
 import CtaBanner from "@/components/CtaBannerSection";
 import SectionHeading from "@/components/SectionHeading";
 
-export const metadata: Metadata = {
-  title: "Gallery — Wall of Honour & Recommended Cadets",
-  description:
-    "The SSBWINGS Wall of Honour: photographs of our recommended cadets, All India Rank holders and commissioned officers across the Army, Navy and Air Force.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("gallery");
+}
 
 export default function GalleryPage() {
   return (

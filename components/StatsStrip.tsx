@@ -2,6 +2,9 @@ import Image from "next/image";
 import Counter from "./Counter";
 import Reveal from "./Reveal";
 import { STATS } from "@/lib/data";
+import { getPublished } from "@/lib/content";
+
+type Stat = { value: number; label: string };
 
 const RECENT = [
   "GC Ashok Suthar — AIR-1 · SSC Tech · OTA Gaya",
@@ -15,7 +18,8 @@ const RECENT = [
   "Recommended — NSB Coimbatore · Navy SSC",
 ];
 
-export default function StatsStrip() {
+export default async function StatsStrip() {
+  const { items: stats } = await getPublished<{ items: Stat[] }>("stats", { items: STATS });
   return (
     <section id="results" className="relative overflow-hidden py-20 sm:py-24">
       {/* Guard-of-honour photo, softly lit */}
@@ -31,7 +35,7 @@ export default function StatsStrip() {
         </Reveal>
 
         <div className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
-          {STATS.map((s, i) => (
+          {stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 80}>
               <div className="skeu-plate card-lift px-4 py-6 text-center">
                 <p className="font-display text-4xl font-black leading-none gold-text sm:text-5xl"><Counter target={s.value} /></p>

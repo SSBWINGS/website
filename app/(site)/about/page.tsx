@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
@@ -9,11 +10,9 @@ import WhyUs from "@/components/WhyUs";
 import CtaBanner from "@/components/CtaBannerSection";
 import { STATS } from "@/lib/data";
 
-export const metadata: Metadata = {
-  title: "About Us — Mentored by Ex-SSB Officers",
-  description:
-    "SSBWINGS is an SSB coaching academy in Noida founded and mentored by ex-SSB assessors. Learn our story, our mission and the directors behind 677+ recommendations.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("about");
+}
 
 const VALUES = [
   { icon: "🎯", title: "Merit Before Marketing", body: "We never promise recommendations. We promise assessor-grade preparation and honest feedback — the Board decides the rest." },

@@ -52,7 +52,14 @@ function useTypewriter(words: string[]) {
   return text;
 }
 
-export default function Hero({ content = HERO_DEFAULT }: { content?: HeroContent }) {
+const DEFAULT_STATS = [
+  { value: 677, label: "Recommendations" },
+  { value: 3450, label: "Alumni Family" },
+  { value: 175, label: "NDA Entries" },
+  { value: 10, label: "All India Rank 1" },
+];
+
+export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS }: { content?: HeroContent; stats?: { value: number; label: string }[] }) {
   const typed = useTypewriter(ROLES);
   const { open } = useContactModal();
 
@@ -152,12 +159,7 @@ export default function Hero({ content = HERO_DEFAULT }: { content?: HeroContent
 
       {/* Stat plates */}
       <div className="relative mx-auto -mb-8 grid max-w-[1840px] grid-cols-2 gap-3 px-4 pb-4 sm:px-8 md:grid-cols-4">
-        {[
-          { value: 677, label: "Recommendations" },
-          { value: 3450, label: "Alumni Family" },
-          { value: 175, label: "NDA Entries" },
-          { value: 10, label: "All India Rank 1" },
-        ].map((s) => (
+        {stats.map((s) => (
           <div key={s.label} className="skeu-plate card-lift px-4 py-3.5 text-center">
             <p className="font-display text-3xl font-black leading-none gold-text sm:text-4xl">
               <Counter target={s.value} />
