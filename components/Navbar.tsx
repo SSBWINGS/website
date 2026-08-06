@@ -12,6 +12,7 @@ export default function Navbar() {
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [desktopGroup, setDesktopGroup] = useState<string | null>(null);
   const pathname = usePathname();
   const { open: openModal } = useContactModal();
 
@@ -27,7 +28,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => { setOpen(false); setOpenGroup(null); }, [pathname]);
+  useEffect(() => { setOpen(false); setOpenGroup(null); setDesktopGroup(null); }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50">
@@ -93,20 +94,29 @@ export default function Navbar() {
                 );
               }
               const groupActive = entry.items.some((i) => pathname === i.href);
+              const isOpenDesktop = desktopGroup === entry.label;
               return (
-                <li key={entry.label} className="group relative">
+                <li
+                  key={entry.label}
+                  className="relative"
+                  onMouseEnter={() => setDesktopGroup(entry.label)}
+                  onMouseLeave={() => setDesktopGroup(null)}
+                  onFocus={() => setDesktopGroup(entry.label)}
+                  onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDesktopGroup(null); }}
+                >
                   <button
                     type="button"
                     aria-haspopup="true"
+                    aria-expanded={isOpenDesktop}
                     className={`nav-link inline-flex items-center gap-1 whitespace-nowrap font-display text-base font-semibold uppercase tracking-wide text-ink hover:text-saffron-600 ${
                       groupActive ? "is-active text-saffron-700" : ""
                     }`}
                   >
                     {entry.label}
-                    <span className="text-[10px] transition-transform duration-200 group-hover:rotate-180" aria-hidden>▾</span>
+                    <span className={`text-[10px] transition-transform duration-200 ${isOpenDesktop ? "rotate-180" : ""}`} aria-hidden>▾</span>
                   </button>
                   {/* Dropdown */}
-                  <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                  <div className={`absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 transition-all duration-200 ${isOpenDesktop ? "visible opacity-100" : "invisible opacity-0"}`}>
                     <ul className="w-72 rounded-xl border border-[rgba(43,36,22,0.14)] bg-[#fffdf7] p-2 shadow-[0_18px_44px_-16px_rgba(43,36,22,0.55)]">
                       {entry.items.map((i) => {
                         const active = pathname === i.href;
@@ -114,6 +124,7 @@ export default function Navbar() {
                           <li key={i.href}>
                             <Link
                               href={i.href}
+                              onClick={() => setDesktopGroup(null)}
                               className={`block rounded-lg px-3 py-2 transition-colors hover:bg-paper-2 ${active ? "bg-paper-2" : ""}`}
                             >
                               <span className={`block font-display text-sm font-bold uppercase tracking-wide ${active ? "text-saffron-700" : "text-ink"}`}>
