@@ -1,29 +1,43 @@
-/** Lightweight, dependency-free HTML sanitizer for admin-authored rich text.
+/** Parser-backed HTML sanitizer for admin-authored rich text.
  *
- *  The CMS rich-text editor emits a constrained set of formatting tags. This
- *  strips anything that could execute script if a rendered page trusts the
- *  stored HTML: <script>/<style>/<iframe> etc., inline event handlers
- *  (on*=...), and javascript:/vbscript:/data: URLs. Defense-in-depth against a
- *  compromised or malicious admin injecting stored XSS against site visitors.
+ *  Uses `sanitize-html` (an HTML parser + strict allowlist) rather than regex
+ *  string-stripping, so it is not fooled by malformed markup, solidus-separated
+ *  event handlers (`<a/onclick=…>`), encoded URL schemes (`java&#115;cript:`),
+ *  or oddly-cased/whitespaced attributes. Only the formatting tags/attributes
+ *  the CMS rich-text editor emits survive; everything else (scripts, iframes,
+ *  event handlers, dangerous URL schemes) is dropped.
  *
- *  Works on both server and client (pure string ops, no DOM needed).
+ *  Server-intended (the parser is a Node module). Current callers are all
+ *  server components / server-only modules.
  */
+import sanitizeHtmlLib from "sanitize-html";
 
-const BLOCK_TAGS =
-  /<\s*\/?\s*(script|style|iframe|object|embed|link|meta|base|form|input|button|textarea|svg|math)\b[^>]*>/gi;
-// Content of script/style must go too, not just the tags.
-const BLOCK_TAG_CONTENT =
-  /<\s*(script|style)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi;
-const EVENT_HANDLERS = /\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi;
-const DANGEROUS_URLS =
-  /\s(href|src|xlink:href)\s*=\s*("|')?\s*(javascript|vbscript|data)\s*:[^"'>\s]*("|')?/gi;
+const OPTIONS: sanitizeHtmlLib.IOptions = {
+  allowedTags: [
+    "p", "div", "span", "br", "hr",
+    "b", "strong", "i", "em", "u", "s", "strike", "sub", "sup", "mark", "small",
+    "a", "ul", "ol", "li", "blockquote",
+    "h1", "h2", "h3", "h4", "h5", "h6", "font",
+  ],
+  allowedAttributes: {
+    a: ["href", "target", "rel"],
+    font: ["color", "face", "size"],
+    "*": ["style", "class", "align"],
+  },
+  // Only safe link schemes; blocks javascript:/vbscript:/data: (encoded too —
+  // the parser decodes entities before this check).
+  allowedSchemes: ["http", "https", "mailto", "tel"],
+  allowedSchemesAppliedToAttributes: ["href"],
+  allowProtocolRelative: false,
+  // Harden any surviving target=_blank links against reverse-tabnabbing.
+  transformTags: {
+    a: sanitizeHtmlLib.simpleTransform("a", { rel: "noopener noreferrer nofollow" }, true),
+  },
+  // Drop disallowed tags entirely (don't keep their text as raw markup).
+  disallowedTagsMode: "discard",
+};
 
 export function sanitizeHtml(input: string | null | undefined): string {
   if (!input) return "";
-  let html = String(input);
-  html = html.replace(BLOCK_TAG_CONTENT, "");
-  html = html.replace(BLOCK_TAGS, "");
-  html = html.replace(EVENT_HANDLERS, "");
-  html = html.replace(DANGEROUS_URLS, "");
-  return html;
+  return sanitizeHtmlLib(String(input), OPTIONS);
 }

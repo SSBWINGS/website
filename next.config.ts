@@ -13,7 +13,8 @@ const securityHeaders = [
   // Force HTTPS once served over TLS (Vercel).
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   // Baseline CSP: no framing, no plugins, no <base> hijack, forms to self only.
-  // (Kept script-src permissive so Next.js hydration/inline bootstrap still works.)
+  // 'unsafe-inline' stays for Next.js' inline hydration bootstrap, but eval is
+  // disallowed and inline event-handler attributes are blocked outright.
   {
     key: "Content-Security-Policy",
     value: [
@@ -22,7 +23,8 @@ const securityHeaders = [
       "media-src 'self' https:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline'",
+      "script-src-attr 'none'",
       "connect-src 'self' https:",
       "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
       "object-src 'none'",

@@ -61,11 +61,27 @@ export async function POST(req: Request) {
 
   // 4. Promote the auto-created profile to 'admin' (the signup trigger now
   //    defaults new users to the non-privileged 'pending' role) and store name.
+  //    Require exactly one updated row; if the profile is missing or the update
+  //    fails, roll back the auth user so we never leave a half-created admin.
   if (created.user) {
-    await admin
+    const { data: updated, error: promoteErr } = await admin
       .from("profiles")
       .update({ role: "admin", ...(fullName ? { full_name: fullName } : {}) })
-      .eq("id", created.user.id);
+      .eq("id", created.user.id)
+      .select("id")
+      .maybeSingle();
+
+    if (promoteErr || !updated) {
+      // Compensation: remove the orphaned auth user we just created.
+      await admin.auth.admin.deleteUser(created.user.id).catch(() => {});
+      return NextResponse.json(
+        {
+          error:
+            "Could not finish setting up the admin account, so it was rolled back. Please try again; if it persists, check that the profile trigger (migration 0001) is installed.",
+        },
+        { status: 500 },
+      );
+    }
   }
 
   // 5. Audit log.

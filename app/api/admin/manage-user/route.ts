@@ -54,8 +54,15 @@ export async function POST(req: Request) {
       if (error) throw new Error(error.message);
     } else {
       const role = action === "make_super_admin" ? "super_admin" : "admin";
-      const { error } = await admin.from("profiles").update({ role }).eq("id", id);
+      const { data: rows, error } = await admin
+        .from("profiles")
+        .update({ role })
+        .eq("id", id)
+        .select("id");
       if (error) throw new Error(error.message);
+      if (!rows || rows.length !== 1) {
+        throw new Error("That admin no longer exists — refresh and try again.");
+      }
     }
   } catch (err) {
     return NextResponse.json(
