@@ -47,7 +47,6 @@ export default function SectionEditor({
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [hasHistory, setHasHistory] = useState(canRollback);
   const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
-  const [scheduleAt, setScheduleAt] = useState("");
   const firstRun = useRef(true);
 
   // Turn preview mode on for this admin while editing; off when leaving.
@@ -120,25 +119,6 @@ export default function SectionEditor({
     reloadPreview();
   }
 
-  async function schedule() {
-    if (!scheduleAt) return setMsg({ ok: false, text: "Pick a date & time first." });
-    const when = new Date(scheduleAt);
-    if (Number.isNaN(when.getTime()) || when.getTime() < Date.now()) {
-      return setMsg({ ok: false, text: "Choose a future date & time." });
-    }
-    setBusy("save"); setMsg(null);
-    // Save the current form as the draft too, so what you see is what will go live.
-    await supabase.from("site_content").upsert({ key: section.key, label: section.label, draft: form }, { onConflict: "key" });
-    const { error } = await supabase.from("scheduled_content").insert({
-      key: section.key, snapshot: form, publish_at: when.toISOString(),
-    });
-    setBusy("");
-    if (error) return setMsg({ ok: false, text: error.message });
-    await logActivity(supabase, "schedule", `section:${section.key}`);
-    setMsg({ ok: true, text: `Scheduled to publish on ${when.toLocaleString()}.` });
-    setScheduleAt("");
-  }
-
   const activeDevice = DEVICES.find((d) => d.id === device)!;
 
   return (
@@ -181,19 +161,6 @@ export default function SectionEditor({
         <p className="mt-3 text-xs text-slate-400">
           Edits show in the preview after <b>Save draft</b>. Nothing is live until you <b>Publish</b>.
         </p>
-
-        <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">⏱ Schedule publish</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <input type="datetime-local" value={scheduleAt} onChange={(e) => setScheduleAt(e.target.value)}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
-            <button onClick={schedule} disabled={!!busy}
-              className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60">
-              Schedule
-            </button>
-          </div>
-          <p className="mt-2 text-[11px] text-slate-400">The current editor content will auto-publish at the chosen time.</p>
-        </div>
       </div>
 
       {/* Live preview panel */}

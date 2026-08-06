@@ -58,12 +58,11 @@ Admin edits (draft)  ──publish──▶  published (JSONB / row flag)  ─�
 | Selection Tracker | animated homepage section | `/admin/selections` | `selections` → `published_selections` |
 | Batch/Exam Countdown | live homepage timers | `/admin/countdown` | `site_content` key `countdown` |
 | Analytics | privacy-friendly tracker | `/admin/analytics` | `page_view_daily` (via `track_view` RPC) |
-| Scheduled publish | — | `⏱ Schedule` in section editor | `scheduled_content` + `/api/cron/publish` (Vercel Cron) |
 | Click-to-edit | preview bar on live site | jumps into CMS | `ssbw-preview` cookie |
 
 Auto-responder emails the aspirant on contact; the CRM captures the lead even if
-email isn't configured. Scheduled publishing needs `CRON_SECRET` set on Vercel
-(the `vercel.json` cron runs every 15 min).
+email isn't configured. Content goes live via manual **Publish** (with draft
+preview and one-click rollback).
 
 ## Security model
 
