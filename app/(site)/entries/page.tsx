@@ -81,22 +81,24 @@ export default function EntriesPage() {
       {JOIN_ROUTES.map((svc, si) => (
         <section key={svc.id} className={`relative py-16 sm:py-20 ${si % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
           <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
-            <div className="grid items-center gap-8 lg:grid-cols-[1fr_1.4fr]">
-              {/* Service banner */}
-              <Reveal direction="left">
-                <div className="card-lift relative overflow-hidden rounded-2xl p-8 text-white shadow-[var(--shadow-plate)]">
-                  <Image src={svc.image} alt="" fill sizes="(min-width:1024px) 30vw, 90vw" className="object-cover" />
-                  <div className="absolute inset-0" style={{ background: svc.grad, opacity: 0.82 }} aria-hidden />
-                  <div className="relative">
-                    <p className="font-display text-sm font-bold uppercase tracking-[0.25em] text-white/80">{svc.motto}</p>
-                    <h2 className="mt-2 font-display text-3xl font-extrabold uppercase sm:text-4xl">{svc.name}</h2>
-                    <p className="mt-4 leading-relaxed text-white/90">{svc.intro}</p>
-                    <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur">
-                      🏛️ {svc.academy}
-                    </p>
+            <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.4fr]">
+              {/* Service banner — sticks beside its own route cards on desktop */}
+              <div className="lg:sticky lg:top-24 lg:self-start">
+                <Reveal direction="left">
+                  <div className="card-lift relative overflow-hidden rounded-2xl p-8 text-white shadow-[var(--shadow-plate)]">
+                    <Image src={svc.image} alt="" fill sizes="(min-width:1024px) 30vw, 90vw" className="object-cover" />
+                    <div className="absolute inset-0" style={{ background: svc.grad, opacity: 0.82 }} aria-hidden />
+                    <div className="relative">
+                      <p className="font-display text-sm font-bold uppercase tracking-[0.25em] text-white/80">{svc.motto}</p>
+                      <h2 className="mt-2 font-display text-3xl font-extrabold uppercase sm:text-4xl">{svc.name}</h2>
+                      <p className="mt-4 leading-relaxed text-white/90">{svc.intro}</p>
+                      <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur">
+                        🏛️ {svc.academy}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Reveal>
+                </Reveal>
+              </div>
 
               {/* Route cards */}
               <div className="grid gap-4 sm:grid-cols-2">
