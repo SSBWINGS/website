@@ -4,7 +4,7 @@ import Testimonials from "@/components/Testimonials";
 import YouTubeGrid from "@/components/YouTubeGrid";
 import InstagramFeed from "@/components/InstagramFeed";
 import StudentWall from "@/components/StudentWall";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 
 export const metadata: Metadata = {
   title: "Testimonials — Success Stories from Recommended Cadets",

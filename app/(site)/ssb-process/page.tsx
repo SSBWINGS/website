@@ -3,7 +3,7 @@ import PageHero from "@/components/PageHero";
 import Journey from "@/components/Journey";
 import ServicesStrip from "@/components/ServicesStrip";
 import Faq from "@/components/Faq";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 
 export const metadata: Metadata = {
   title: "The 5-Day SSB Process — Screening to Conference",

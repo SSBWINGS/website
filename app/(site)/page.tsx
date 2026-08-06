@@ -12,7 +12,7 @@ import OfficerBanners from "@/components/OfficerBanners";
 import Testimonials from "@/components/Testimonials";
 import InstagramFeed from "@/components/InstagramFeed";
 import Faq from "@/components/Faq";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 
 export default function Home() {
   return (

@@ -3,7 +3,7 @@ import PageHero from "@/components/PageHero";
 import Courses from "@/components/Courses";
 import WhyUs from "@/components/WhyUs";
 import Faq from "@/components/Faq";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 
 export const metadata: Metadata = {
   title: "SSB Courses — 15-Day Offline, 20-Day Online & Smart Learning App",

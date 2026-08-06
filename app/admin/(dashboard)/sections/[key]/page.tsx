@@ -1,15 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getSection } from "@/lib/sections";
-import { HERO_DEFAULT } from "@/components/Hero";
+import { getSection, sectionDefaults } from "@/lib/sections";
 import SectionEditor from "@/components/admin/SectionEditor";
 
 export const dynamic = "force-dynamic";
-
-const DEFAULTS: Record<string, Record<string, string>> = {
-  hero: HERO_DEFAULT,
-};
 
 export default async function SectionEditorPage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;
@@ -23,7 +18,7 @@ export default async function SectionEditorPage({ params }: { params: Promise<{ 
     .select("id", { count: "exact", head: true })
     .eq("key", key);
 
-  const initial = { ...(DEFAULTS[key] ?? {}), ...((data?.draft as Record<string, string>) ?? {}) };
+  const initial = { ...sectionDefaults(key), ...((data?.draft as Record<string, string>) ?? {}) };
 
   return (
     <div>

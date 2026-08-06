@@ -1,15 +1,37 @@
+import Link from "next/link";
 import { getCurrentAdmin } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
 const PHASES = [
-  { done: true, title: "Secure login & roles", desc: "Email/password auth, super-admin & admin roles, route protection." },
-  { done: false, title: "Recommended Candidates manager", desc: "Add photos, names & entries to the Wall of Honour." },
-  { done: false, title: "Page & section editors", desc: "Edit every heading, tagline, text & image with fonts, colours & word-art." },
-  { done: false, title: "Footer editor", desc: "Update contact details, links & credits." },
-  { done: false, title: "Live preview & publish", desc: "Video-editor-style preview with device frames and one-click publish." },
+  { done: true, title: "Secure login, roles & users", desc: "Email/password auth, super-admin & admin roles, password changes." },
+  { done: true, title: "Recommended Candidates, Testimonials & Mentors", desc: "Add photos, names & entries with rich text and image uploads." },
+  { done: true, title: "Footer, contact & page sections", desc: "Edit headings, taglines & text with fonts, colours & word-art." },
+  { done: true, title: "Live preview, publish & rollback", desc: "Device-framed preview, autosave, one-click publish and rollback." },
+  { done: true, title: "Media library & activity log", desc: "Upload/browse images; full audit trail of changes." },
 ];
+
+async function countOf(table: string) {
+  try {
+    const supabase = await createClient();
+    const { count } = await supabase.from(table).select("id", { count: "exact", head: true });
+    return count ?? 0;
+  } catch { return 0; }
+}
 
 export default async function AdminDashboard() {
   const admin = await getCurrentAdmin();
+  const [candidates, testimonials, mentors] = await Promise.all([
+    countOf("recommended_candidates"),
+    countOf("testimonials"),
+    countOf("mentors"),
+  ]);
+
+  const cards = [
+    { label: "Recommended Candidates", value: candidates, hint: "Wall of Honour entries", href: "/admin/candidates" },
+    { label: "Testimonials", value: testimonials, hint: "Success stories", href: "/admin/testimonials" },
+    { label: "Mentors", value: mentors, hint: "Team members", href: "/admin/mentors" },
+  ];
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-900">
@@ -21,16 +43,12 @@ export default async function AdminDashboard() {
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        {[
-          { label: "Recommended Candidates", value: "—", hint: "Wall of Honour entries" },
-          { label: "Editable Sections", value: "12+", hint: "Across all pages" },
-          { label: "Your Role", value: admin?.role === "super_admin" ? "Super Admin" : "Admin", hint: "Access level" },
-        ].map((c) => (
-          <div key={c.label} className="rounded-xl border border-slate-200 bg-white p-5">
+        {cards.map((c) => (
+          <Link key={c.label} href={c.href} className="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-blue-300 hover:shadow-sm">
             <p className="text-sm font-medium text-slate-500">{c.label}</p>
             <p className="mt-1 text-2xl font-bold text-slate-900">{c.value}</p>
             <p className="text-xs text-slate-400">{c.hint}</p>
-          </div>
+          </Link>
         ))}
       </div>
 

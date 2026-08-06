@@ -9,6 +9,8 @@ import { useContactModal } from "./ModalProvider";
 
 const ROLES = ["an Officer", "a Leader", "a Warrior", "Recommended"];
 
+import { HERO } from "@/lib/section-defaults";
+
 export type HeroContent = {
   badge: string;
   headingLine1: string;
@@ -17,14 +19,7 @@ export type HeroContent = {
   rating: string;
 };
 
-export const HERO_DEFAULT: HeroContent = {
-  badge: "Noida Sector 62 · Mentored by Ex-SSB Officers",
-  headingLine1: "The Uniform Doesn't",
-  headingLine2: "Choose Everyone.",
-  paragraph:
-    "Five days at the Services Selection Board decide who wears the stars. At <strong>SSBWINGS</strong>, ex-SSB assessors rebuild you for every one of them — Screening, Psychology, GTO, Interview and Conference — until the Board sees what we see: <em>an officer</em>.",
-  rating: "Rated 5.0 on Google by aspirants across India",
-};
+export const HERO_DEFAULT: HeroContent = HERO;
 
 /** Recommended-candidate photos that auto-rotate in the hero collage. */
 const RECO_PHOTOS = [

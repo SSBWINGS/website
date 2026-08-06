@@ -3,7 +3,7 @@ import PageHero from "@/components/PageHero";
 import StudentWall from "@/components/StudentWall";
 import AchievementCards from "@/components/AchievementCards";
 import OfficerBanners from "@/components/OfficerBanners";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 import SectionHeading from "@/components/SectionHeading";
 
 export const metadata: Metadata = {

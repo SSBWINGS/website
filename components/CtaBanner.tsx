@@ -3,9 +3,12 @@
 import Image from "next/image";
 import Reveal from "./Reveal";
 import { SITE } from "@/lib/data";
+import { CTA } from "@/lib/section-defaults";
 import { useContactModal } from "./ModalProvider";
 
-export default function CtaBanner() {
+type CtaContent = { eyebrow: string; title: string; paragraph: string };
+
+export default function CtaBanner({ content = CTA }: { content?: CtaContent }) {
   const { open } = useContactModal();
   return (
     <section className="relative overflow-hidden py-16 sm:py-20">
@@ -17,17 +20,10 @@ export default function CtaBanner() {
 
       <Reveal className="relative mx-auto max-w-4xl px-4 text-center sm:px-8">
         <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-saffron-700">
-          ⏳ New batches open every month · Seats are limited
+          {content.eyebrow}
         </p>
-        <h2 className="section-title mt-4 text-4xl leading-tight sm:text-6xl">
-          Your Chest Number
-          <br />
-          <span className="tricolour-text">Is Waiting to Be Called</span>
-        </h2>
-        <p className="mx-auto mt-5 max-w-xl text-lg text-ink-soft">
-          Every day you delay is a day your competition trains. Book a free counselling call —
-          a mentor will map your entry, your timeline and your battle plan.
-        </p>
+        <h2 className="section-title mt-4 text-4xl leading-tight sm:text-6xl" dangerouslySetInnerHTML={{ __html: content.title }} />
+        <p className="rich-html mx-auto mt-5 max-w-xl text-lg text-ink-soft" dangerouslySetInnerHTML={{ __html: content.paragraph }} />
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <button onClick={open} className="btn btn-saffron btn-shine text-base">Book Free Counselling</button>
           <a href={SITE.phone1Href} className="btn btn-outline btn-shine">📞 Call {SITE.phone1}</a>

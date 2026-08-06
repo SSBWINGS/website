@@ -3,7 +3,7 @@ import Image from "next/image";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 import { JOIN_ROUTES } from "@/lib/data";
 
 export const metadata: Metadata = {

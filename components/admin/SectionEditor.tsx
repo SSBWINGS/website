@@ -1,9 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { SectionDef } from "@/lib/sections";
 import RichText from "./RichText";
+
+async function logActivity(
+  supabase: ReturnType<typeof createClient>,
+  action: string,
+  target: string,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("activity_log").insert({
+    actor: user.id, actor_email: user.email, action, target,
+  });
+}
 
 const DEVICES = [
   { id: "mobile", label: "📱 Mobile", width: 390 },
@@ -34,6 +46,8 @@ export default function SectionEditor({
   const [busy, setBusy] = useState<"" | "save" | "publish" | "rollback">("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [hasHistory, setHasHistory] = useState(canRollback);
+  const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
+  const firstRun = useRef(true);
 
   // Turn preview mode on for this admin while editing; off when leaving.
   useEffect(() => {
@@ -41,6 +55,22 @@ export default function SectionEditor({
     setReady(true);
     return () => setPreviewCookie(false);
   }, []);
+
+  // Autosave the draft ~1.6s after typing stops, then refresh the preview.
+  useEffect(() => {
+    if (firstRun.current) { firstRun.current = false; return; }
+    setAutosave("saving");
+    const t = setTimeout(async () => {
+      await supabase.from("site_content").upsert(
+        { key: section.key, label: section.label, draft: form },
+        { onConflict: "key" },
+      );
+      setAutosave("saved");
+      reloadPreview();
+    }, 1600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
 
   const reloadPreview = () => setIframeKey((k) => k + 1);
 
@@ -67,6 +97,7 @@ export default function SectionEditor({
     const { error } = await supabase.from("site_content").update({ published: form }).eq("key", section.key);
     setBusy("");
     if (error) return setMsg({ ok: false, text: error.message });
+    await logActivity(supabase, "publish", `section:${section.key}`);
     setMsg({ ok: true, text: "Published! This is now live on the website." });
     reloadPreview();
   }
@@ -80,6 +111,8 @@ export default function SectionEditor({
     if (!ver) { setBusy(""); return setMsg({ ok: false, text: "No previous version to restore." }); }
     await supabase.from("site_content").update({ published: ver.snapshot, draft: ver.snapshot }).eq("key", section.key);
     await supabase.from("content_versions").delete().eq("id", ver.id);
+    await logActivity(supabase, "rollback", `section:${section.key}`);
+    firstRun.current = true; // don't retrigger autosave from this programmatic change
     setForm(ver.snapshot as Record<string, string>);
     setBusy("");
     setMsg({ ok: true, text: "Rolled back to the previous version." });
@@ -108,7 +141,11 @@ export default function SectionEditor({
 
         {msg && <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}
 
-        <div className="mt-5 flex flex-wrap gap-2">
+        <p className="mt-3 text-xs text-slate-400">
+          {autosave === "saving" ? "● Autosaving draft…" : autosave === "saved" ? "✓ Draft auto-saved" : "Drafts save automatically as you type."}
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-2">
           <button onClick={saveDraft} disabled={!!busy} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">
             {busy === "save" ? "Saving…" : "Save draft"}
           </button>

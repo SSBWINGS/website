@@ -1,6 +1,8 @@
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 import BookButton from "./BookButton";
+import { getPublished } from "@/lib/content";
+import { WHYUS } from "@/lib/section-defaults";
 
 const USPS = [
   { title: "Mentored by Ex-SSB Assessors", body: "Learn from officers who sat on the other side of the table — retired Interviewing Officers, GTOs and psychology experts who assessed thousands at real Boards.", icon: "🎖️" },
@@ -11,16 +13,17 @@ const USPS = [
   { title: "Merit-First, No False Promises", body: "No academy can 'guarantee' a recommendation. We build the officer; the Board does the rest — honestly, transparently.", icon: "⚖️" },
 ];
 
-export default function WhyUs() {
+export default async function WhyUs() {
+  const c = await getPublished("whyus", WHYUS);
   return (
     <section id="why-us" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.6fr]">
           <div className="lg:sticky lg:top-32">
             <SectionHeading
-              kicker="The SSBWINGS Edge"
-              title={<>Why Aspirants Trust the <span className="tricolour-text">Wings</span></>}
-              subtitle="Coaching factories teach tricks. We run a personality forge — the same standards, ground realities and honest assessment you'll face at Allahabad, Bhopal or Bengaluru."
+              kicker={c.kicker}
+              title={<span dangerouslySetInnerHTML={{ __html: c.title }} />}
+              subtitle={c.subtitle}
             />
             <Reveal delay={150}><BookButton className="btn btn-ink btn-shine mt-8">Talk to a Mentor</BookButton></Reveal>
           </div>

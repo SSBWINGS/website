@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
+import { getPublished } from "@/lib/content";
+import { SERVICES as SERVICES_HEAD } from "@/lib/section-defaults";
 
 const SERVICES = [
   {
@@ -49,15 +51,16 @@ const SERVICES = [
   },
 ];
 
-export default function ServicesStrip() {
+export default async function ServicesStrip() {
+  const c = await getPublished("services", SERVICES_HEAD);
   return (
     <section className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <SectionHeading
           center
-          kicker="Four Forces · One Dream"
-          title={<>Which <span className="tricolour-text">Uniform</span> Calls You?</>}
-          subtitle="Army, Navy, Air Force or Coast Guard — the SSB is common, but the interview, PIQ and career path are not. We prepare you for your exact service and entry."
+          kicker={c.kicker}
+          title={<span dangerouslySetInnerHTML={{ __html: c.title }} />}
+          subtitle={c.subtitle}
         />
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">

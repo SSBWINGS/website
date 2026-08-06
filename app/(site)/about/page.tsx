@@ -6,7 +6,7 @@ import Reveal from "@/components/Reveal";
 import Counter from "@/components/Counter";
 import Mentors from "@/components/Mentors";
 import WhyUs from "@/components/WhyUs";
-import CtaBanner from "@/components/CtaBanner";
+import CtaBanner from "@/components/CtaBannerSection";
 import { STATS } from "@/lib/data";
 
 export const metadata: Metadata = {

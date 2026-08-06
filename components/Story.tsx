@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Reveal from "./Reveal";
 import Link from "next/link";
+import { getPublished } from "@/lib/content";
+import { STORY } from "@/lib/section-defaults";
 
 const GAPS = [
   {
@@ -23,27 +25,19 @@ const GAPS = [
   },
 ];
 
-export default function Story() {
+export default async function Story() {
+  const c = await getPublished("story", STORY);
   return (
     <section id="story" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
           <div>
             <Reveal>
-              <p className="kicker">The Hard Truth</p>
-              <h2 className="section-title mt-4 text-4xl sm:text-5xl">
-                1.4 Billion Indians.
-                <br />
-                <span className="tricolour-text">Still Short of Officers.</span>
-              </h2>
+              <p className="kicker">{c.kicker}</p>
+              <h2 className="section-title mt-4 text-4xl sm:text-5xl" dangerouslySetInnerHTML={{ __html: c.title }} />
             </Reveal>
             <Reveal delay={150}>
-              <p className="mt-6 text-lg leading-relaxed text-ink-soft">
-                Every year lakhs clear the written exam, reach the SSB gates — and come back
-                with a <strong>Conference Out</strong>. Not because they lack potential, but because
-                nobody showed them the battlefield map. In mentoring 3,450+ aspirants, almost every
-                failure traces back to three gaps:
-              </p>
+              <p className="rich-html mt-6 text-lg leading-relaxed text-ink-soft" dangerouslySetInnerHTML={{ __html: c.paragraph }} />
             </Reveal>
             <Reveal delay={250} className="mt-8 space-y-4">
               {GAPS.map((g) => (
