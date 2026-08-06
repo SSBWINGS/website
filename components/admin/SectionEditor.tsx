@@ -17,12 +17,6 @@ async function logActivity(
   });
 }
 
-const DEVICES = [
-  { id: "mobile", label: "📱 Mobile", width: 390 },
-  { id: "tablet", label: "💻 Tablet", width: 768 },
-  { id: "desktop", label: "🖥 Desktop", width: 0 },
-] as const;
-
 function setPreviewCookie(on: boolean) {
   document.cookie = on
     ? "ssbw-preview=1; path=/; SameSite=Lax"
@@ -40,23 +34,20 @@ export default function SectionEditor({
 }) {
   const supabase = createClient();
   const [form, setForm] = useState<Record<string, string>>(initial);
-  const [device, setDevice] = useState<(typeof DEVICES)[number]["id"]>("desktop");
-  const [iframeKey, setIframeKey] = useState(0);
-  const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState<"" | "save" | "publish" | "rollback">("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [hasHistory, setHasHistory] = useState(canRollback);
   const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
   const firstRun = useRef(true);
 
-  // Turn preview mode on for this admin while editing; off when leaving.
+  // While editing, let this admin see drafts on the live site (draft-preview
+  // cookie). Cleared when they leave the editor.
   useEffect(() => {
     setPreviewCookie(true);
-    setReady(true);
     return () => setPreviewCookie(false);
   }, []);
 
-  // Autosave the draft ~1.6s after typing stops, then refresh the preview.
+  // Autosave the draft ~1.6s after typing stops.
   useEffect(() => {
     if (firstRun.current) { firstRun.current = false; return; }
     setAutosave("saving");
@@ -66,13 +57,10 @@ export default function SectionEditor({
         { onConflict: "key" },
       );
       setAutosave("saved");
-      reloadPreview();
     }, 1600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);
-
-  const reloadPreview = () => setIframeKey((k) => k + 1);
 
   async function saveDraft() {
     setBusy("save"); setMsg(null);
@@ -82,8 +70,7 @@ export default function SectionEditor({
     );
     setBusy("");
     if (error) return setMsg({ ok: false, text: error.message });
-    setMsg({ ok: true, text: "Draft saved — preview updated." });
-    reloadPreview();
+    setMsg({ ok: true, text: "Draft saved." });
   }
 
   async function publish() {
@@ -99,7 +86,6 @@ export default function SectionEditor({
     if (error) return setMsg({ ok: false, text: error.message });
     await logActivity(supabase, "publish", `section:${section.key}`);
     setMsg({ ok: true, text: "Published! This is now live on the website." });
-    reloadPreview();
   }
 
   async function rollback() {
@@ -116,14 +102,10 @@ export default function SectionEditor({
     setForm(ver.snapshot as Record<string, string>);
     setBusy("");
     setMsg({ ok: true, text: "Rolled back to the previous version." });
-    reloadPreview();
   }
 
-  const activeDevice = DEVICES.find((d) => d.id === device)!;
-
   return (
-    <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(360px,2fr)_3fr]">
-      {/* Editor panel */}
+    <div className="mt-6 max-w-3xl">
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-4">
           {section.fields.map((f) => (
@@ -159,34 +141,8 @@ export default function SectionEditor({
           )}
         </div>
         <p className="mt-3 text-xs text-slate-400">
-          Edits show in the preview after <b>Save draft</b>. Nothing is live until you <b>Publish</b>.
+          Changes are saved privately as a <b>draft</b>. Open your live site while signed in to preview them; nothing is public until you <b>Publish</b>.
         </p>
-      </div>
-
-      {/* Live preview panel */}
-      <div className="rounded-xl border border-slate-200 bg-slate-100 p-3">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex gap-1">
-            {DEVICES.map((d) => (
-              <button key={d.id} onClick={() => setDevice(d.id)}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium ${device === d.id ? "bg-slate-900 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}>
-                {d.label}
-              </button>
-            ))}
-          </div>
-          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">● Live preview (draft)</span>
-        </div>
-        <div className="flex justify-center overflow-hidden rounded-lg bg-white" style={{ height: "70vh" }}>
-          {ready && (
-            <iframe
-              key={iframeKey}
-              src={section.previewPath}
-              title="Live preview"
-              className="h-full border-0 transition-all"
-              style={{ width: activeDevice.width ? activeDevice.width : "100%", maxWidth: "100%" }}
-            />
-          )}
-        </div>
       </div>
     </div>
   );
