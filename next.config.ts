@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const securityHeaders = [
-  // Clickjacking protection.
-  { key: "X-Frame-Options", value: "DENY" },
+  // Clickjacking protection. SAMEORIGIN (not DENY) so the admin CMS can frame
+  // the site's own pages in its live-preview iframe; external sites still can't.
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
   // Block MIME-type sniffing.
   { key: "X-Content-Type-Options", value: "nosniff" },
   // Don't leak full URLs to third parties.
@@ -32,7 +33,9 @@ const securityHeaders = [
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-      "frame-ancestors 'none'",
+      // 'self' (not 'none') so the admin live-preview iframe can frame our own
+      // pages; other origins still cannot embed the site.
+      "frame-ancestors 'self'",
     ].join("; "),
   },
 ];
