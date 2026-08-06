@@ -23,7 +23,9 @@ const securityHeaders = [
       "media-src 'self' https:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline'",
+      // 'wasm-unsafe-eval' lets the DotLottie WebAssembly renderer (aeroplane
+      // preloader) instantiate its WASM, without re-enabling arbitrary eval().
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
       "script-src-attr 'none'",
       "connect-src 'self' https:",
       "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com",
