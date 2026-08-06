@@ -441,6 +441,7 @@ export const JOIN_ROUTES: {
   },
 ];
 
+// Flat list — used by the footer & anywhere a simple link list is needed.
 export const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -454,3 +455,34 @@ export const NAV_LINKS = [
   { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
 ];
+
+// Grouped structure for the primary navbar (dropdowns keep the bar uncluttered).
+export type NavLink = { href: string; label: string; desc?: string };
+export type NavGroup = { label: string; items: NavLink[] };
+export type NavEntry = NavLink | NavGroup;
+
+export const NAV: NavEntry[] = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  {
+    label: "The SSB",
+    items: [
+      { href: "/ssb-process", label: "5-Day SSB Process", desc: "Screening to Conference, day by day" },
+      { href: "/entries", label: "Officer Entries", desc: "NDA, CDS, AFCAT, TES & more" },
+      { href: "/eligibility", label: "Eligibility Finder", desc: "See which entries you qualify for" },
+      { href: "/mock-tests", label: "Free Mock Tests", desc: "OIR & SRT practice with scoring" },
+    ],
+  },
+  { href: "/courses", label: "Courses" },
+  {
+    label: "Success",
+    items: [
+      { href: "/gallery", label: "Wall of Honour", desc: "Recommended cadets & AIR holders" },
+      { href: "/testimonials", label: "Testimonials", desc: "Success stories in their words" },
+      { href: "/blog", label: "Blog", desc: "Tips & defence current affairs" },
+    ],
+  },
+  { href: "/contact", label: "Contact" },
+];
+
+export const isNavGroup = (e: NavEntry): e is NavGroup => "items" in e;

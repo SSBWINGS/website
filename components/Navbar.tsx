@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV_LINKS, SITE } from "@/lib/data";
+import { NAV, isNavGroup, SITE } from "@/lib/data";
 import { useContactModal } from "./ModalProvider";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const pathname = usePathname();
   const { open: openModal } = useContactModal();
 
@@ -26,7 +27,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => { setOpen(false); setOpenGroup(null); }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50">
@@ -74,19 +75,57 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <ul className="hidden items-center gap-4 xl:flex 2xl:gap-6">
-            {NAV_LINKS.map((l) => {
-              const active = pathname === l.href;
+          <ul className="hidden items-center gap-5 xl:flex 2xl:gap-7">
+            {NAV.map((entry) => {
+              if (!isNavGroup(entry)) {
+                const active = pathname === entry.href;
+                return (
+                  <li key={entry.href}>
+                    <Link
+                      href={entry.href}
+                      className={`nav-link whitespace-nowrap font-display text-base font-semibold uppercase tracking-wide text-ink hover:text-saffron-600 ${
+                        active ? "is-active text-saffron-700" : ""
+                      }`}
+                    >
+                      {entry.label}
+                    </Link>
+                  </li>
+                );
+              }
+              const groupActive = entry.items.some((i) => pathname === i.href);
               return (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className={`nav-link whitespace-nowrap font-display text-base font-semibold uppercase tracking-wide text-ink hover:text-saffron-600 ${
-                      active ? "is-active text-saffron-700" : ""
+                <li key={entry.label} className="group relative">
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    className={`nav-link inline-flex items-center gap-1 whitespace-nowrap font-display text-base font-semibold uppercase tracking-wide text-ink hover:text-saffron-600 ${
+                      groupActive ? "is-active text-saffron-700" : ""
                     }`}
                   >
-                    {l.label}
-                  </Link>
+                    {entry.label}
+                    <span className="text-[10px] transition-transform duration-200 group-hover:rotate-180" aria-hidden>▾</span>
+                  </button>
+                  {/* Dropdown */}
+                  <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <ul className="w-72 rounded-xl border border-[rgba(43,36,22,0.14)] bg-[#fffdf7] p-2 shadow-[0_18px_44px_-16px_rgba(43,36,22,0.55)]">
+                      {entry.items.map((i) => {
+                        const active = pathname === i.href;
+                        return (
+                          <li key={i.href}>
+                            <Link
+                              href={i.href}
+                              className={`block rounded-lg px-3 py-2 transition-colors hover:bg-paper-2 ${active ? "bg-paper-2" : ""}`}
+                            >
+                              <span className={`block font-display text-sm font-bold uppercase tracking-wide ${active ? "text-saffron-700" : "text-ink"}`}>
+                                {i.label}
+                              </span>
+                              {i.desc && <span className="mt-0.5 block text-xs normal-case text-ink-soft">{i.desc}</span>}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
                 </li>
               );
             })}
@@ -113,18 +152,55 @@ export default function Navbar() {
         <div className={`grid overflow-hidden transition-[grid-template-rows] duration-300 xl:hidden ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
           <div className="overflow-hidden">
             <ul className="space-y-1 border-t border-[rgba(43,36,22,0.12)] px-4 py-4">
-              {NAV_LINKS.map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className={`block rounded-lg px-4 py-3 font-display text-lg font-semibold uppercase tracking-wider transition-colors hover:bg-paper-2 ${
-                      pathname === l.href ? "text-saffron-700" : "text-ink"
-                    }`}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
+              {NAV.map((entry) => {
+                if (!isNavGroup(entry)) {
+                  return (
+                    <li key={entry.href}>
+                      <Link
+                        href={entry.href}
+                        className={`block rounded-lg px-4 py-3 font-display text-lg font-semibold uppercase tracking-wider transition-colors hover:bg-paper-2 ${
+                          pathname === entry.href ? "text-saffron-700" : "text-ink"
+                        }`}
+                      >
+                        {entry.label}
+                      </Link>
+                    </li>
+                  );
+                }
+                const isOpen = openGroup === entry.label;
+                const groupActive = entry.items.some((i) => pathname === i.href);
+                return (
+                  <li key={entry.label}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenGroup(isOpen ? null : entry.label)}
+                      aria-expanded={isOpen}
+                      className={`flex w-full items-center justify-between rounded-lg px-4 py-3 font-display text-lg font-semibold uppercase tracking-wider transition-colors hover:bg-paper-2 ${
+                        groupActive ? "text-saffron-700" : "text-ink"
+                      }`}
+                    >
+                      {entry.label}
+                      <span className={`text-sm transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} aria-hidden>▾</span>
+                    </button>
+                    <div className={`grid overflow-hidden transition-[grid-template-rows] duration-300 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                      <ul className="overflow-hidden pl-3">
+                        {entry.items.map((i) => (
+                          <li key={i.href}>
+                            <Link
+                              href={i.href}
+                              className={`block rounded-lg px-4 py-2.5 font-display text-base font-semibold uppercase tracking-wide transition-colors hover:bg-paper-2 ${
+                                pathname === i.href ? "text-saffron-700" : "text-ink-soft"
+                              }`}
+                            >
+                              {i.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                );
+              })}
               <li className="pt-2">
                 <button onClick={openModal} className="btn btn-gold w-full">Book Free Counselling</button>
               </li>
