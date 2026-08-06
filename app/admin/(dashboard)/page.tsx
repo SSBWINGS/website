@@ -20,16 +20,18 @@ async function countOf(table: string) {
 
 export default async function AdminDashboard() {
   const admin = await getCurrentAdmin();
-  const [candidates, testimonials, mentors] = await Promise.all([
+  const [candidates, testimonials, mentors, faqs] = await Promise.all([
     countOf("recommended_candidates"),
     countOf("testimonials"),
     countOf("mentors"),
+    countOf("faqs"),
   ]);
 
   const cards = [
     { label: "Recommended Candidates", value: candidates, hint: "Wall of Honour entries", href: "/admin/candidates" },
     { label: "Testimonials", value: testimonials, hint: "Success stories", href: "/admin/testimonials" },
     { label: "Mentors", value: mentors, hint: "Team members", href: "/admin/mentors" },
+    { label: "FAQs", value: faqs, hint: "Questions answered", href: "/admin/faqs" },
   ];
 
   return (
@@ -42,7 +44,7 @@ export default async function AdminDashboard() {
         <span className="font-medium capitalize text-slate-700">{admin?.role.replace("_", " ")}</span>.
       </p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
           <Link key={c.label} href={c.href} className="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-blue-300 hover:shadow-sm">
             <p className="text-sm font-medium text-slate-500">{c.label}</p>

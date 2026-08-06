@@ -26,14 +26,11 @@ export async function getCurrentAdmin(): Promise<AdminProfile | null> {
       .eq("id", user.id)
       .single();
 
-    return (
-      (profile as AdminProfile | null) ?? {
-        id: user.id,
-        email: user.email ?? null,
-        full_name: null,
-        role: "admin",
-      }
-    );
+    // Fail closed: a signed-in user is only an admin when they have a profile
+    // row with an admin role. A missing row or a 'pending' role is NOT admin.
+    const p = profile as AdminProfile | null;
+    if (!p || (p.role !== "admin" && p.role !== "super_admin")) return null;
+    return p;
   } catch {
     return null;
   }

@@ -2,6 +2,21 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SITE } from "@/lib/data";
+import { sanitizeHtml } from "@/lib/sanitize";
+
+/** Recursively sanitize every string in a CMS payload. Rich-text fields are
+ *  rendered with dangerouslySetInnerHTML downstream, so we neutralize any
+ *  script/event-handler injection here, once, for all consumers. */
+function deepSanitize<T>(value: T): T {
+  if (typeof value === "string") return sanitizeHtml(value) as unknown as T;
+  if (Array.isArray(value)) return value.map(deepSanitize) as unknown as T;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) out[k] = deepSanitize(v);
+    return out as T;
+  }
+  return value;
+}
 
 /** True when an authenticated admin is previewing drafts (cookie set by the editor). */
 async function isPreview(): Promise<boolean> {
@@ -46,7 +61,7 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
         .eq("key", key)
         .maybeSingle();
       if (draftRow?.draft && Object.keys(draftRow.draft).length > 0) {
-        return { ...fallback, ...(draftRow.draft as Partial<T>) } as T;
+        return deepSanitize({ ...fallback, ...(draftRow.draft as Partial<T>) }) as T;
       }
     }
 
@@ -58,7 +73,7 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
     if (error || !data?.published || Object.keys(data.published).length === 0) {
       return fallback;
     }
-    return { ...fallback, ...(data.published as Partial<T>) } as T;
+    return deepSanitize({ ...fallback, ...(data.published as Partial<T>) }) as T;
   } catch {
     return fallback;
   }
@@ -71,7 +86,7 @@ export async function getCollection<T>(view: string, fallback: T[]): Promise<T[]
     const supabase = await createClient();
     const { data, error } = await supabase.from(view).select("*").order("sort_order", { ascending: true });
     if (error || !data || data.length === 0) return fallback;
-    return data as T[];
+    return deepSanitize(data) as T[];
   } catch {
     return fallback;
   }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,15 @@ const escapeHtml = (s: string) =>
     .replace(/"/g, "&quot;");
 
 export async function POST(req: Request) {
+  // Throttle abusive submitters (best-effort per instance; honeypot handles bots).
+  const rl = rateLimit(`contact:${clientIp(req)}`, { limit: 5, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "You're sending messages too quickly. Please try again shortly." },
+      { status: 429 },
+    );
+  }
+
   let body: Payload;
   try {
     body = await req.json();

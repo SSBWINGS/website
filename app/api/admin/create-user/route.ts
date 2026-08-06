@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, hasServiceRole } from "@/lib/supabase/admin";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  // 0. Throttle: even a super-admin session shouldn't script-create in bulk.
+  const rl = rateLimit(`create-user:${clientIp(req)}`, { limit: 10, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json({ error: "Too many requests. Please wait a moment." }, { status: 429 });
+  }
+
   // 1. Authenticate the caller and confirm they are a super-admin.
   const supabase = await createClient();
   const {
@@ -52,9 +59,13 @@ export async function POST(req: Request) {
   });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  // 4. Store the full name on the profile.
-  if (created.user && fullName) {
-    await admin.from("profiles").update({ full_name: fullName }).eq("id", created.user.id);
+  // 4. Promote the auto-created profile to 'admin' (the signup trigger now
+  //    defaults new users to the non-privileged 'pending' role) and store name.
+  if (created.user) {
+    await admin
+      .from("profiles")
+      .update({ role: "admin", ...(fullName ? { full_name: fullName } : {}) })
+      .eq("id", created.user.id);
   }
 
   // 5. Audit log.

@@ -47,6 +47,46 @@ Admin edits (draft)  ──publish──▶  published (JSONB / row flag)  ─�
 - **SEO** — `generateMetadata` on every page reads `seo.<key>` from the CMS with defaults.
 - **Auth** — email/password; first user becomes super_admin; RLS via `private.is_admin()`.
 
+## Security model
+
+Defense-in-depth across four layers:
+
+1. **Auth gate** — `proxy.ts` refreshes the session and redirects unauthenticated
+   users away from `/admin` and `/api/admin`.
+2. **Role gate** — the dashboard layout calls `getCurrentAdmin()`, which is
+   **fail-closed**: a signed-in user with no profile row, or a `pending` role, is
+   NOT treated as admin. Privileged API routes independently re-check
+   `super_admin`.
+3. **Row-Level Security** — every table is `TO authenticated` + `private.is_admin()`
+   (SECURITY DEFINER, `search_path=''`). Anon users only read `published_*` views.
+4. **Least-privilege signup** — new auth users default to `pending` (no access).
+   Only the super-admin, via the service-role API route, promotes them to `admin`.
+   The **first** user bootstraps as `super_admin`. A DB trigger blocks demoting or
+   deleting the **last** super-admin (no lockout).
+
+Additional hardening:
+
+- **User management** — super-admin can promote/demote/approve/remove admins
+  (`/api/admin/manage-user`, service-role, revokes login). Can't act on self.
+- **HTML sanitization** — all CMS strings pass through `lib/sanitize.ts` in the
+  content layer before being rendered with `dangerouslySetInnerHTML`, stripping
+  `<script>`, inline `on*` handlers, `javascript:`/`data:` URLs, `<iframe>` etc.
+- **Security headers** (`next.config.ts`) — CSP (`frame-ancestors 'none'`,
+  `object-src 'none'`, `base-uri 'self'`), HSTS, `X-Frame-Options: DENY`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`.
+  `X-Powered-By` is disabled.
+- **Rate limiting** — `lib/rate-limit.ts` throttles `/api/contact` and the admin
+  API routes (best-effort per instance); the contact form also has a honeypot.
+- **No SQL injection surface** — all DB access goes through the parameterized
+  supabase-js query builder; the only raw SQL is static migration files.
+- **Secrets** — the service-role key is `server-only` and never shipped to the
+  client; `.env.local` is gitignored.
+
+> One project-side setting to confirm in the Supabase dashboard:
+> **Authentication → Providers → Email → disable "Allow new users to sign up"**.
+> Even if it's left on, the `pending`-by-default trigger keeps self-registered
+> users powerless — but disabling it is belt-and-braces.
+
 ## Code-managed by design (not in CMS)
 
 These are structural/layout content edited in code, not exposed as free-form CMS fields:
