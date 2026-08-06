@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { saveEnquiry } from "@/lib/enquiries";
 
 export const runtime = "nodejs";
 
@@ -61,13 +62,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Message is too long." }, { status: 400 });
   }
 
+  // Capture the lead in the CRM first (best-effort, independent of email).
+  await saveEnquiry({ name, email, phone, entry, message, source: "contact_form" });
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error("RESEND_API_KEY is not configured.");
-    return NextResponse.json(
-      { error: "Mail service is not configured yet. Please call us instead." },
-      { status: 503 },
-    );
+    // Lead is saved; email just isn't configured. Treat as success for the user.
+    return NextResponse.json({ ok: true });
   }
 
   const resend = new Resend(apiKey);
@@ -111,10 +112,32 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error("Resend error:", error);
-      return NextResponse.json(
-        { error: "Could not send your message right now." },
-        { status: 502 },
-      );
+      // Lead is already saved; report success but note delivery couldn't happen.
+      return NextResponse.json({ ok: true, warning: "saved" });
+    }
+
+    // Auto-responder to the aspirant (best-effort; don't fail the request).
+    try {
+      await resend.emails.send({
+        from,
+        to: email,
+        subject: "We've received your enquiry — SSBWINGS",
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e5e5e5;border-radius:12px;overflow:hidden;">
+            <div style="background:#0a1524;padding:20px 24px;">
+              <h1 style="margin:0;color:#f2d519;font-size:20px;letter-spacing:2px;">SSBWINGS</h1>
+              <p style="margin:4px 0 0;color:#c1d5ea;font-size:12px;">We give shape to your dreams</p>
+            </div>
+            <div style="padding:22px 24px;color:#333;font-size:14px;line-height:1.6;">
+              <p>Dear ${escapeHtml(name)},</p>
+              <p>Thank you for reaching out to <strong>SSBWINGS</strong>. Our counselling team has received your enquiry${entry ? ` about <strong>${escapeHtml(entry)}</strong>` : ""} and will call you back shortly.</p>
+              <p>Meanwhile, feel free to explore our courses and the 5-day SSB process on our website. Jai Hind! 🇮🇳</p>
+              <p style="margin-top:18px;color:#666;">— Team SSBWINGS</p>
+            </div>
+          </div>`,
+      });
+    } catch {
+      /* auto-responder failure is non-fatal */
     }
 
     return NextResponse.json({ ok: true });

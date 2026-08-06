@@ -26,6 +26,15 @@ export const SEO_PAGES: SeoPage[] = [
   { key: "contact", label: "Contact", path: "/contact",
     title: "Contact Us — Book Free SSB Counselling",
     description: "Get in touch with SSBWINGS, Noida Sector 62. Book a free counselling call, WhatsApp our team, or visit our campus." },
+  { key: "eligibility", label: "Eligibility Finder", path: "/eligibility",
+    title: "SSB Eligibility Finder — Which Defence Entry Can I Apply For?",
+    description: "Answer five quick questions and instantly find which officer entries you're eligible for — NDA, CDS, AFCAT, TES, TGC, SSC, JAG and more — then get free counselling." },
+  { key: "mock-tests", label: "Free Mock Tests", path: "/mock-tests",
+    title: "Free SSB Mock Tests — OIR & SRT Practice",
+    description: "Practise Officer Intelligence Rating (OIR) and Situation Reaction Test (SRT) questions free, with instant scoring — sharpen your SSB screening & psychology skills." },
+  { key: "blog", label: "Blog", path: "/blog",
+    title: "SSB Blog & Defence Current Affairs",
+    description: "Tips, strategy and current affairs for SSB aspirants from the ex-SSB assessors at SSBWINGS — OIR, PPDT, psychology, GTO and personal-interview guidance." },
 ];
 
 export const getSeoPage = (key: string) => SEO_PAGES.find((p) => p.key === key);

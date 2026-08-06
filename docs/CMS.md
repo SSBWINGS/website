@@ -47,6 +47,24 @@ Admin edits (draft)  ──publish──▶  published (JSONB / row flag)  ─�
 - **SEO** — `generateMetadata` on every page reads `seo.<key>` from the CMS with defaults.
 - **Auth** — email/password; first user becomes super_admin; RLS via `private.is_admin()`.
 
+## Lead-gen & engagement features
+
+| Feature | Public | Admin | Data |
+|---------|--------|-------|------|
+| Enquiry CRM | contact form → CRM | `/admin/enquiries` (pipeline, notes, CSV) | `enquiries` (service-role insert, admin-only read) |
+| Eligibility Finder | `/eligibility` quiz → lead | leads land in CRM | `lib/eligibility.ts` rules + `/api/lead` |
+| Mock Tests | `/mock-tests` OIR quiz | `/admin/mock-tests` | `mock_questions` (answers hidden from public view, server scoring via `/api/mock/score`) |
+| Blog | `/blog`, `/blog/[slug]` | `/admin/blog` (rich text + cover) | `posts` → `published_posts` |
+| Selection Tracker | animated homepage section | `/admin/selections` | `selections` → `published_selections` |
+| Batch/Exam Countdown | live homepage timers | `/admin/countdown` | `site_content` key `countdown` |
+| Analytics | privacy-friendly tracker | `/admin/analytics` | `page_view_daily` (via `track_view` RPC) |
+| Scheduled publish | — | `⏱ Schedule` in section editor | `scheduled_content` + `/api/cron/publish` (Vercel Cron) |
+| Click-to-edit | preview bar on live site | jumps into CMS | `ssbw-preview` cookie |
+
+Auto-responder emails the aspirant on contact; the CRM captures the lead even if
+email isn't configured. Scheduled publishing needs `CRON_SECRET` set on Vercel
+(the `vercel.json` cron runs every 15 min).
+
 ## Security model
 
 Defense-in-depth across four layers:

@@ -10,12 +10,18 @@ type Item = { href: string; label: string; icon: string; soon?: boolean; superOn
 
 const ITEMS: Item[] = [
   { href: "/admin", label: "Dashboard", icon: "▦" },
+  { href: "/admin/enquiries", label: "Enquiries", icon: "📥" },
+  { href: "/admin/analytics", label: "Analytics", icon: "📈" },
   { href: "/admin/candidates", label: "Recommended Candidates", icon: "🎖" },
   { href: "/admin/testimonials", label: "Testimonials", icon: "💬" },
   { href: "/admin/mentors", label: "Mentors", icon: "🎓" },
+  { href: "/admin/selections", label: "Selection Tracker", icon: "🏅" },
   { href: "/admin/faqs", label: "FAQs", icon: "❓" },
+  { href: "/admin/blog", label: "Blog", icon: "📝" },
+  { href: "/admin/mock-tests", label: "Mock Tests", icon: "🧠" },
   { href: "/admin/sections", label: "Pages & Sections", icon: "✎" },
   { href: "/admin/stats", label: "Scoreboard Stats", icon: "📊" },
+  { href: "/admin/countdown", label: "Batch & Exam Countdown", icon: "⏱" },
   { href: "/admin/settings", label: "Footer & Contact", icon: "▤" },
   { href: "/admin/seo", label: "SEO", icon: "🔎" },
   { href: "/admin/media", label: "Media Library", icon: "🖼" },
@@ -36,7 +42,7 @@ export default function Sidebar({ role, email }: { role: AdminRole; email: strin
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
         {ITEMS.filter((i) => !i.superOnly || role === "super_admin").map((i) => {
           const active = i.href === "/admin" ? pathname === "/admin" : pathname.startsWith(i.href);
           if (i.soon) {

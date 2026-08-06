@@ -10,6 +10,8 @@ import Courses from "@/components/Courses";
 import WhyUs from "@/components/WhyUs";
 import Mentors from "@/components/Mentors";
 import StatsStrip from "@/components/StatsStrip";
+import CountdownStrip from "@/components/CountdownStrip";
+import SelectionTracker from "@/components/SelectionTracker";
 import OfficerBanners from "@/components/OfficerBanners";
 import Testimonials from "@/components/Testimonials";
 import InstagramFeed from "@/components/InstagramFeed";
@@ -33,6 +35,8 @@ export default function Home() {
       <WhyUs />
       <Mentors />
       <StatsStrip />
+      <SelectionTracker />
+      <CountdownStrip />
       <OfficerBanners />
       <Testimonials />
       <InstagramFeed />

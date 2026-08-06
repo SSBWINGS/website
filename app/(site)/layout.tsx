@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ChatBot from "@/components/ChatBot";
 import BackToTop from "@/components/BackToTop";
+import PageViewTracker from "@/components/PageViewTracker";
+import PreviewBar from "@/components/PreviewBar";
 
 const SITE_URL = "https://www.ssbwings.com";
 
@@ -37,6 +39,7 @@ export default function SiteLayout({ children }: Readonly<{ children: React.Reac
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <PageViewTracker />
       <Preloader />
       <Cursor />
       <ModalProvider>
@@ -46,6 +49,7 @@ export default function SiteLayout({ children }: Readonly<{ children: React.Reac
         <WhatsAppButton />
         <ChatBot />
         <BackToTop />
+        <PreviewBar />
       </ModalProvider>
     </>
   );

@@ -446,8 +446,11 @@ export const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/ssb-process", label: "5-Day SSB" },
   { href: "/entries", label: "Entries" },
+  { href: "/eligibility", label: "Eligibility" },
   { href: "/courses", label: "Courses" },
+  { href: "/mock-tests", label: "Mock Tests" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/blog", label: "Blog" },
   { href: "/testimonials", label: "Testimonials" },
   { href: "/contact", label: "Contact" },
 ];
