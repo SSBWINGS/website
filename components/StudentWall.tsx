@@ -24,7 +24,9 @@ export default async function StudentWall({
     image_path: `/images/students/${s.file}`,
     sort_order: i,
   }));
-  const rows = await getCollection<Candidate>("published_candidates", fallback);
+  // Only fetch what we render — the homepage wall pulls just `limit` rows, not
+  // the entire (hundreds-strong) candidate table.
+  const rows = await getCollection<Candidate>("published_candidates", fallback, limit ? { limit } : undefined);
   const list = limit ? rows.slice(0, limit) : rows;
 
   return (
@@ -64,7 +66,7 @@ export default async function StudentWall({
 
         {showCta && (
           <Reveal delay={200} className="mt-12 text-center">
-            <Link href="/gallery" className="btn btn-gold btn-shine">See the Full Wall of Honour →</Link>
+            <Link href="/recommended" className="btn btn-gold btn-shine">See All Recommended Candidates →</Link>
           </Reveal>
         )}
       </div>

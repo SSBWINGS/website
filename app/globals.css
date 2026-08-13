@@ -108,6 +108,14 @@
   }
 }
 
+/* Glowing "+" nav badge → All Recommended Candidates */
+@keyframes plus-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242,213,25,0.5), 0 0 10px 2px rgba(242,213,25,0.45); }
+  50% { box-shadow: 0 0 0 4px rgba(242,213,25,0), 0 0 22px 7px rgba(242,213,25,0.9); }
+}
+.glow-plus { animation: plus-glow 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .glow-plus { animation: none; } }
+
 /* ————————————————————— Base ————————————————————— */
 
 html {

@@ -79,12 +79,20 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
   }
 }
 
-/** Fetch a published collection view (e.g. 'published_candidates'), else fallback. */
-export async function getCollection<T>(view: string, fallback: T[]): Promise<T[]> {
+/** Fetch a published collection view (e.g. 'published_candidates'), else fallback.
+ *  Pass `{ limit }` to fetch only what's rendered (e.g. the homepage wall) instead
+ *  of pulling the whole table. */
+export async function getCollection<T>(
+  view: string,
+  fallback: T[],
+  opts?: { limit?: number },
+): Promise<T[]> {
   if (!isSupabaseConfigured()) return fallback;
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase.from(view).select("*").order("sort_order", { ascending: true });
+    let query = supabase.from(view).select("*").order("sort_order", { ascending: true });
+    if (opts?.limit) query = query.limit(opts.limit);
+    const { data, error } = await query;
     if (error || !data || data.length === 0) return fallback;
     return deepSanitize(data) as T[];
   } catch {

@@ -51,3 +51,7 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# Bulk candidate source images (uploaded to Supabase, not committed)
+/january onwards pic/
+/old pics/

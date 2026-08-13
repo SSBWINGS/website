@@ -143,6 +143,17 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-3">
+            {/* Glowing "+" → all recommended candidates */}
+            <Link
+              href="/recommended"
+              aria-label="See all recommended candidates"
+              title="All Recommended Candidates"
+              className={`glow-plus relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-950 text-2xl font-bold leading-none text-gold-300 transition-transform hover:scale-110 ${
+                pathname === "/recommended" ? "ring-2 ring-gold-400" : ""
+              }`}
+            >
+              <span className="-mt-0.5" aria-hidden>+</span>
+            </Link>
             <button onClick={openModal} className="btn btn-gold btn-shine hidden px-5 py-2.5 text-sm xl:inline-flex">
               Enquire
             </button>
@@ -163,6 +174,15 @@ export default function Navbar() {
         <div className={`grid overflow-hidden transition-[grid-template-rows] duration-300 xl:hidden ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
           <div className="overflow-hidden">
             <ul className="space-y-1 border-t border-[rgba(43,36,22,0.12)] px-4 py-4">
+              <li>
+                <Link
+                  href="/recommended"
+                  className="flex items-center gap-3 rounded-lg bg-navy-950 px-4 py-3 font-display text-lg font-semibold uppercase tracking-wider text-gold-300"
+                >
+                  <span className="glow-plus flex h-7 w-7 items-center justify-center rounded-full bg-gold-400 text-xl leading-none text-navy-950" aria-hidden>+</span>
+                  All Recommended Candidates
+                </Link>
+              </li>
               {NAV.map((entry) => {
                 if (!isNavGroup(entry)) {
                   return (

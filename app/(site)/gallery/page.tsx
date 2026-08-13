@@ -22,7 +22,7 @@ export default function GalleryPage() {
         image="/images/women-officers.jpg"
       />
 
-      <StudentWall heading={false} />
+      <StudentWall heading={false} limit={24} showCta />
 
       <section className="pt-4">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">

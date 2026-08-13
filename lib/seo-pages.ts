@@ -35,6 +35,9 @@ export const SEO_PAGES: SeoPage[] = [
   { key: "blog", label: "Blog", path: "/blog",
     title: "SSB Blog & Defence Current Affairs",
     description: "Tips, strategy and current affairs for SSB aspirants from the ex-SSB assessors at SSBWINGS — OIR, PPDT, psychology, GTO and personal-interview guidance." },
+  { key: "recommended", label: "Recommended Candidates", path: "/recommended",
+    title: "All Recommended Candidates — Wall of Honour",
+    description: "The complete wall of SSBWINGS recommended cadets across NDA, CDS, AFCAT, TES, Navy, ICG and more — hundreds of real faces and chest numbers." },
 ];
 
 export const getSeoPage = (key: string) => SEO_PAGES.find((p) => p.key === key);
