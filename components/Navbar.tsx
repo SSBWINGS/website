@@ -54,7 +54,7 @@ export default function Navbar() {
         aria-label="Primary"
         className="relative border-b border-[rgba(43,36,22,0.12)] bg-[linear-gradient(180deg,#fffdf7,#f4ecd8)] shadow-[0_6px_18px_-10px_rgba(43,36,22,0.4)]"
       >
-        <div className="mx-auto flex max-w-[1840px] items-center justify-between px-4 py-2.5 sm:px-8">
+        <div className="relative mx-auto flex max-w-[1840px] items-center justify-between px-4 py-2.5 sm:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="SSBWINGS home">
             <span className="medal">
               <Image
@@ -76,8 +76,8 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <ul className="hidden items-center gap-5 xl:flex 2xl:gap-7">
-            {NAV.map((entry) => {
+          <ul className="hidden items-center gap-5 xl:absolute xl:left-1/2 xl:flex xl:-translate-x-1/2 2xl:gap-7">
+            {NAV.filter((entry) => isNavGroup(entry) || entry.href !== "/contact").map((entry) => {
               if (!isNavGroup(entry)) {
                 const active = pathname === entry.href;
                 return (
@@ -143,20 +143,48 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-3">
-            {/* Glowing "+" → all recommended candidates */}
+            {/* Desktop: glowing "+" with label → recommendation gallery */}
             <Link
               href="/recommended"
-              aria-label="See all recommended candidates"
-              title="All Recommended Candidates"
-              className={`glow-plus relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-950 text-2xl font-bold leading-none text-gold-300 transition-transform hover:scale-110 ${
-                pathname === "/recommended" ? "ring-2 ring-gold-400" : ""
+              aria-label="Recommendation gallery — all recommended candidates"
+              className="hidden flex-col items-center gap-1 xl:flex"
+            >
+              <span
+                className={`glow-plus flex h-9 w-9 items-center justify-center rounded-full bg-navy-950 text-xl font-bold leading-none text-gold-300 transition-transform hover:scale-110 ${
+                  pathname === "/recommended" ? "ring-2 ring-gold-400" : ""
+                }`}
+                aria-hidden
+              >
+                +
+              </span>
+              <span className="text-center text-[8px] font-bold uppercase leading-tight tracking-wide text-ink-soft">
+                Recommendation<br />Gallery
+              </span>
+            </Link>
+
+            {/* Desktop: Contact */}
+            <Link
+              href="/contact"
+              className={`hidden items-center rounded-lg border border-[rgba(43,36,22,0.25)] bg-paper px-5 py-2.5 font-display text-sm font-semibold uppercase tracking-wide shadow-[var(--shadow-raised)] transition hover:text-saffron-700 xl:inline-flex ${
+                pathname === "/contact" ? "text-saffron-700" : "text-ink"
               }`}
             >
-              <span className="-mt-0.5" aria-hidden>+</span>
+              Contact
             </Link>
+
+            {/* Desktop: Enquire */}
             <button onClick={openModal} className="btn btn-gold btn-shine hidden px-5 py-2.5 text-sm xl:inline-flex">
               Enquire
             </button>
+
+            {/* Mobile: compact "+" icon */}
+            <Link
+              href="/recommended"
+              aria-label="Recommendation gallery"
+              className="glow-plus flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-950 text-2xl font-bold leading-none text-gold-300 xl:hidden"
+            >
+              <span className="-mt-0.5" aria-hidden>+</span>
+            </Link>
             <button
               onClick={() => setOpen(!open)}
               className="flex h-11 w-11 flex-col items-center justify-center gap-1.5 rounded-lg border border-[rgba(43,36,22,0.2)] bg-paper text-saffron-700 shadow-[var(--shadow-raised)] xl:hidden"
