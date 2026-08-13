@@ -47,10 +47,11 @@ export default async function Footer() {
 
           <nav aria-label="Entries we coach">
             <h3 className="font-display text-lg font-bold uppercase tracking-widest text-gold-400">Entries We Coach</h3>
-            <ul className="mt-5 grid grid-cols-1 gap-3 text-sm">
-              {ENTRIES.slice(0, 8).map((e) => (
-                <li key={e} className="flex items-center gap-2 text-navy-100/85">
-                  <span className="text-saffron-500" aria-hidden>★</span> {e}
+            <p className="mt-2 text-xs text-navy-100/60">Every officer entry into the Army, Navy, Air Force &amp; Coast Guard.</p>
+            <ul className="mt-4 grid grid-cols-1 gap-x-5 gap-y-2 text-sm sm:grid-cols-2">
+              {ENTRIES.map((e) => (
+                <li key={e} className="flex items-start gap-2 text-navy-100/85">
+                  <span className="mt-0.5 text-saffron-500" aria-hidden>★</span> {e}
                 </li>
               ))}
             </ul>

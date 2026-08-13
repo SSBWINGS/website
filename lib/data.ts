@@ -54,10 +54,39 @@ export const STATS = [
   { value: 10, label: "All India Rank 1" },
 ];
 
+// Every officer-entry scheme across the four Indian Armed Forces (Army, Navy,
+// Air Force, Coast Guard). Used by the homepage ticker and the footer.
 export const ENTRIES = [
-  "NDA", "CDS", "AFCAT", "TES", "TGC", "10+2 Navy B.Tech",
-  "SSC Tech (Men)", "SSC Tech (Women)", "NCC Special Entry",
-  "Indian Coast Guard", "ACC", "PC (SL)", "SCO", "University Entry",
+  // After 10+2
+  "NDA & NA",
+  "10+2 TES (Technical Entry)",
+  "10+2 B.Tech Cadet Entry (Navy)",
+  // Army — after graduation
+  "CDS – IMA (Permanent)",
+  "CDS – OTA / SSC",
+  "TGC (Technical Graduate Course)",
+  "SSC (Tech) – Men & Women",
+  "NCC Special Entry",
+  "JAG (Judge Advocate General)",
+  "University Entry Scheme (UES)",
+  // Navy — after graduation
+  "CDS – INA (Navy)",
+  "SSC Executive – GS(X) & Technical",
+  "SSC Pilot / Observer",
+  "SSC Logistics / ATC / Education / Law",
+  // Air Force — after graduation
+  "AFCAT – Flying Branch",
+  "AFCAT – Ground Duty (Technical)",
+  "AFCAT – Ground Duty (Non-Technical)",
+  "Meteorology Entry",
+  // Coast Guard
+  "ICG Asst Commandant – General Duty",
+  "ICG AC – Pilot / Navigator",
+  "ICG AC – Technical",
+  // For serving personnel
+  "ACC (Army Cadet College)",
+  "SCO (Special Commissioned Officer)",
+  "PC (SL) – Permanent Commission",
 ];
 
 export type Service = "army" | "navy" | "airforce";
@@ -386,6 +415,7 @@ export const JOIN_ROUTES: {
       { name: "SSC (Tech) – Men & Women", stage: "After Graduation", who: "Men & women, 20–27 yrs. Engineering degree.", how: "Shortlist on merit → SSB → Medical", commission: "Short Service · OTA" },
       { name: "NCC Special Entry", stage: "After Graduation", who: "Men & women with NCC 'C' certificate (min B grade).", how: "NCC Directorate slot → SSB → Medical (no written)", commission: "Short Service · OTA" },
       { name: "JAG (Judge Advocate General)", stage: "After Graduation", who: "Men & women, 21–27 yrs. LLB (min 55%).", how: "Shortlist → SSB → Medical", commission: "Short Service · OTA" },
+      { name: "University Entry Scheme (UES)", stage: "After Graduation", who: "Pre-final year engineering students (unmarried men & women).", how: "Campus shortlist → SSB → Medical (no written)", commission: "Permanent · IMA" },
       { name: "ACC & SCO", stage: "For Serving Personnel", who: "Serving soldiers of the Army meeting service & education criteria.", how: "Departmental written exam → SSB → Medical", commission: "Permanent · via ACC / direct" },
     ],
   },
