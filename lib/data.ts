@@ -75,6 +75,7 @@ export const ENTRIES = [
   "SSC Pilot / Observer",
   "SSC Logistics / ATC / Education / Law",
   // Air Force — after graduation
+  "CDS – AFA (Air Force Academy)",
   "AFCAT – Flying Branch",
   "AFCAT – Ground Duty (Technical)",
   "AFCAT – Ground Duty (Non-Technical)",
@@ -87,6 +88,34 @@ export const ENTRIES = [
   "ACC (Army Cadet College)",
   "SCO (Special Commissioned Officer)",
   "PC (SL) – Permanent Commission",
+];
+
+// Short single-line labels for the compact footer list (24 → 2 columns × 12 rows).
+export const ENTRIES_SHORT = [
+  "NDA & NA",
+  "10+2 TES",
+  "10+2 B.Tech (Navy)",
+  "CDS – IMA",
+  "CDS – OTA (SSC)",
+  "CDS – INA (Navy)",
+  "CDS – AFA (Air)",
+  "TGC",
+  "SSC Tech (M&W)",
+  "SSC Exec GS(X)",
+  "SSC Pilot / Obs",
+  "SSC Logistics",
+  "AFCAT Flying",
+  "AFCAT GD (Tech)",
+  "AFCAT GD (N-Tech)",
+  "Meteorology",
+  "NCC Special",
+  "JAG",
+  "UES",
+  "ICG AC – GD",
+  "ICG AC – Pilot/Nav",
+  "ICG AC – Tech",
+  "ACC & SCO",
+  "PC (SL)",
 ];
 
 export type Service = "army" | "navy" | "airforce";
@@ -447,6 +476,7 @@ export const JOIN_ROUTES: {
     intro: "Fly fighters and transports, or lead the technical and administrative branches that keep the IAF airborne — every branch begins with the AFSB.",
     routes: [
       { name: "NDA (Air)", stage: "After 10+2", who: "Unmarried men & women, 16½–19½ yrs. 10+2 with PCM.", how: "UPSC written → AFSB → PABT/CPSS → Medical", commission: "Permanent · NDA then AFA" },
+      { name: "CDS – AFA (Flying)", stage: "After Graduation", who: "Unmarried men, 20–24 yrs. Graduate with Physics & Maths at 10+2, or engineering.", how: "UPSC CDS written → AFSB → PABT/CPSS → Medical", commission: "Permanent · Air Force Academy" },
       { name: "AFCAT – Flying Branch", stage: "After Graduation", who: "Men & women, 20–24 yrs. Graduate (with PCM at 10+2).", how: "AFCAT written → AFSB → PABT → Medical", commission: "Short Service · Flying" },
       { name: "AFCAT – Ground Duty (Tech)", stage: "After Graduation", who: "Men & women, 20–26 yrs. Engineering degree.", how: "AFCAT written → AFSB → Medical", commission: "Permanent / Short Service" },
       { name: "AFCAT – Ground Duty (Non-Tech)", stage: "After Graduation", who: "Men & women graduates (Admin, Logistics, Accounts, etc.).", how: "AFCAT written → AFSB → Medical", commission: "Short Service" },
