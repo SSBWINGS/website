@@ -150,8 +150,8 @@ export default function Navbar() {
               className="hidden flex-col items-center gap-1 xl:flex"
             >
               <span
-                className={`glow-plus flex h-9 w-9 items-center justify-center rounded-full bg-navy-950 text-xl font-bold leading-none text-gold-300 transition-transform hover:scale-110 ${
-                  pathname === "/recommended" ? "ring-2 ring-gold-400" : ""
+                className={`glow-plus-text text-3xl font-black leading-none transition-transform hover:scale-110 ${
+                  pathname === "/recommended" ? "text-saffron-700" : "text-saffron-600"
                 }`}
                 aria-hidden
               >
@@ -177,13 +177,13 @@ export default function Navbar() {
               Enquire
             </button>
 
-            {/* Mobile: compact "+" icon */}
+            {/* Mobile: compact "+" glyph */}
             <Link
               href="/recommended"
               aria-label="Recommendation gallery"
-              className="glow-plus flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-950 text-2xl font-bold leading-none text-gold-300 xl:hidden"
+              className="glow-plus-text flex h-10 w-10 shrink-0 items-center justify-center text-4xl font-black leading-none text-saffron-600 xl:hidden"
             >
-              <span className="-mt-0.5" aria-hidden>+</span>
+              <span aria-hidden>+</span>
             </Link>
             <button
               onClick={() => setOpen(!open)}
@@ -207,7 +207,7 @@ export default function Navbar() {
                   href="/recommended"
                   className="flex items-center gap-3 rounded-lg bg-navy-950 px-4 py-3 font-display text-lg font-semibold uppercase tracking-wider text-gold-300"
                 >
-                  <span className="glow-plus flex h-7 w-7 items-center justify-center rounded-full bg-gold-400 text-xl leading-none text-navy-950" aria-hidden>+</span>
+                  <span className="glow-plus-text text-2xl font-black leading-none text-gold-300" aria-hidden>+</span>
                   All Recommended Candidates
                 </Link>
               </li>

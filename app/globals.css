@@ -114,7 +114,12 @@
   50% { box-shadow: 0 0 0 4px rgba(242,213,25,0), 0 0 22px 7px rgba(242,213,25,0.9); }
 }
 .glow-plus { animation: plus-glow 1.8s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .glow-plus { animation: none; } }
+@keyframes plus-glow-text {
+  0%, 100% { text-shadow: 0 0 6px rgba(255,153,51,0.6), 0 0 12px rgba(242,213,25,0.4); }
+  50% { text-shadow: 0 0 12px rgba(255,153,51,0.95), 0 0 24px rgba(242,213,25,0.75); }
+}
+.glow-plus-text { animation: plus-glow-text 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .glow-plus, .glow-plus-text { animation: none; } }
 
 /* ————————————————————— Base ————————————————————— */
 
