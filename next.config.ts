@@ -29,7 +29,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
       "script-src-attr 'none'",
       "connect-src 'self' https:",
-      "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com https://maps.google.com https://*.supabase.co",
+      "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.google.com https://maps.google.com https://*.supabase.co https://www.instagram.com https://instagram.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
