@@ -18,7 +18,7 @@ export default async function SectionEditorPage({ params }: { params: Promise<{ 
     .select("id", { count: "exact", head: true })
     .eq("key", key);
 
-  const initial = { ...sectionDefaults(key), ...((data?.draft as Record<string, string>) ?? {}) };
+  const initial = { ...sectionDefaults(key), ...((data?.draft as Record<string, unknown>) ?? {}) };
 
   return (
     <div>

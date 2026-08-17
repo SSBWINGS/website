@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import Counter from "@/components/Counter";
@@ -23,13 +23,7 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <main>
-      <PageHero
-        crumb="About"
-        kicker="Our Story"
-        title={<>We Give Shape to Your <span className="tricolour-text">Dreams</span></>}
-        subtitle="Born from the belief that every deserving aspirant deserves an honest shot at the uniform — mentored by the very officers who once sat on the assessor's chair."
-        image="/images/ota-sunrise.jpg"
-      />
+      <CmsHero pageKey="about" />
 
       <section className="relative py-20 sm:py-24">
         <div className="mx-auto grid max-w-[1840px] items-center gap-12 px-4 sm:px-8 lg:grid-cols-2">

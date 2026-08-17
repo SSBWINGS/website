@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import Image from "next/image";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import CtaBanner from "@/components/CtaBannerSection";
@@ -41,13 +41,7 @@ const GATEWAYS = [
 export default function EntriesPage() {
   return (
     <main>
-      <PageHero
-        crumb="Entries"
-        kicker="How to Join as an Officer"
-        title={<>Every Route to the <span className="tricolour-text">Uniform</span></>}
-        subtitle="Army, Navy, Air Force or Coast Guard — there is more than one way to earn a commission. Here is every officer-entry scheme, who it's for, how selection works and the commission it leads to."
-        image="/images/pipping-ceremony.jpg"
-      />
+      <CmsHero pageKey="entries" />
 
       {/* Three gateways */}
       <section className="relative py-20 sm:py-24">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 import ContactSection from "@/components/ContactSection";
 import Faq from "@/components/Faq";
 
@@ -11,13 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function ContactPage() {
   return (
     <main>
-      <PageHero
-        crumb="Contact"
-        kicker="Report for Duty"
-        title={<>Begin Your <span className="tricolour-text">March</span></>}
-        subtitle="A mentor — not a salesperson — will call you back with an honest assessment of your entry, timeline and preparation plan. No spam, ever."
-        image="/images/gto-training.jpg"
-      />
+      <CmsHero pageKey="contact" />
       <ContactSection />
 
       <section className="pb-8">

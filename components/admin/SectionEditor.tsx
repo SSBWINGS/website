@@ -1,105 +1,160 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import type { SectionDef } from "@/lib/sections";
+import { mediaUrl } from "@/lib/supabase/media";
+import { compressImage } from "@/lib/image-client";
+import type { SectionDef, SectionField } from "@/lib/sections";
 import RichText from "./RichText";
 
-async function logActivity(
-  supabase: ReturnType<typeof createClient>,
-  action: string,
-  target: string,
-) {
+const supabase = createClient();
+
+async function uploadImage(file: File): Promise<string> {
+  const f = await compressImage(file);
+  const path = `sections/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.webp`;
+  const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
+  if (error) throw new Error(error.message);
+  return path;
+}
+
+async function logActivity(action: string, target: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  await supabase.from("activity_log").insert({
-    actor: user.id, actor_email: user.email, action, target,
-  });
+  await supabase.from("activity_log").insert({ actor: user.id, actor_email: user.email, action, target });
 }
 
 function setPreviewCookie(on: boolean) {
-  document.cookie = on
-    ? "ssbw-preview=1; path=/; SameSite=Lax"
-    : "ssbw-preview=; path=/; Max-Age=0; SameSite=Lax";
+  document.cookie = on ? "ssbw-preview=1; path=/; SameSite=Lax" : "ssbw-preview=; path=/; Max-Age=0; SameSite=Lax";
 }
 
-export default function SectionEditor({
-  section,
-  initial,
-  canRollback,
-}: {
-  section: SectionDef;
-  initial: Record<string, string>;
-  canRollback: boolean;
-}) {
-  const supabase = createClient();
-  const [form, setForm] = useState<Record<string, string>>(initial);
+/** Renders a single field (text/rich/image/tags/repeater). */
+function FieldInput({ field, value, onChange }: { field: SectionField; value: unknown; onChange: (v: unknown) => void }) {
+  const [uploading, setUploading] = useState(false);
+
+  if (field.type === "text") {
+    return <input value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)}
+      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />;
+  }
+  if (field.type === "rich") {
+    return <RichText value={(value as string) ?? ""} onChange={(html) => onChange(html)} />;
+  }
+  if (field.type === "tags") {
+    const arr = Array.isArray(value) ? (value as string[]) : [];
+    return <input value={arr.join(", ")} onChange={(e) => onChange(e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}
+      placeholder="Comma-separated" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500" />;
+  }
+  if (field.type === "image") {
+    const path = value as string;
+    return (
+      <div className="flex items-center gap-3">
+        {path && (
+          <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-md bg-slate-100">
+            <Image src={mediaUrl(path)} alt="" fill sizes="96px" className="object-cover" />
+          </div>
+        )}
+        <input type="file" accept="image/*" disabled={uploading}
+          onChange={async (e) => {
+            const file = e.target.files?.[0]; if (!file) return;
+            setUploading(true);
+            try { onChange(await uploadImage(file)); } catch (err) { alert(err instanceof Error ? err.message : "Upload failed"); }
+            finally { setUploading(false); e.target.value = ""; }
+          }}
+          className="text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-slate-700" />
+        {uploading && <span className="text-xs text-slate-400">Uploading…</span>}
+      </div>
+    );
+  }
+  if (field.type === "repeater") {
+    const items = Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
+    const itemFields = field.itemFields ?? [];
+    const setItem = (i: number, k: string, v: unknown) => onChange(items.map((it, j) => (j === i ? { ...it, [k]: v } : it)));
+    const add = () => onChange([...items, Object.fromEntries(itemFields.map((f) => [f.key, f.type === "tags" ? [] : ""]))]);
+    const remove = (i: number) => onChange(items.filter((_, j) => j !== i));
+    const move = (i: number, d: -1 | 1) => { const j = i + d; if (j < 0 || j >= items.length) return; const c = [...items]; [c[i], c[j]] = [c[j], c[i]]; onChange(c); };
+    return (
+      <div className="space-y-3">
+        {items.map((it, i) => (
+          <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{field.itemLabel ?? "Item"} {i + 1}</span>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => move(i, -1)} className="rounded border border-slate-200 bg-white px-1.5 text-slate-600 hover:bg-slate-100">↑</button>
+                <button type="button" onClick={() => move(i, 1)} className="rounded border border-slate-200 bg-white px-1.5 text-slate-600 hover:bg-slate-100">↓</button>
+                <button type="button" onClick={() => remove(i)} className="rounded border border-red-200 bg-white px-1.5 text-xs text-red-600 hover:bg-red-50">✕</button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {itemFields.map((sf) => (
+                <div key={sf.key}>
+                  <label className="mb-1 block text-xs font-medium text-slate-600">{sf.label}</label>
+                  <FieldInput field={sf} value={it[sf.key]} onChange={(v) => setItem(i, sf.key, v)} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+        <button type="button" onClick={add} className="text-sm font-medium text-blue-600 hover:text-blue-800">+ Add {field.itemLabel ?? "item"}</button>
+      </div>
+    );
+  }
+  return null;
+}
+
+export default function SectionEditor({ section, initial, canRollback }: { section: SectionDef; initial: Record<string, unknown>; canRollback: boolean }) {
+  const [form, setForm] = useState<Record<string, unknown>>(initial);
   const [busy, setBusy] = useState<"" | "save" | "publish" | "rollback">("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [hasHistory, setHasHistory] = useState(canRollback);
   const [autosave, setAutosave] = useState<"idle" | "saving" | "saved">("idle");
   const firstRun = useRef(true);
 
-  // While editing, let this admin see drafts on the live site (draft-preview
-  // cookie). Cleared when they leave the editor.
-  useEffect(() => {
-    setPreviewCookie(true);
-    return () => setPreviewCookie(false);
-  }, []);
+  useEffect(() => { setPreviewCookie(true); return () => setPreviewCookie(false); }, []);
 
-  // Autosave the draft ~1.6s after typing stops.
   useEffect(() => {
     if (firstRun.current) { firstRun.current = false; return; }
     setAutosave("saving");
     const t = setTimeout(async () => {
-      await supabase.from("site_content").upsert(
-        { key: section.key, label: section.label, draft: form },
-        { onConflict: "key" },
-      );
+      await supabase.from("site_content").upsert({ key: section.key, label: section.label, draft: form }, { onConflict: "key" });
       setAutosave("saved");
     }, 1600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form]);
 
+  const setField = (k: string, v: unknown) => setForm((s) => ({ ...s, [k]: v }));
+
   async function saveDraft() {
     setBusy("save"); setMsg(null);
-    const { error } = await supabase.from("site_content").upsert(
-      { key: section.key, label: section.label, draft: form },
-      { onConflict: "key", ignoreDuplicates: false },
-    );
+    const { error } = await supabase.from("site_content").upsert({ key: section.key, label: section.label, draft: form }, { onConflict: "key", ignoreDuplicates: false });
     setBusy("");
-    if (error) return setMsg({ ok: false, text: error.message });
-    setMsg({ ok: true, text: "Draft saved." });
+    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Draft saved." });
   }
 
   async function publish() {
     setBusy("publish"); setMsg(null);
-    // snapshot current published for rollback
     const { data: cur } = await supabase.from("site_content").select("published").eq("key", section.key).maybeSingle();
-    if (cur?.published) {
+    if (cur?.published && Object.keys(cur.published).length) {
       await supabase.from("content_versions").insert({ key: section.key, snapshot: cur.published });
       setHasHistory(true);
     }
-    const { error } = await supabase.from("site_content").update({ published: form }).eq("key", section.key);
+    const { error } = await supabase.from("site_content").upsert({ key: section.key, label: section.label, published: form, draft: form }, { onConflict: "key" });
     setBusy("");
     if (error) return setMsg({ ok: false, text: error.message });
-    await logActivity(supabase, "publish", `section:${section.key}`);
+    await logActivity("publish", `section:${section.key}`);
     setMsg({ ok: true, text: "Published! This is now live on the website." });
   }
 
   async function rollback() {
     if (!confirm("Restore the previous published version?")) return;
     setBusy("rollback"); setMsg(null);
-    const { data: ver } = await supabase
-      .from("content_versions").select("id, snapshot").eq("key", section.key)
-      .order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const { data: ver } = await supabase.from("content_versions").select("id, snapshot").eq("key", section.key).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (!ver) { setBusy(""); return setMsg({ ok: false, text: "No previous version to restore." }); }
     await supabase.from("site_content").update({ published: ver.snapshot, draft: ver.snapshot }).eq("key", section.key);
     await supabase.from("content_versions").delete().eq("id", ver.id);
-    await logActivity(supabase, "rollback", `section:${section.key}`);
-    firstRun.current = true; // don't retrigger autosave from this programmatic change
-    setForm(ver.snapshot as Record<string, string>);
+    await logActivity("rollback", `section:${section.key}`);
+    firstRun.current = true;
+    setForm(ver.snapshot as Record<string, unknown>);
     setBusy("");
     setMsg({ ok: true, text: "Rolled back to the previous version." });
   }
@@ -111,18 +166,12 @@ export default function SectionEditor({
           {section.fields.map((f) => (
             <div key={f.key}>
               <label className="mb-1 block text-sm font-medium text-slate-700">{f.label}</label>
-              {f.type === "text" ? (
-                <input value={form[f.key] ?? ""} onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
-              ) : (
-                <RichText value={form[f.key] ?? ""} onChange={(html) => setForm((s) => ({ ...s, [f.key]: html }))} />
-              )}
+              <FieldInput field={f} value={form[f.key]} onChange={(v) => setField(f.key, v)} />
             </div>
           ))}
         </div>
 
         {msg && <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}
-
         <p className="mt-3 text-xs text-slate-400">
           {autosave === "saving" ? "● Autosaving draft…" : autosave === "saved" ? "✓ Draft auto-saved" : "Drafts save automatically as you type."}
         </p>
@@ -141,7 +190,7 @@ export default function SectionEditor({
           )}
         </div>
         <p className="mt-3 text-xs text-slate-400">
-          Changes are saved privately as a <b>draft</b>. Open your live site while signed in to preview them; nothing is public until you <b>Publish</b>.
+          Changes save as a <b>draft</b>. Open your live site while signed in to preview; nothing is public until you <b>Publish</b>.
         </p>
       </div>
     </div>

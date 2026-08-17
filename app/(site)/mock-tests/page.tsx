@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { getCollection } from "@/lib/content";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 import MockQuiz, { type OirQuestion } from "@/components/MockQuiz";
 
 export const dynamic = "force-dynamic";
@@ -21,13 +21,7 @@ export default async function MockTestsPage() {
 
   return (
     <main>
-      <PageHero
-        kicker="Free practice"
-        title={<>SSB <span className="tricolour-text">Mock Tests</span></>}
-        subtitle="Sharpen your screening reasoning with a free Officer Intelligence Rating (OIR) quiz — instant scoring, no sign-up."
-        image="/images/hero-parade.jpg"
-        crumb="Mock Tests"
-      />
+      <CmsHero pageKey="mock-tests" />
 
       <section className="bg-[#faf6ec] px-4 py-14 sm:py-20">
         <div className="mx-auto mb-8 max-w-3xl text-center">

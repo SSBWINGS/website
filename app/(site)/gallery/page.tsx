@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { pageMetadata } from "@/lib/seo";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 import AchievementCards from "@/components/AchievementCards";
 import OfficerBanners from "@/components/OfficerBanners";
 import CtaBanner from "@/components/CtaBannerSection";
@@ -14,13 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function GalleryPage() {
   return (
     <main>
-      <PageHero
-        crumb="Gallery"
-        kicker="Wall of Honour"
-        title={<>Faces of <span className="tricolour-text">Recommendation</span></>}
-        subtitle="Every photograph here is a real SSBWINGS aspirant who walked out of the Board recommended. Discipline, dedication and determination — made visible."
-        image="/images/women-officers.jpg"
-      />
+      <CmsHero pageKey="gallery" />
 
       <section className="py-12 text-center">
         <div className="mx-auto max-w-2xl px-4">

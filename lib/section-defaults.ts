@@ -39,10 +39,16 @@ export const CTA = {
     "Every day you delay is a day your competition trains. Book a free counselling call — a mentor will map your entry, your timeline and your battle plan.",
 };
 
-export const SECTION_DEFAULTS: Record<string, Record<string, string>> = {
+import { PAGE_HEROES } from "@/lib/pagehero-defaults";
+import { AIR1 } from "@/lib/data";
+
+export const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
   hero: HERO,
   story: STORY,
   whyus: WHYUS,
   services: SERVICES,
   cta: CTA,
+  air1: { items: AIR1 },
+  // One editable hero doc per interior page (pagehero.<page>).
+  ...Object.fromEntries(Object.entries(PAGE_HEROES).map(([k, v]) => [`pagehero.${k}`, v])),
 };

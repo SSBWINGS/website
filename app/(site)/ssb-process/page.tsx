@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 import Journey from "@/components/Journey";
 import ServicesStrip from "@/components/ServicesStrip";
 import Faq from "@/components/Faq";
@@ -13,13 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function SsbProcessPage() {
   return (
     <main>
-      <PageHero
-        crumb="The 5-Day SSB"
-        kicker="Know Your Battlefield"
-        title={<>The <span className="tricolour-text">5-Day SSB</span> Decoded</>}
-        subtitle="Five days. Three assessors. Fifteen Officer Like Qualities. Here is exactly what awaits you at the Services Selection Board — day by day, test by test."
-        image="/images/gto-training.jpg"
-      />
+      <CmsHero pageKey="ssb-process" />
       <Journey heading={false} />
       <ServicesStrip />
       <Faq />

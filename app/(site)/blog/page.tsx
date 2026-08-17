@@ -4,7 +4,7 @@ import Image from "next/image";
 import { pageMetadata } from "@/lib/seo";
 import { getCollection } from "@/lib/content";
 import { mediaUrl } from "@/lib/supabase/media";
-import PageHero from "@/components/PageHero";
+import CmsHero from "@/components/CmsHero";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +19,7 @@ export default async function BlogList() {
 
   return (
     <main>
-      <PageHero
-        kicker="Insights & current affairs"
-        title={<>SSBWINGS <span className="tricolour-text">Blog</span></>}
-        subtitle="Strategy, tips and defence current affairs for SSB aspirants — straight from our ex-SSB assessors."
-        image="/images/hero-parade.jpg"
-        crumb="Blog"
-      />
+      <CmsHero pageKey="blog" />
       <section className="bg-[#faf6ec] px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-6xl">
           {posts.length === 0 ? (
