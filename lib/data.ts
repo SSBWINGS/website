@@ -573,6 +573,7 @@ export const NAV: NavEntry[] = [
     ],
   },
   { href: "/courses", label: "Courses" },
+  { href: "/resources", label: "Resources" },
   { href: "/blog", label: "Blog" },
   {
     label: "Success",

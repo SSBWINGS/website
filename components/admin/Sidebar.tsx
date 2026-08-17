@@ -19,6 +19,7 @@ const ITEMS: Item[] = [
   { href: "/admin/faqs", label: "FAQs", icon: "❓" },
   { href: "/admin/blog", label: "Blog", icon: "📝" },
   { href: "/admin/mock-tests", label: "Mock Tests", icon: "🧠" },
+  { href: "/admin/resources", label: "Resources", icon: "📂" },
   { href: "/admin/sections", label: "Pages & Sections", icon: "✎" },
   { href: "/admin/hero-carousel", label: "Hero Carousel", icon: "🖼" },
   { href: "/admin/four-forces", label: "Four Forces", icon: "🎖" },

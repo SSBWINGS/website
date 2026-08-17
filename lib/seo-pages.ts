@@ -38,6 +38,9 @@ export const SEO_PAGES: SeoPage[] = [
   { key: "recommended", label: "Recommended Candidates", path: "/recommended",
     title: "All Recommended Candidates — Wall of Honour",
     description: "The complete wall of SSBWINGS recommended cadets across NDA, CDS, AFCAT, TES, Navy, ICG and more — hundreds of real faces and chest numbers." },
+  { key: "resources", label: "Resources", path: "/resources",
+    title: "Free SSB Resources — Notes, PDFs & Video Lessons",
+    description: "Downloadable SSB study material from SSBWINGS — notes, sample dossiers, PDFs and video lessons, organised by topic. Free for every aspirant." },
 ];
 
 export const getSeoPage = (key: string) => SEO_PAGES.find((p) => p.key === key);
