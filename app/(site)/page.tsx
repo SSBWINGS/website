@@ -6,7 +6,7 @@ import Air1Marquee from "@/components/Air1Marquee";
 import StudentWall from "@/components/StudentWall";
 import ServicesStrip from "@/components/ServicesStrip";
 import Story from "@/components/Story";
-import Journey from "@/components/Journey";
+import JourneySection from "@/components/JourneySection";
 import Courses from "@/components/Courses";
 import WhyUs from "@/components/WhyUs";
 import Mentors from "@/components/Mentors";
@@ -32,7 +32,7 @@ export default function Home() {
       <StudentWall limit={24} showCta />
       <ServicesStrip />
       <Story />
-      <Journey />
+      <JourneySection />
       <Courses />
       <WhyUs />
       <Mentors />

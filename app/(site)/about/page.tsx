@@ -9,18 +9,23 @@ import Mentors from "@/components/Mentors";
 import WhyUs from "@/components/WhyUs";
 import CtaBanner from "@/components/CtaBannerSection";
 import { STATS } from "@/lib/data";
+import { getPublished } from "@/lib/content";
+import { mediaUrl } from "@/lib/supabase/media";
+import { ABOUT_MISSION, ABOUT_VALUES } from "@/lib/section-defaults";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("about");
 }
 
-const VALUES = [
-  { icon: "🎯", title: "Merit Before Marketing", body: "We never promise recommendations. We promise assessor-grade preparation and honest feedback — the Board decides the rest." },
-  { icon: "🤝", title: "Mentorship for Life", body: "Enroll once; stay family forever. Alumni return for free monthly practice sessions and to mentor the next batch." },
-  { icon: "🛡️", title: "Discipline & Character", body: "The uniform rewards OLQs. Everything we do — from the GTO ground to midnight interview calls — builds the officer within." },
-];
+type Value = { icon: string; title: string; body: string };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [mission, valuesDoc] = await Promise.all([
+    getPublished("about_mission", ABOUT_MISSION),
+    getPublished<{ items: Value[] }>("about_values", { items: ABOUT_VALUES }),
+  ]);
+  const VALUES = valuesDoc.items?.length ? valuesDoc.items : ABOUT_VALUES;
+
   return (
     <main>
       <CmsHero pageKey="about" />
@@ -28,18 +33,14 @@ export default function AboutPage() {
       <section className="relative py-20 sm:py-24">
         <div className="mx-auto grid max-w-[1840px] items-center gap-12 px-4 sm:px-8 lg:grid-cols-2">
           <Reveal direction="left">
-            <p className="kicker">The Mission</p>
-            <h2 className="section-title mt-4 text-4xl sm:text-5xl">From Aspirant to <span className="tricolour-text">Officer</span></h2>
-            <div className="mt-6 space-y-4 text-lg leading-relaxed text-ink-soft">
-              <p>India has more than 1.4 billion people, yet the Armed Forces remain short of officers. The gap isn&apos;t talent — it&apos;s <strong className="text-ink">preparation that understands the Board</strong>.</p>
-              <p>SSBWINGS was founded to close that gap. Our director <strong className="text-ink">Vishal Kaushik</strong>, alongside a bench of retired Interviewing Officers, GTOs and DIPR-trained psychologists, built an academy that mirrors the real SSB — a full GTO ground, honest psychology feedback and one-on-one mock interviews.</p>
-              <p>The result: <strong className="text-ink">677+ recommendations</strong>, cadets marching into IMA, INA, AFA and OTA — many after repeated setbacks that we helped them turn around.</p>
-            </div>
+            <p className="kicker">{mission.kicker}</p>
+            <h2 className="section-title mt-4 text-4xl sm:text-5xl" dangerouslySetInnerHTML={{ __html: mission.title }} />
+            <div className="rich-html mt-6 space-y-4 text-lg leading-relaxed text-ink-soft [&_strong]:text-ink" dangerouslySetInnerHTML={{ __html: mission.body }} />
           </Reveal>
           <Reveal direction="right" delay={120}>
             <div className="photo-frame">
               <div>
-                <Image src="/images/campus/imagestwo-20.jpg" alt="SSBWINGS commissioned officer alumnus" width={900} height={300} sizes="(min-width:1024px) 45vw, 90vw" className="h-auto w-full" />
+                <Image src={mediaUrl(mission.image)} alt="SSBWINGS commissioned officer alumnus" width={900} height={300} sizes="(min-width:1024px) 45vw, 90vw" className="h-auto w-full" />
               </div>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-4">

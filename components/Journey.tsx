@@ -11,9 +11,9 @@ const SERVICE_GRAD: Record<string, string> = {
   airforce: "linear-gradient(160deg,#3f92cf,#235f94)",
 };
 
-export default function Journey({ heading = true }: { heading?: boolean }) {
+export default function Journey({ heading = true, days = DAYS }: { heading?: boolean; days?: typeof DAYS }) {
   const [active, setActive] = useState(0);
-  const d = DAYS[active];
+  const d = days[active];
 
   return (
     <section id="journey" className="relative py-20 sm:py-24">
@@ -29,7 +29,7 @@ export default function Journey({ heading = true }: { heading?: boolean }) {
 
         {/* Day tabs */}
         <div role="tablist" aria-label="SSB days" className="mt-12 flex flex-wrap justify-center gap-3">
-          {DAYS.map((day, i) => (
+          {days.map((day, i) => (
             <button
               key={day.code}
               role="tab"
@@ -50,7 +50,7 @@ export default function Journey({ heading = true }: { heading?: boolean }) {
 
         {/* Progress track */}
         <div className="mx-auto mt-8 hidden h-2 max-w-3xl overflow-hidden rounded-full sm:block skeu-inset" aria-hidden>
-          <div className="tricolour-bar h-full transition-all duration-500 ease-out" style={{ width: `${((active + 1) / DAYS.length) * 100}%` }} />
+          <div className="tricolour-bar h-full transition-all duration-500 ease-out" style={{ width: `${((active + 1) / days.length) * 100}%` }} />
         </div>
 
         {/* Active panel */}
@@ -60,11 +60,11 @@ export default function Journey({ heading = true }: { heading?: boolean }) {
               <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-saffron-700">{d.day} — {d.code}</p>
               <h3 className="mt-3 section-title text-3xl sm:text-4xl">{d.title}</h3>
               <p className="mt-1 font-semibold text-saffron-600">{d.subtitle}</p>
-              <p className="mt-5 leading-relaxed text-ink-soft">{d.brief}</p>
+              <p className="mt-5 leading-relaxed text-ink-soft" dangerouslySetInnerHTML={{ __html: d.brief }} />
               <div className="mt-6 rounded-xl border-l-4 border-gold-500 bg-gold-50 p-5">
                 <p className="text-sm leading-relaxed text-ink">
                   <span className="font-display font-bold uppercase tracking-wider text-saffron-700">Our Drill → </span>
-                  {d.drill}
+                  <span dangerouslySetInnerHTML={{ __html: d.drill }} />
                 </p>
               </div>
             </div>

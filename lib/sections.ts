@@ -92,6 +92,79 @@ export const SECTIONS: SectionDef[] = [
       { key: "paragraph", label: "Paragraph", type: "rich" },
     ],
   },
+  {
+    key: "whyus_items", label: "Why Us — Cards", page: "Home",
+    description: "The six 'Why aspirants trust us' cards.", previewPath: "/",
+    fields: [{ key: "items", label: "Cards", type: "repeater", itemLabel: "Card", itemFields: [
+      { key: "icon", label: "Icon (emoji)", type: "text" },
+      { key: "title", label: "Title", type: "text" },
+      { key: "body", label: "Body", type: "rich" },
+    ] }],
+  },
+  {
+    key: "journey", label: "5-Day SSB Journey", page: "Home",
+    description: "The day-by-day SSB timeline (also on the 5-Day SSB page).", previewPath: "/",
+    fields: [{ key: "items", label: "Days", type: "repeater", itemLabel: "Day", itemFields: [
+      { key: "day", label: "Day label (e.g. Day 1)", type: "text" },
+      { key: "code", label: "Code (e.g. Screening)", type: "text" },
+      { key: "service", label: "Colour theme (army/navy/airforce)", type: "text" },
+      { key: "title", label: "Title", type: "text" },
+      { key: "subtitle", label: "Subtitle", type: "text" },
+      { key: "brief", label: "Brief", type: "rich" },
+      { key: "drill", label: "Our Drill", type: "rich" },
+      { key: "tests", label: "Tests of the day", type: "repeater", itemLabel: "Test", itemFields: [
+        { key: "name", label: "Test name", type: "text" },
+        { key: "detail", label: "Detail", type: "text" },
+      ] },
+    ] }],
+  },
+  {
+    key: "about_mission", label: "Mission", page: "About",
+    description: "The 'From Aspirant to Officer' intro block.", previewPath: "/about",
+    fields: [
+      { key: "kicker", label: "Kicker", type: "text" },
+      { key: "title", label: "Title (HTML allowed)", type: "text" },
+      { key: "body", label: "Body paragraphs", type: "rich" },
+      { key: "image", label: "Photo", type: "image" },
+    ],
+  },
+  {
+    key: "about_values", label: "Core Values", page: "About",
+    description: "The three 'What we stand for' value cards.", previewPath: "/about",
+    fields: [{ key: "items", label: "Values", type: "repeater", itemLabel: "Value", itemFields: [
+      { key: "icon", label: "Icon (emoji)", type: "text" },
+      { key: "title", label: "Title", type: "text" },
+      { key: "body", label: "Body", type: "text" },
+    ] }],
+  },
+  {
+    key: "gateways", label: "Three Gateways", page: "Entries",
+    description: "The 'Where do you stand today?' gateway cards.", previewPath: "/entries",
+    fields: [{ key: "items", label: "Gateways", type: "repeater", itemLabel: "Gateway", itemFields: [
+      { key: "icon", label: "Icon (emoji)", type: "text" },
+      { key: "title", label: "Title", type: "text" },
+      { key: "body", label: "Body", type: "rich" },
+      { key: "tags", label: "Tags", type: "tags" },
+    ] }],
+  },
+  {
+    key: "join_routes", label: "Entry Routes by Service", page: "Entries",
+    description: "Army/Navy/Air Force/Coast Guard entry-route cards.", previewPath: "/entries",
+    fields: [{ key: "items", label: "Services", type: "repeater", itemLabel: "Service", itemFields: [
+      { key: "name", label: "Service name", type: "text" },
+      { key: "motto", label: "Motto", type: "text" },
+      { key: "intro", label: "Intro", type: "rich" },
+      { key: "academy", label: "Academy", type: "text" },
+      { key: "image", label: "Banner image", type: "image" },
+      { key: "routes", label: "Routes", type: "repeater", itemLabel: "Route", itemFields: [
+        { key: "name", label: "Route name", type: "text" },
+        { key: "stage", label: "Stage (After 10+2 / After Graduation / For Serving Personnel)", type: "text" },
+        { key: "who", label: "Who", type: "text" },
+        { key: "how", label: "How", type: "text" },
+        { key: "commission", label: "Commission", type: "text" },
+      ] },
+    ] }],
+  },
   ...PAGE_HERO_SECTIONS,
 ];
 

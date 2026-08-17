@@ -6,6 +6,9 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import CtaBanner from "@/components/CtaBannerSection";
 import { JOIN_ROUTES } from "@/lib/data";
+import { getPublished } from "@/lib/content";
+import { mediaUrl } from "@/lib/supabase/media";
+import { GATEWAYS as GATEWAYS_DEFAULT } from "@/lib/section-defaults";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("entries");
@@ -17,28 +20,13 @@ const STAGE_STYLE: Record<string, string> = {
   "For Serving Personnel": "bg-army-500 text-white",
 };
 
-const GATEWAYS = [
-  {
-    icon: "🎓",
-    title: "After Class 12th",
-    body: "Join right after school and train as a cadet. Routes like NDA, 10+2 TES and the Navy's 10+2 B.Tech entry commission you young — with a full degree earned in uniform.",
-    tags: ["NDA & NA", "10+2 TES", "10+2 B.Tech (Navy)"],
-  },
-  {
-    icon: "🎖️",
-    title: "After Graduation",
-    body: "Already a graduate? CDS, AFCAT, TGC, SSC, NCC Special and JAG open both Permanent and Short Service Commissions across all branches and specialisations.",
-    tags: ["CDS", "AFCAT", "TGC / SSC Tech", "NCC Special", "JAG"],
-  },
-  {
-    icon: "⚔️",
-    title: "From the Ranks",
-    body: "Serving soldiers, sailors and airmen can earn a commission through departmental entries like ACC and SCO — the classic 'Sipahi to Officer' journey many of our alumni have walked.",
-    tags: ["ACC", "SCO", "Departmental"],
-  },
-];
-
-export default function EntriesPage() {
+export default async function EntriesPage() {
+  const [gwDoc, routesDoc] = await Promise.all([
+    getPublished<{ items: typeof GATEWAYS_DEFAULT }>("gateways", { items: GATEWAYS_DEFAULT }),
+    getPublished<{ items: typeof JOIN_ROUTES }>("join_routes", { items: JOIN_ROUTES }),
+  ]);
+  const GATEWAYS = gwDoc.items?.length ? gwDoc.items : GATEWAYS_DEFAULT;
+  const routes = routesDoc.items?.length ? routesDoc.items : JOIN_ROUTES;
   return (
     <main>
       <CmsHero pageKey="entries" />
@@ -58,7 +46,7 @@ export default function EntriesPage() {
                 <article className="card-lift skeu-panel h-full p-8">
                   <span className="text-5xl" aria-hidden>{g.icon}</span>
                   <h3 className="mt-4 font-display text-2xl font-bold uppercase text-ink">{g.title}</h3>
-                  <p className="mt-3 leading-relaxed text-ink-soft">{g.body}</p>
+                  <p className="mt-3 leading-relaxed text-ink-soft" dangerouslySetInnerHTML={{ __html: g.body }} />
                   <ul className="mt-5 flex flex-wrap gap-2">
                     {g.tags.map((t) => (
                       <li key={t} className="rounded-full bg-paper-2 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ink-soft shadow-[var(--shadow-pressed)]">{t}</li>
@@ -72,7 +60,7 @@ export default function EntriesPage() {
       </section>
 
       {/* Per-service entry routes */}
-      {JOIN_ROUTES.map((svc, si) => (
+      {routes.map((svc, si) => (
         <section key={svc.id} className={`relative py-16 sm:py-20 ${si % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
           <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
             <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.4fr]">
@@ -80,7 +68,7 @@ export default function EntriesPage() {
               <div className="lg:sticky lg:top-24 lg:self-start">
                 <Reveal direction="left">
                   <div className="card-lift relative overflow-hidden rounded-2xl p-8 text-white shadow-[var(--shadow-plate)]">
-                    <Image src={svc.image} alt="" fill sizes="(min-width:1024px) 30vw, 90vw" className="object-cover" />
+                    <Image src={mediaUrl(svc.image)} alt="" fill sizes="(min-width:1024px) 30vw, 90vw" className="object-cover" />
                     <div className="absolute inset-0" style={{ background: svc.grad, opacity: 0.82 }} aria-hidden />
                     <div className="relative">
                       <p className="font-display text-sm font-bold uppercase tracking-[0.25em] text-white/80">{svc.motto}</p>

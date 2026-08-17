@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import CmsHero from "@/components/CmsHero";
-import Journey from "@/components/Journey";
+import JourneySection from "@/components/JourneySection";
 import ServicesStrip from "@/components/ServicesStrip";
 import Faq from "@/components/Faq";
 import CtaBanner from "@/components/CtaBannerSection";
@@ -14,7 +14,7 @@ export default function SsbProcessPage() {
   return (
     <main>
       <CmsHero pageKey="ssb-process" />
-      <Journey heading={false} />
+      <JourneySection heading={false} />
       <ServicesStrip />
       <Faq />
       <CtaBanner />
