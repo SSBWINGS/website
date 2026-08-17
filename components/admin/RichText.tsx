@@ -33,13 +33,16 @@ export default function RichText({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Sync the editor with the external value (e.g. when you click "Edit" and the
+  // record's saved content loads), but never while the user is typing in it —
+  // that would reset the caret. So we only overwrite when the editor isn't focused.
   useEffect(() => {
-    if (ref.current && ref.current.innerHTML !== value) {
-      ref.current.innerHTML = value || "";
+    const el = ref.current;
+    if (!el) return;
+    if (document.activeElement !== el && el.innerHTML !== (value || "")) {
+      el.innerHTML = value || "";
     }
-    // Only set once on mount / when switching records (value identity change).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value]);
 
   const emit = () => onChange(ref.current?.innerHTML ?? "");
 
