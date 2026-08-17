@@ -4,21 +4,17 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NAV, isNavGroup, SITE } from "@/lib/data";
-import { useContactModal } from "./ModalProvider";
+import { NAV, isNavGroup } from "@/lib/data";
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [desktopGroup, setDesktopGroup] = useState<string | null>(null);
   const pathname = usePathname();
-  const { open: openModal } = useContactModal();
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 20);
       const doc = document.documentElement;
       const max = doc.scrollHeight - window.innerHeight;
       setProgress(max > 0 ? (window.scrollY / max) * 100 : 0);
@@ -32,23 +28,6 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Top contact strip */}
-      <div
-        className={`bg-navy-950 text-paper transition-all duration-300 ${
-          scrolled ? "max-h-0 overflow-hidden opacity-0" : "max-h-12 opacity-100"
-        }`}
-      >
-        <div className="mx-auto flex max-w-[1840px] items-center justify-between gap-4 px-4 py-1.5 text-xs sm:px-8">
-          <p className="hidden font-medium tracking-wide sm:block">
-            🎖️ Champions of Discipline, Dedication &amp; Determination
-          </p>
-          <div className="flex items-center gap-4">
-            <a href={SITE.phone1Href} className="transition-colors hover:text-gold-300">📞 {SITE.phone1}</a>
-            <a href={`mailto:${SITE.email}`} className="hidden transition-colors hover:text-gold-300 sm:block">✉️ {SITE.email}</a>
-          </div>
-        </div>
-      </div>
-
       {/* Main nav — light skeuomorphic bar */}
       <nav
         aria-label="Primary"
@@ -172,10 +151,6 @@ export default function Navbar() {
               Contact
             </Link>
 
-            {/* Desktop: Enquire */}
-            <button onClick={openModal} className="btn btn-gold btn-shine hidden px-5 py-2.5 text-sm xl:inline-flex">
-              Enquire
-            </button>
 
             {/* Mobile: compact "+" glyph */}
             <Link
@@ -261,7 +236,7 @@ export default function Navbar() {
                 );
               })}
               <li className="pt-2">
-                <button onClick={openModal} className="btn btn-gold w-full">Book Free Counselling</button>
+                <Link href="/contact" className="btn btn-gold w-full inline-flex justify-center">Book Free Counselling</Link>
               </li>
             </ul>
           </div>

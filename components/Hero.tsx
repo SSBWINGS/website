@@ -5,8 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Counter from "./Counter";
 import PhotoCarousel from "./PhotoCarousel";
-import { useContactModal } from "./ModalProvider";
-
 const ROLES = ["an Officer", "a Leader", "a Warrior", "Recommended"];
 
 import { HERO } from "@/lib/section-defaults";
@@ -61,7 +59,6 @@ const DEFAULT_STATS = [
 
 export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS }: { content?: HeroContent; stats?: { value: number; label: string }[] }) {
   const typed = useTypewriter(ROLES);
-  const { open } = useContactModal();
 
   return (
     <section className="relative overflow-hidden">
@@ -106,12 +103,12 @@ export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS }: 
           />
 
           <div className="mt-6 flex flex-wrap items-center gap-4">
-            <button onClick={open} className="btn btn-saffron btn-shine text-base">
+            <Link href="/contact" className="btn btn-saffron btn-shine text-base">
               Book Free Counselling
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </button>
+            </Link>
             <Link href="/ssb-process" className="btn btn-outline btn-shine">Decode the 5-Day SSB</Link>
           </div>
 

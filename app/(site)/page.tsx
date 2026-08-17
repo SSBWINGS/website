@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import HeroSection from "@/components/HeroSection";
 import EntriesTicker from "@/components/EntriesTicker";
+import Air1Marquee from "@/components/Air1Marquee";
 import StudentWall from "@/components/StudentWall";
 import ServicesStrip from "@/components/ServicesStrip";
 import Story from "@/components/Story";
@@ -27,6 +28,7 @@ export default function Home() {
     <main>
       <HeroSection />
       <EntriesTicker />
+      <Air1Marquee />
       <StudentWall limit={24} showCta />
       <ServicesStrip />
       <Story />

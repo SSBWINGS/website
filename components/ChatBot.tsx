@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { SITE, BATCH_INFO, BOOK, STATS } from "@/lib/data";
+import { SITE, BATCH_INFO, BOOKS, STATS } from "@/lib/data";
 
 type Link = { label: string; href: string; download?: boolean };
 type Msg = { from: "bot" | "user"; text: string; links?: Link[] };
@@ -31,30 +31,30 @@ const KB: Entry[] = [
   {
     id: "dates",
     keys: ["date", "when", "next batch", "batch date", "schedule", "starting", "start date", "timing", "upcoming", "commence"],
-    a: `${BATCH_INFO.offline}\n\n${BATCH_INFO.online}\n\nFor the exact next start date, tap enrol or message us on WhatsApp — our team confirms instantly.`,
+    a: `${BATCH_INFO.offline}\n\n${BATCH_INFO.online}\n\nFor the exact next start date, tap enroll or message us on WhatsApp — our team confirms instantly.`,
     links: [
-      { label: "Enrol — Offline", href: SITE.enrollOffline },
-      { label: "Enrol — Online", href: SITE.enrollOnline },
+      { label: "Enroll — Offline", href: SITE.enrollOffline },
+      { label: "Enroll — Online", href: SITE.enrollOnline },
       { label: "Ask on WhatsApp", href: WA },
     ],
   },
   {
     id: "fees",
     keys: ["fee", "fees", "price", "cost", "charge", "how much", "payment", "pay ", "rupee"],
-    a: "Course fees vary by batch and are best confirmed on a quick free counselling call. Offline includes an optional AC hostel @ ₹500/day with meals. You can enrol & pay securely via Razorpay from the course cards.",
+    a: "Course fees vary by batch and are best confirmed on a quick free counselling call. Offline includes an optional AC hostel @ ₹500/day with meals. You can enroll & pay securely via Razorpay from the course cards.",
     links: [
-      { label: "Enrol — Offline", href: SITE.enrollOffline },
-      { label: "Enrol — Online", href: SITE.enrollOnline },
+      { label: "Enroll — Offline", href: SITE.enrollOffline },
+      { label: "Enroll — Online", href: SITE.enrollOnline },
       { label: "Free counselling on WhatsApp", href: WA },
     ],
   },
   {
     id: "courses",
-    keys: ["course", "program", "programme", "training", "which class", "enrol", "enroll", "buy", "purchase", "join batch"],
-    a: "We offer three ways to train: 🎖 15-Day Offline Immersion (Noida campus), 💻 20-Day Online Masterclass (live 8–10 PM), and 📱 the SSB Smart Learning App. You can enrol online securely below.",
+    keys: ["course", "program", "programme", "training", "which class", "enroll", "enroll", "buy", "purchase", "join batch"],
+    a: "We offer three ways to train: 🎖 15-Day Offline Immersion (Noida campus), 💻 20-Day Online Masterclass (live 8–10 PM), and 📱 the SSB Smart Learning App. You can enroll online securely below.",
     links: [
-      { label: "Enrol — Offline Batch", href: SITE.enrollOffline },
-      { label: "Enrol — Online Batch", href: SITE.enrollOnline },
+      { label: "Enroll — Offline Batch", href: SITE.enrollOffline },
+      { label: "Enroll — Online Batch", href: SITE.enrollOnline },
       { label: "View all courses →", href: "/courses" },
     ],
   },
@@ -62,13 +62,13 @@ const KB: Entry[] = [
     id: "offline",
     keys: ["offline", "noida", "campus", "residential", "15 day", "15-day"],
     a: `Offline: a 15-day residential immersion at our Noida Sector 62 campus — psychology dossiers, a real GTO ground, mock boards & one-on-one interviews. ${BATCH_INFO.offline}`,
-    links: [{ label: "Enrol in Offline Batch", href: SITE.enrollOffline }],
+    links: [{ label: "Enroll in Offline Batch", href: SITE.enrollOffline }],
   },
   {
     id: "online",
     keys: ["online", "remote", "live class", "evening", "20 day", "20-day", "work"],
     a: `Online: a 20-day live masterclass, 8:00–10:00 PM IST, with recordings provided. ${BATCH_INFO.online}`,
-    links: [{ label: "Enrol in Online Batch", href: SITE.enrollOnline }],
+    links: [{ label: "Enroll in Online Batch", href: SITE.enrollOnline }],
   },
   {
     id: "why",
@@ -97,8 +97,8 @@ const KB: Entry[] = [
   {
     id: "book",
     keys: ["book", "victor kilo", "read", "author", "vishal kaushik"],
-    a: `📖 "${BOOK.title} — ${BOOK.subtitle}" by our Director ${BOOK.author}. ${BOOK.price} (${BOOK.rating}). ${BOOK.blurb}`,
-    links: [{ label: "Buy on Flipkart", href: BOOK.buyUrl }],
+    a: `📖 Two books by our team — "${BOOKS[0].title}" and "${BOOKS[1].title} — ${BOOKS[1].subtitle}" by ${BOOKS[1].author}. ${BOOKS[1].blurb}`,
+    links: BOOKS.map((b) => ({ label: `Buy "${b.title}" on Flipkart`, href: b.buyUrl })),
   },
   {
     id: "brochure",

@@ -55,3 +55,7 @@ next-env.d.ts
 # Bulk candidate source images (uploaded to Supabase, not committed)
 /january onwards pic/
 /old pics/
+
+# Root book-cover originals (copied into public/images/books)
+/ssb-interview-workbook-original-*.webp
+/victor-kilo-the-hustle-*.webp

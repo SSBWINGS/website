@@ -1,15 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import Reveal from "./Reveal";
 import { SITE } from "@/lib/data";
 import { CTA } from "@/lib/section-defaults";
-import { useContactModal } from "./ModalProvider";
 
 type CtaContent = { eyebrow: string; title: string; paragraph: string };
 
 export default function CtaBanner({ content = CTA }: { content?: CtaContent }) {
-  const { open } = useContactModal();
   return (
     <section className="relative overflow-hidden py-16 sm:py-20">
       <div className="tricolour-bar absolute inset-x-0 top-0 z-10 h-2" aria-hidden />
@@ -25,7 +24,7 @@ export default function CtaBanner({ content = CTA }: { content?: CtaContent }) {
         <h2 className="section-title mt-4 text-4xl leading-tight sm:text-6xl" dangerouslySetInnerHTML={{ __html: content.title }} />
         <p className="rich-html mx-auto mt-5 max-w-xl text-lg text-ink-soft" dangerouslySetInnerHTML={{ __html: content.paragraph }} />
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <button onClick={open} className="btn btn-saffron btn-shine text-base">Book Free Counselling</button>
+          <Link href="/contact" className="btn btn-saffron btn-shine text-base">Book Free Counselling</Link>
           <a href={SITE.phone1Href} className="btn btn-outline btn-shine">📞 Call {SITE.phone1}</a>
         </div>
       </Reveal>

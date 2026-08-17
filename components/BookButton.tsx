@@ -1,6 +1,4 @@
-"use client";
-
-import { useContactModal } from "./ModalProvider";
+import Link from "next/link";
 
 export default function BookButton({
   children = "Book Free Counselling",
@@ -9,10 +7,9 @@ export default function BookButton({
   children?: React.ReactNode;
   className?: string;
 }) {
-  const { open } = useContactModal();
   return (
-    <button type="button" onClick={open} className={className}>
+    <Link href="/contact" className={className}>
       {children}
-    </button>
+    </Link>
   );
 }

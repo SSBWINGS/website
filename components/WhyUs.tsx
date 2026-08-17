@@ -7,7 +7,7 @@ import { WHYUS } from "@/lib/section-defaults";
 const USPS = [
   { title: "Mentored by Ex-SSB Assessors", body: "Learn from officers who sat on the other side of the table — retired Interviewing Officers, GTOs and psychology experts who assessed thousands at real Boards.", icon: "🎖️" },
   { title: "Real GTO Ground on Campus", body: "Full-scale PGT structures, command task areas and obstacle courses. You rehearse Day 3 & 4 physically — not on a whiteboard.", icon: "🪖" },
-  { title: "Guidance Till Recommendation", body: "One enrolment, our commitment till you hear your chest number called. Repeaters get focused conference-out analysis and a rebuilt strategy.", icon: "🧭" },
+  { title: "Guidance Till Recommendation", body: "One enrollment, our commitment till you hear your chest number called. Repeaters get focused conference-out analysis and a rebuilt strategy.", icon: "🧭" },
   { title: "Personal Attention, Small Batches", body: "Every dossier read, every mock interview debriefed one-on-one. You are a name and a personality here — never a roll number.", icon: "🔍" },
   { title: "3,450+ Strong Alumni Network", body: "Serving officers across the Army, Navy and Air Force mentor the next generation. Free monthly practice sessions for alumni, always.", icon: "🤝" },
   { title: "Merit-First, No False Promises", body: "No academy can 'guarantee' a recommendation. We build the officer; the Board does the rest — honestly, transparently.", icon: "⚖️" },

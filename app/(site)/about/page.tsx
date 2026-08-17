@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const VALUES = [
   { icon: "🎯", title: "Merit Before Marketing", body: "We never promise recommendations. We promise assessor-grade preparation and honest feedback — the Board decides the rest." },
-  { icon: "🤝", title: "Mentorship for Life", body: "Enrol once; stay family forever. Alumni return for free monthly practice sessions and to mentor the next batch." },
+  { icon: "🤝", title: "Mentorship for Life", body: "Enroll once; stay family forever. Alumni return for free monthly practice sessions and to mentor the next batch." },
   { icon: "🛡️", title: "Discipline & Character", body: "The uniform rewards OLQs. Everything we do — from the GTO ground to midnight interview calls — builds the officer within." },
 ];
 

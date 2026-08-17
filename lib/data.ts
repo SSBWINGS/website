@@ -22,28 +22,52 @@ export const SITE = {
   enrollOnline: "https://pages.razorpay.com/ssbwingsonlinebatch",
 };
 
-/** Batch cadence — exact upcoming dates are confirmed on enrolment / WhatsApp. */
+/** Batch cadence — exact upcoming dates are confirmed on enrollment / WhatsApp. */
 export const BATCH_INFO = {
-  offline: "Two fresh 15-day offline batches begin every month at our Noida Sector 62 campus (typically around the 1st and 15th). Exact dates for the next batch are confirmed at enrolment.",
-  online: "20-day online batches run live from 8:00–10:00 PM IST and start every month. The next start date is shared on enrolment or over WhatsApp.",
+  offline: "Two fresh 15-day offline batches begin every month at our Noida Sector 62 campus (typically around the 1st and 15th). Exact dates for the next batch are confirmed at enrollment.",
+  online: "20-day online batches run live from 8:00–10:00 PM IST and start every month. The next start date is shared on enrollment or over WhatsApp.",
 };
 
 /** Book by Director & GTO mentor Vishal Kaushik (Flipkart). */
-export const BOOK = {
-  title: "Victor Kilo",
-  subtitle: "The Hustle Behind Earning the Stars",
-  author: "Vishal Kaushik",
-  publisher: "SSBWINGS Leadership LLP",
-  price: "₹259",
-  mrp: "₹399",
-  rating: "4.9★ (57 ratings)",
-  edition: "Paperback · First Edition, 2026",
-  isbn: "9789356927520",
-  blurb:
-    "Written by our Director & GTO mentor Vishal Kaushik, this book takes you inside the grit, mindset and everyday hustle behind earning the officer's stars — real lessons from the journey to the Armed Forces.",
-  buyUrl:
-    "https://www.flipkart.com/victor-kilo-hustle-behind-earning-stars/p/itmf5ee8bd3badf7?pid=9789356927520",
+export type BookItem = {
+  title: string;
+  subtitle: string;
+  author: string;
+  publisher: string;
+  rating?: string;
+  edition?: string;
+  blurb: string;
+  cover: string;
+  buyUrl: string;
 };
+
+export const BOOKS: BookItem[] = [
+  {
+    title: "SSBWINGS SSB Interview Workbook",
+    subtitle: "SSB Interview Preparation Book",
+    author: "Vishal Kaushik",
+    publisher: "SSBWINGS Leadership LLP",
+    rating: "4.9★",
+    edition: "Paperback",
+    blurb:
+      "A complete, practice-first workbook for the SSB Interview — structured drills and templates across Screening (OIR, PPDT), Psychology (TAT, WAT, SRT, SD), GTO and the Personal Interview, so you walk into the Board rehearsed, not guessing.",
+    cover: "/images/books/ssb-interview-workbook.webp",
+    buyUrl: "https://fkrt.co/0s0exZ",
+  },
+  {
+    title: "Victor Kilo",
+    subtitle: "The Hustle Behind Earning the Stars",
+    author: "Vishal Kaushik",
+    publisher: "SSBWINGS Leadership LLP",
+    rating: "4.9★ (57 ratings)",
+    edition: "Paperback · First Edition, 2026",
+    blurb:
+      "Written by our Director & GTO mentor Vishal Kaushik, this book takes you inside the grit, mindset and everyday hustle behind earning the officer's stars — real lessons from the journey to the Armed Forces.",
+    cover: "/images/books/victor-kilo.webp",
+    buyUrl:
+      "https://www.flipkart.com/victor-kilo-hustle-behind-earning-stars/p/itmf5ee8bd3badf7?pid=9789356927520",
+  },
+];
 
 export const STATS = [
   { value: 677, label: "Recommendations" },
@@ -68,7 +92,6 @@ export const ENTRIES = [
   "SSC (Tech) – Men & Women",
   "NCC Special Entry",
   "JAG (Judge Advocate General)",
-  "University Entry Scheme (UES)",
   // Navy — after graduation
   "CDS – INA (Navy)",
   "SSC Executive – GS(X) & Technical",
@@ -110,12 +133,26 @@ export const ENTRIES_SHORT = [
   "Meteorology",
   "NCC Special",
   "JAG",
-  "UES",
   "ICG AC – GD",
   "ICG AC – Pilot/Nav",
   "ICG AC – Tech",
   "ACC & SCO",
   "PC (SL)",
+];
+
+// All India Rank 1 highlights for the homepage marquee (CMS-overridable via the
+// site_content "air1" doc; admins can add real cadet names, e.g. "Ravi · NDA").
+export const AIR1 = [
+  "NDA · AIR 1",
+  "CDS (OTA) · AIR 1",
+  "CDS (IMA) · AIR 1",
+  "AFCAT · AIR 1",
+  "TES · AIR 1",
+  "10+2 B.Tech (Navy) · AIR 1",
+  "SSC Tech · AIR 1",
+  "NCC Special · AIR 1",
+  "AFCAT (Flying) · AIR 1",
+  "ICG Asst Commandant · AIR 1",
 ];
 
 export type Service = "army" | "navy" | "airforce";
@@ -217,6 +254,7 @@ export type CourseItem = {
   highlight: boolean;
   title: string;
   where: string;
+  price?: string;
   service: Service;
   desc: string;
   features: string[];
@@ -231,6 +269,7 @@ export const COURSES: CourseItem[] = [
     highlight: true,
     title: "15-Day Offline Immersion",
     where: "Noida Sector 62 Campus",
+    price: "₹24,999",
     service: "army" as Service,
     desc: "Live like a cadet for 15 days. Psychology dossiers, real GTO ground, mock boards and one-on-one interviews — the complete rebuild.",
     features: [
@@ -238,16 +277,17 @@ export const COURSES: CourseItem[] = [
       "Full-scale GTO ground: PGT, HGT, Command Task on real obstacles",
       "Mock personal interviews by retired Interviewing Officers",
       "Mock PPDT screenings & group discussions every week",
-      "2 fresh batches every month · optional AC hostel @ ₹500/day with meals",
+      "2 fresh batches every month at the Noida campus",
     ],
-    cta: "Enrol in Offline Batch",
+    cta: "Enroll in Offline Batch",
     enrollUrl: "https://pages.razorpay.com/ssbwings",
   },
   {
     tag: "For Working Aspirants",
     highlight: false,
-    title: "20-Day Online Masterclass",
+    title: "1-Month Online Batch",
     where: "Live · 8:00–10:00 PM IST",
+    price: "₹6,999",
     service: "airforce" as Service,
     desc: "The same mentors, the same method — beamed to your desk every evening. Built for college students, working professionals and remote aspirants.",
     features: [
@@ -257,7 +297,7 @@ export const COURSES: CourseItem[] = [
       "Live doubt-clearing with mentors after every session",
       "Recordings available — never miss a class",
     ],
-    cta: "Enrol in Online Batch",
+    cta: "Enroll in Online Batch",
     enrollUrl: "https://pages.razorpay.com/ssbwingsonlinebatch",
   },
   {
@@ -444,7 +484,6 @@ export const JOIN_ROUTES: {
       { name: "SSC (Tech) – Men & Women", stage: "After Graduation", who: "Men & women, 20–27 yrs. Engineering degree.", how: "Shortlist on merit → SSB → Medical", commission: "Short Service · OTA" },
       { name: "NCC Special Entry", stage: "After Graduation", who: "Men & women with NCC 'C' certificate (min B grade).", how: "NCC Directorate slot → SSB → Medical (no written)", commission: "Short Service · OTA" },
       { name: "JAG (Judge Advocate General)", stage: "After Graduation", who: "Men & women, 21–27 yrs. LLB (min 55%).", how: "Shortlist → SSB → Medical", commission: "Short Service · OTA" },
-      { name: "University Entry Scheme (UES)", stage: "After Graduation", who: "Pre-final year engineering students (unmarried men & women).", how: "Campus shortlist → SSB → Medical (no written)", commission: "Permanent · IMA" },
       { name: "ACC & SCO", stage: "For Serving Personnel", who: "Serving soldiers of the Army meeting service & education criteria.", how: "Departmental written exam → SSB → Medical", commission: "Permanent · via ACC / direct" },
     ],
   },

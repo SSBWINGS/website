@@ -1,13 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
-import { COURSES, BOOK, SITE } from "@/lib/data";
-import { useContactModal } from "./ModalProvider";
+import { COURSES, BOOKS, SITE } from "@/lib/data";
 
 export default function Courses({ heading = true }: { heading?: boolean }) {
-  const { open } = useContactModal();
   return (
     <section id="courses" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
@@ -40,6 +39,12 @@ export default function Courses({ heading = true }: { heading?: boolean }) {
 
                 <h3 className="mt-5 section-title text-3xl">{c.title}</h3>
                 <p className="mt-1 font-display text-sm font-semibold uppercase tracking-[0.18em] text-saffron-700">{c.where}</p>
+                {c.price && (
+                  <p className="mt-3 font-display text-3xl font-black text-ink">
+                    {c.price}
+                    <span className="ml-2 align-middle text-xs font-semibold uppercase tracking-wide text-ink-soft">all inclusive</span>
+                  </p>
+                )}
                 <p className="mt-4 leading-relaxed text-ink-soft">{c.desc}</p>
 
                 {c.image && (
@@ -74,7 +79,7 @@ export default function Courses({ heading = true }: { heading?: boolean }) {
                     </svg>
                   </a>
                 ) : (
-                  <button onClick={open} className="btn btn-ink btn-shine mt-8 w-full">{c.cta}</button>
+                  <Link href="/contact" className="btn btn-ink btn-shine mt-8 w-full">{c.cta}</Link>
                 )}
                 {c.enrollUrl && (
                   <p className="mt-2 text-center text-[11px] text-ink-soft">🔒 Secure payment via Razorpay · seats limited</p>
@@ -91,53 +96,45 @@ export default function Courses({ heading = true }: { heading?: boolean }) {
           </p>
         </Reveal>
 
-        {/* Featured book */}
-        <Reveal delay={100} className="mt-14">
-          <article className="skeu-plate card-lift grid items-center gap-8 overflow-hidden p-8 sm:p-10 md:grid-cols-[auto_1fr]">
-            {/* Book cover mockup */}
-            <div className="mx-auto w-[190px]">
-              <div className="relative aspect-[3/4.4] w-full overflow-hidden rounded-r-md rounded-l-sm shadow-[0_18px_40px_-14px_rgba(16,24,32,0.7)]"
-                style={{ background: "linear-gradient(160deg,#16233f,#0a1524)" }}>
-                <div className="absolute inset-y-0 left-0 w-2.5 bg-gradient-to-r from-black/50 to-transparent" aria-hidden />
-                <div className="tricolour-bar absolute inset-x-0 top-0 h-1" aria-hidden />
-                <div className="flex h-full flex-col items-center justify-between p-4 text-center">
-                  <Image src="/logo.webp" alt="" width={44} height={44} className="mt-2 h-11 w-11 object-contain opacity-90" />
-                  <div>
-                    <p className="font-display text-3xl font-black uppercase leading-none gold-text">Victor</p>
-                    <p className="font-display text-3xl font-black uppercase leading-none gold-text">Kilo</p>
-                    <p className="mt-3 text-[10px] font-semibold uppercase tracking-widest text-navy-100/80">The Hustle Behind<br />Earning the Stars</p>
+        {/* Featured books */}
+        <div className="mt-14 space-y-8">
+          {BOOKS.map((book, i) => (
+            <Reveal key={book.title} delay={100}>
+              <article className="skeu-plate card-lift grid items-center gap-8 overflow-hidden p-8 sm:p-10 md:grid-cols-[auto_1fr]">
+                {/* Real cover */}
+                <div className="mx-auto w-[190px]">
+                  <div className="relative aspect-[3/4.4] w-full overflow-hidden rounded-r-md rounded-l-sm shadow-[0_18px_40px_-14px_rgba(16,24,32,0.7)]">
+                    <Image src={book.cover} alt={`${book.title} — ${book.subtitle}`} fill sizes="190px" className="object-cover" />
                   </div>
-                  <p className="mb-1 text-[11px] font-bold uppercase tracking-wide text-gold-300">Vishal Kaushik</p>
                 </div>
-              </div>
-            </div>
 
-            {/* Details */}
-            <div>
-              <p className="kicker">From Our Director&apos;s Desk</p>
-              <h3 className="mt-3 section-title text-3xl sm:text-4xl">
-                {BOOK.title} <span className="tricolour-text">— {BOOK.subtitle}</span>
-              </h3>
-              <p className="mt-2 font-display text-sm font-semibold uppercase tracking-[0.16em] text-saffron-700">
-                By {BOOK.author} · {BOOK.publisher}
-              </p>
-              <p className="mt-4 max-w-2xl leading-relaxed text-ink-soft">{BOOK.blurb}</p>
+                {/* Details */}
+                <div>
+                  <p className="kicker">{i === 0 ? "New · SSB Workbook" : "From Our Director’s Desk"}</p>
+                  <h3 className="mt-3 section-title text-3xl sm:text-4xl">
+                    {book.title} <span className="tricolour-text">— {book.subtitle}</span>
+                  </h3>
+                  <p className="mt-2 font-display text-sm font-semibold uppercase tracking-[0.16em] text-saffron-700">
+                    By {book.author} · {book.publisher}
+                  </p>
+                  <p className="mt-4 max-w-2xl leading-relaxed text-ink-soft">{book.blurb}</p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3">
-                <span className="skeu-inset px-3 py-1.5 text-sm font-bold text-ink">{BOOK.price} <span className="text-xs font-normal text-ink-soft line-through">{BOOK.mrp}</span></span>
-                <span className="skeu-inset px-3 py-1.5 text-sm font-semibold text-tri-green-700">{BOOK.rating}</span>
-                <span className="skeu-inset px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-ink-soft">{BOOK.edition}</span>
-              </div>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    {book.rating && <span className="skeu-inset px-3 py-1.5 text-sm font-semibold text-tri-green-700">{book.rating}</span>}
+                    {book.edition && <span className="skeu-inset px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-ink-soft">{book.edition}</span>}
+                  </div>
 
-              <a href={BOOK.buyUrl} target="_blank" rel="noopener noreferrer" className="btn btn-saffron btn-shine mt-6">
-                Buy on Flipkart
-                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden>
-                  <path d="M7 17 17 7m0 0H9m8 0v8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
-            </div>
-          </article>
-        </Reveal>
+                  <a href={book.buyUrl} target="_blank" rel="noopener noreferrer" className="btn btn-saffron btn-shine mt-6">
+                    Buy on Flipkart
+                    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden>
+                      <path d="M7 17 17 7m0 0H9m8 0v8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
