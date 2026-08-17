@@ -1,12 +1,20 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 import { COURSES, BOOKS, SITE } from "@/lib/data";
+import { getPublished } from "@/lib/content";
 
-export default function Courses({ heading = true }: { heading?: boolean }) {
+// Fields an admin may safely edit; payment URL, button, styling & image stay in code.
+type CourseEdit = { tag: string; title: string; where: string; price: string; desc: string; features: string[] };
+const pickSafe = (c: (typeof COURSES)[number]): CourseEdit => ({
+  tag: c.tag, title: c.title, where: c.where, price: c.price ?? "", desc: c.desc, features: c.features,
+});
+
+export default async function Courses({ heading = true }: { heading?: boolean }) {
+  const doc = await getPublished<{ items: CourseEdit[] }>("courses_cards", { items: COURSES.map(pickSafe) });
+  // Merge editable text over the protected code card (enrollUrl, cta, highlight, image kept).
+  const cards = COURSES.map((c, i) => ({ ...c, ...(doc.items?.[i] ?? {}) }));
   return (
     <section id="courses" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
@@ -28,7 +36,7 @@ export default function Courses({ heading = true }: { heading?: boolean }) {
         </div>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-3">
-          {COURSES.map((c, i) => (
+          {cards.map((c, i) => (
             <Reveal key={c.title} delay={i * 130} className="h-full">
               <article className={`card-lift relative flex h-full flex-col overflow-hidden p-8 ${c.highlight ? "skeu-plate" : "skeu-panel"}`}>
                 {c.highlight && <div className="tricolour-bar absolute inset-x-0 top-0 h-1.5" aria-hidden />}
