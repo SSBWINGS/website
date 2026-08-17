@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { NAV_LINKS, ENTRIES_SHORT } from "@/lib/data";
+import { NAV_LINKS } from "@/lib/data";
 import { getSettings, telHref } from "@/lib/content";
 
 export default async function Footer() {
@@ -45,16 +45,20 @@ export default async function Footer() {
             </ul>
           </nav>
 
-          <nav aria-label="Entries we coach">
-            <h3 className="font-display text-lg font-bold uppercase tracking-widest text-gold-400">Entries We Coach</h3>
-            <ul className="mt-5 grid grid-cols-2 gap-x-5 gap-y-3 text-sm">
-              {ENTRIES_SHORT.map((e) => (
-                <li key={e} className="flex items-center gap-1.5 whitespace-nowrap text-navy-100/85">
-                  <span className="text-saffron-500" aria-hidden>★</span> {e}
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div>
+            <h3 className="font-display text-lg font-bold uppercase tracking-widest text-gold-400">Find Us</h3>
+            <p className="mt-4 text-sm text-navy-100/80">{SITE.address}</p>
+            <a href="https://maps.google.com/maps?q=SSBWINGS%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=16" target="_blank" rel="noopener noreferrer"
+              className="mt-4 block overflow-hidden rounded-xl border border-navy-700/60">
+              <iframe
+                title="SSBWINGS location — Sector 62, Noida"
+                src="https://maps.google.com/maps?q=SSBWINGS%2C%20C-56%2F43%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=15&output=embed"
+                className="pointer-events-none h-36 w-full"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </a>
+          </div>
 
           <div>
             <h3 className="font-display text-lg font-bold uppercase tracking-widest text-gold-400">Contact HQ</h3>
@@ -68,18 +72,29 @@ export default async function Footer() {
             </address>
             <div className="mt-5 flex gap-3">
               {[
-                { label: "YouTube", href: SITE.youtube },
-                { label: "Instagram", href: SITE.instagram },
-                { label: "Telegram", href: SITE.telegram },
+                {
+                  label: "YouTube", href: SITE.youtube,
+                  icon: <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.2 3.6-6.2 3.6Z" />,
+                },
+                {
+                  label: "Instagram", href: SITE.instagram,
+                  icon: <><rect x="2" y="2" width="20" height="20" rx="5.5" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="17.5" cy="6.5" r="1.4" /></>,
+                },
+                {
+                  label: "Telegram", href: SITE.telegram,
+                  icon: <path d="M21.9 4.3 2.9 11.6c-1.1.5-1.1 1.6-.2 1.9l4.8 1.5 1.8 5.6c.3.7.5 1 1 1 .5 0 .7-.2 1-.7l2.5-2.4 4.9 3.6c.9.5 1.6.2 1.8-.8l3.2-15c.3-1.3-.5-1.9-1.6-1.5Z" />,
+                },
               ].map((s) => (
                 <a
                   key={s.label}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-lg border border-navy-600/60 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-navy-100/90 transition-all duration-300 hover:-translate-y-0.5 hover:border-gold-400 hover:text-gold-300"
+                  aria-label={s.label}
+                  title={s.label}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-navy-600/60 text-navy-100/90 transition-all duration-300 hover:-translate-y-0.5 hover:border-gold-400 hover:text-gold-300"
                 >
-                  {s.label}
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>{s.icon}</svg>
                 </a>
               ))}
             </div>

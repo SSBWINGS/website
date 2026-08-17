@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
 import { getPublished } from "@/lib/content";
@@ -15,6 +16,7 @@ const SERVICES = [
     accent: "#9ab04a",
     icon: "⭐",
     entries: ["NDA", "CDS IMA/OTA", "TES", "TGC", "ACC"],
+    blog: "/blog/join-indian-army",
   },
   {
     name: "Indian Navy",
@@ -26,6 +28,7 @@ const SERVICES = [
     accent: "#5aa0e0",
     icon: "⚓",
     entries: ["10+2 B.Tech", "GS(X)", "Pilot SSC", "Logistics", "ATC"],
+    blog: "/blog/join-indian-navy",
   },
   {
     name: "Indian Air Force",
@@ -37,6 +40,7 @@ const SERVICES = [
     accent: "#7cc0ef",
     icon: "✈",
     entries: ["AFCAT", "NDA (Air)", "Flying", "Ground Duty", "NCC"],
+    blog: "/blog/join-indian-air-force",
   },
   {
     name: "Indian Coast Guard",
@@ -48,6 +52,7 @@ const SERVICES = [
     accent: "#63b3e8",
     icon: "🛡️",
     entries: ["Asst. Commandant", "GD Branch", "Tech", "Pilot / Navigator", "Law"],
+    blog: "/blog/join-indian-coast-guard",
   },
 ];
 
@@ -84,7 +89,9 @@ export default async function ServicesStrip() {
                       <li key={e} className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1 text-[11px] font-medium backdrop-blur">{e}</li>
                     ))}
                   </ul>
-                  <div className="mt-5 h-1 w-0 rounded bg-white/80 transition-all duration-500 group-hover:w-full" />
+                  <Link href={s.blog} className="mt-5 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/95 px-4 py-2 text-sm font-bold uppercase tracking-wide text-[#0a1524] transition hover:bg-white">
+                    How to Join →
+                  </Link>
                 </div>
               </article>
             </Reveal>

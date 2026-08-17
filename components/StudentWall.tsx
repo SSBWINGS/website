@@ -24,9 +24,13 @@ export default async function StudentWall({
     image_path: `/images/students/${s.file}`,
     sort_order: i,
   }));
-  // Only fetch what we render — the homepage wall pulls just `limit` rows, not
-  // the entire (hundreds-strong) candidate table.
-  const rows = await getCollection<Candidate>("published_candidates", fallback, limit ? { limit } : undefined);
+  // Latest recommendation first (dated rows first, then legacy by sort_order).
+  // Only fetch what we render — the homepage wall pulls just `limit` rows.
+  const order = [
+    { column: "recommended_on", ascending: false, nullsFirst: false },
+    { column: "sort_order", ascending: true },
+  ];
+  const rows = await getCollection<Candidate>("published_candidates", fallback, { order, ...(limit ? { limit } : {}) });
   const list = limit ? rows.slice(0, limit) : rows;
 
   return (

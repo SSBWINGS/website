@@ -43,6 +43,14 @@ export default function RichText({
 
   const emit = () => onChange(ref.current?.innerHTML ?? "");
 
+  const makeLink = () => {
+    const url = window.prompt("Link URL (https://…)");
+    if (!url) return;
+    const safe = /^(https?:|mailto:|tel:)/i.test(url) ? url : `https://${url}`;
+    exec("createLink", safe);
+    emit();
+  };
+
   const applyWordArt = (cls: string) => {
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
@@ -62,6 +70,8 @@ export default function RichText({
         <Btn title="Bold" onClick={() => { exec("bold"); emit(); }}><b>B</b></Btn>
         <Btn title="Italic" onClick={() => { exec("italic"); emit(); }}><i>I</i></Btn>
         <Btn title="Underline" onClick={() => { exec("underline"); emit(); }}><u>U</u></Btn>
+        <Btn title="Insert link" onClick={makeLink}>🔗</Btn>
+        <Btn title="Remove link" onClick={() => { exec("unlink"); emit(); }}>⛓</Btn>
         <span className="mx-1 h-4 w-px bg-slate-300" />
         <select title="Font" onMouseDown={(e) => e.stopPropagation()} onChange={(e) => { exec("fontName", e.target.value); emit(); }}
           className="rounded border border-slate-200 bg-white px-1 py-0.5 text-xs text-slate-700">

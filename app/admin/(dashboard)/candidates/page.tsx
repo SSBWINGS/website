@@ -7,7 +7,8 @@ export default async function CandidatesPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("recommended_candidates")
-    .select("id, name, exam, image_path, sort_order, published")
+    .select("id, name, exam, image_path, sort_order, published, recommended_on")
+    .order("recommended_on", { ascending: false, nullsFirst: false })
     .order("sort_order", { ascending: true });
 
   return (

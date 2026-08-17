@@ -573,12 +573,12 @@ export const NAV: NavEntry[] = [
     ],
   },
   { href: "/courses", label: "Courses" },
+  { href: "/blog", label: "Blog" },
   {
     label: "Success",
     items: [
       { href: "/gallery", label: "Wall of Honour", desc: "Recommended cadets & AIR holders" },
       { href: "/testimonials", label: "Testimonials", desc: "Success stories in their words" },
-      { href: "/blog", label: "Blog", desc: "Tips & defence current affairs" },
     ],
   },
   { href: "/contact", label: "Contact" },

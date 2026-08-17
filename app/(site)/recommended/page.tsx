@@ -19,10 +19,10 @@ async function firstPage(): Promise<Candidate[]> {
     const supabase = await createClient();
     const { data } = await supabase
       .from("published_candidates")
-      .select("name, exam, image_path, sort_order")
-      .gte("sort_order", HOMEPAGE_WALL_COUNT)
+      .select("name, exam, image_path, sort_order, recommended_on")
+      .order("recommended_on", { ascending: false, nullsFirst: false })
       .order("sort_order", { ascending: true })
-      .range(0, WALL_PAGE_SIZE - 1);
+      .range(HOMEPAGE_WALL_COUNT, HOMEPAGE_WALL_COUNT + WALL_PAGE_SIZE - 1);
     return (data as Candidate[]) ?? [];
   } catch {
     return [];

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { mediaUrl } from "@/lib/supabase/media";
 
-export type Candidate = { name: string; exam: string; image_path: string; sort_order: number };
+export type Candidate = { name: string; exam: string; image_path: string; sort_order: number; recommended_on?: string | null };
 
 /** Full recommended-candidates wall with infinite scroll — loads a page at a
  *  time as the user nears the bottom, so we never pull all rows up front.
@@ -21,7 +21,8 @@ export default function RecommendedWall({
 }) {
   const supabase = createClient();
   const [items, setItems] = useState<Candidate[]>(initial);
-  const [offset, setOffset] = useState(initial.length); // rows already loaded from the (>= startAt) set
+  // Global row offset where the NEXT page begins (homepage set + rows already shown).
+  const [offset, setOffset] = useState(startAt + initial.length);
   const [done, setDone] = useState(initial.length < pageSize);
   const [loading, setLoading] = useState(false);
   const sentinel = useRef<HTMLDivElement>(null);
@@ -31,8 +32,8 @@ export default function RecommendedWall({
     setLoading(true);
     const { data, error } = await supabase
       .from("published_candidates")
-      .select("name, exam, image_path, sort_order")
-      .gte("sort_order", startAt)
+      .select("name, exam, image_path, sort_order, recommended_on")
+      .order("recommended_on", { ascending: false, nullsFirst: false })
       .order("sort_order", { ascending: true })
       .range(offset, offset + pageSize - 1);
     if (!error && data) {

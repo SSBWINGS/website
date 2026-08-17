@@ -12,15 +12,27 @@ export type Candidate = {
   image_path: string | null;
   sort_order: number;
   published: boolean;
+  recommended_on?: string | null;
 };
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const today = () => new Date().toISOString().slice(0, 10);
+
+// Latest recommendation first; undated rows fall back to sort_order.
+const sortCands = (arr: Candidate[]) =>
+  [...arr].sort((a, b) => {
+    if (a.recommended_on && b.recommended_on) return b.recommended_on.localeCompare(a.recommended_on);
+    if (a.recommended_on) return -1;
+    if (b.recommended_on) return 1;
+    return a.sort_order - b.sort_order;
+  });
 
 export default function CandidatesManager({ initial }: { initial: Candidate[] }) {
   const supabase = createClient();
-  const [rows, setRows] = useState<Candidate[]>(initial);
+  const [rows, setRows] = useState<Candidate[]>(() => sortCands(initial));
   const [name, setName] = useState("");
   const [exam, setExam] = useState("");
+  const [date, setDate] = useState(today);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -43,12 +55,12 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
       const sort_order = rows.length ? Math.max(...rows.map((r) => r.sort_order)) + 1 : 0;
       const { data, error } = await supabase
         .from("recommended_candidates")
-        .insert({ name, exam, image_path, sort_order, published: true })
-        .select("id, name, exam, image_path, sort_order, published")
+        .insert({ name, exam, image_path, sort_order, published: true, recommended_on: date || null })
+        .select("id, name, exam, image_path, sort_order, published, recommended_on")
         .single();
       if (error) throw new Error(error.message);
-      setRows((r) => [...r, data as Candidate]);
-      setName(""); setExam(""); setFile(null);
+      setRows((r) => sortCands([...r, data as Candidate]));
+      setName(""); setExam(""); setFile(null); setDate(today());
       (document.getElementById("cand-file") as HTMLInputElement | null)?.value && ((document.getElementById("cand-file") as HTMLInputElement).value = "");
       setMsg({ ok: true, text: "Candidate added." });
     } catch (err) {
@@ -93,7 +105,7 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
       {/* Add form */}
       <form onSubmit={addCandidate} className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="text-base font-semibold text-slate-900">Add a candidate</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Name</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required
@@ -103,6 +115,11 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
             <label className="mb-1 block text-sm font-medium text-slate-700">Entry</label>
             <input value={exam} onChange={(e) => setExam(e.target.value)} required
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="e.g. CDS OTA" />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Date of recommendation</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Photo</label>

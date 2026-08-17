@@ -85,12 +85,16 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
 export async function getCollection<T>(
   view: string,
   fallback: T[],
-  opts?: { limit?: number },
+  opts?: { limit?: number; order?: { column: string; ascending?: boolean; nullsFirst?: boolean }[] },
 ): Promise<T[]> {
   if (!isSupabaseConfigured()) return fallback;
   try {
     const supabase = await createClient();
-    let query = supabase.from(view).select("*").order("sort_order", { ascending: true });
+    let query = supabase.from(view).select("*");
+    const orders = opts?.order ?? [{ column: "sort_order", ascending: true }];
+    for (const o of orders) {
+      query = query.order(o.column, { ascending: o.ascending ?? true, nullsFirst: o.nullsFirst ?? false });
+    }
     if (opts?.limit) query = query.limit(opts.limit);
     const { data, error } = await query;
     if (error || !data || data.length === 0) return fallback;
