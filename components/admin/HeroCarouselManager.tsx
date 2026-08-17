@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { mediaUrl } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 
-export default function HeroCarouselManager({ initial }: { initial: string[] }) {
+export default function HeroCarouselManager({ initial, auto = false }: { initial: string[]; auto?: boolean }) {
   const supabase = createClient();
   const [images, setImages] = useState<string[]>(initial);
   const [busy, setBusy] = useState(false);
@@ -61,6 +61,11 @@ export default function HeroCarouselManager({ initial }: { initial: string[] }) 
         <p className="mt-2 text-xs text-slate-400">
           These photos auto-rotate in the homepage hero. Leave the list empty to automatically show your latest recommended candidates.
         </p>
+        {auto && images.length > 0 && (
+          <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">
+            Showing your <b>latest recommended candidates</b> (automatic). Reorder, remove or add photos and press <b>Save &amp; publish</b> to set a fixed custom carousel — or <b>Reset to automatic</b> anytime.
+          </p>
+        )}
       </div>
 
       {images.length > 0 ? (

@@ -131,7 +131,7 @@ export default function RecordManager({
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
               )}
               {f.type === "rich" && (
-                <RichText value={form[f.key] ?? ""} onChange={(html) => setForm((s) => ({ ...s, [f.key]: html }))} />
+                <RichText key={`${editingId ?? "new"}-${f.key}`} value={form[f.key] ?? ""} onChange={(html) => setForm((s) => ({ ...s, [f.key]: html }))} />
               )}
               {f.type === "image" && (
                 <div className="flex items-center gap-3">

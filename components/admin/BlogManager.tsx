@@ -126,7 +126,7 @@ export default function BlogManager({ initial }: { initial: Post[] }) {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Article body</label>
-            <RichText value={form.body} onChange={(html) => setForm((f) => ({ ...f, body: html }))} />
+            <RichText key={editingId ?? "new"} value={form.body} onChange={(html) => setForm((f) => ({ ...f, body: html }))} />
           </div>
         </div>
         {msg && <p className={`mt-3 rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}
