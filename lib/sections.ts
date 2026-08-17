@@ -77,12 +77,6 @@ export const SECTIONS: SectionDef[] = [
     ],
   },
   {
-    key: "air1", label: "AIR-1 Marquee", page: "Home",
-    description: "The scrolling 'All India Rank 1' highlights band under the entries ticker.",
-    previewPath: "/",
-    fields: [{ key: "items", label: "AIR-1 highlights (comma-separated)", type: "tags" }],
-  },
-  {
     key: "cta", label: "Call-to-Action Banner", page: "Home",
     description: "The 'Your chest number is waiting' banner (appears on most pages).",
     previewPath: "/",

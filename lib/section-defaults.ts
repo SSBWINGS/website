@@ -40,7 +40,7 @@ export const CTA = {
 };
 
 import { PAGE_HEROES } from "@/lib/pagehero-defaults";
-import { AIR1, DAYS, JOIN_ROUTES } from "@/lib/data";
+import { DAYS, JOIN_ROUTES } from "@/lib/data";
 
 export const WHYUS_ITEMS = [
   { icon: "🎖️", title: "Mentored by Ex-SSB Assessors", body: "Learn from officers who sat on the other side of the table — retired Interviewing Officers, GTOs and psychology experts who assessed thousands at real Boards." },
@@ -77,7 +77,6 @@ export const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
   whyus: WHYUS,
   services: SERVICES,
   cta: CTA,
-  air1: { items: AIR1 },
   whyus_items: { items: WHYUS_ITEMS },
   about_values: { items: ABOUT_VALUES },
   about_mission: ABOUT_MISSION,

@@ -12,7 +12,6 @@ const PAGES: Page[] = [
     items: [
       { label: "Hero", href: "/admin/sections/hero", hint: "Headline, badge, intro, rating" },
       { label: "Hero Carousel", href: "/admin/hero-carousel", hint: "Rotating candidate photos" },
-      { label: "AIR-1 Marquee", href: "/admin/sections/air1", hint: "Scrolling AIR-1 highlights" },
       { label: "Wall of Honour", href: "/admin/candidates", hint: "Recommended candidate tiles" },
       { label: "Four Forces", href: "/admin/four-forces", hint: "Army/Navy/AF/ICG cards" },
       { label: "The Hard Truth", href: "/admin/sections/story", hint: "Story block" },
