@@ -15,7 +15,9 @@ export async function generateMetadata(): Promise<Metadata> {
 type Post = { id: string; slug: string; title: string; excerpt: string | null; cover_path: string | null; tag: string | null; author: string | null; published_at: string | null };
 
 export default async function BlogList() {
-  const posts = await getCollection<Post>("published_posts", []);
+  const posts = await getCollection<Post>("published_posts", [], {
+    order: [{ column: "published_at", ascending: false, nullsFirst: false }],
+  });
 
   return (
     <main>
