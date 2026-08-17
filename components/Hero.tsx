@@ -19,8 +19,8 @@ export type HeroContent = {
 
 export const HERO_DEFAULT: HeroContent = HERO;
 
-/** Recommended-candidate photos that auto-rotate in the hero collage. */
-const RECO_PHOTOS = [
+/** Recommended-candidate photos that auto-rotate in the hero collage (fallback). */
+export const RECO_PHOTOS = [
   "/images/students/tanishq.png",
   "/images/students/tejas.jpg",
   "/images/students/yash.jpg",
@@ -57,7 +57,7 @@ const DEFAULT_STATS = [
   { value: 10, label: "All India Rank 1" },
 ];
 
-export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS }: { content?: HeroContent; stats?: { value: number; label: string }[] }) {
+export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS, carousel = RECO_PHOTOS }: { content?: HeroContent; stats?: { value: number; label: string }[]; carousel?: string[] }) {
   const typed = useTypewriter(ROLES);
 
   return (
@@ -138,7 +138,7 @@ export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS }: 
           <div className="photo-frame card-lift absolute -bottom-6 left-0 z-20 w-[58%] rotate-3 sm:-bottom-10 sm:w-[52%]">
             <div>
               <PhotoCarousel
-                images={RECO_PHOTOS}
+                images={carousel}
                 alt="An SSBWINGS recommended candidate"
                 sizes="(min-width: 1024px) 26vw, 55vw"
               />

@@ -20,6 +20,8 @@ const ITEMS: Item[] = [
   { href: "/admin/blog", label: "Blog", icon: "📝" },
   { href: "/admin/mock-tests", label: "Mock Tests", icon: "🧠" },
   { href: "/admin/sections", label: "Pages & Sections", icon: "✎" },
+  { href: "/admin/hero-carousel", label: "Hero Carousel", icon: "🖼" },
+  { href: "/admin/four-forces", label: "Four Forces", icon: "🎖" },
   { href: "/admin/stats", label: "Scoreboard Stats", icon: "📊" },
   { href: "/admin/countdown", label: "Batch & Exam Countdown", icon: "⏱" },
   { href: "/admin/settings", label: "Footer & Contact", icon: "▤" },
