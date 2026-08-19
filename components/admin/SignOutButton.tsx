@@ -10,6 +10,7 @@ export default function SignOutButton({ className = "" }: { className?: string }
     try {
       await createClient().auth.signOut();
     } finally {
+      try { sessionStorage.removeItem("ssbw-admin-live"); } catch {}
       window.location.href = "/admin/login";
     }
   };

@@ -28,6 +28,9 @@ export default function LoginPage() {
       setBusy(false);
       return;
     }
+    // Mark this tab as a live session — cleared when the tab/window closes so the
+    // admin is auto-logged-out on close (see AdminSessionGuard).
+    try { sessionStorage.setItem("ssbw-admin-live", "1"); } catch {}
     router.replace(params.get("next") || "/admin");
     router.refresh();
   }
@@ -53,6 +56,9 @@ export default function LoginPage() {
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="••••••••" />
           </div>
 
+          {params.get("expired") && !error && (
+            <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">For your security you were signed out when the tab was closed. Please sign in again.</p>
+          )}
           {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
           <button type="submit" disabled={busy}

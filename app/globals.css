@@ -121,6 +121,26 @@
 .glow-plus-text { animation: plus-glow-text 1.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .glow-plus, .glow-plus-text { animation: none; } }
 
+/* Skeleton loaders (shimmer) */
+@keyframes skeleton-shimmer { 100% { transform: translateX(100%); } }
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(43, 36, 22, 0.08);
+  border-radius: 0.6rem;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.skeleton-dark { background: rgba(255, 255, 255, 0.08); }
+.skeleton-dark::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent); }
+@media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }
+
 /* ————————————————————— Base ————————————————————— */
 
 html {
