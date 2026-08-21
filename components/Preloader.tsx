@@ -6,7 +6,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 const WORD = "SSBWINGS";
 const MIN_SHOW_MS = 2900;
 
-export default function Preloader() {
+export default function Preloader({ lottie = true }: { lottie?: boolean }) {
   const [done, setDone] = useState(false);
   const [removed, setRemoved] = useState(false);
 
@@ -43,9 +43,11 @@ export default function Preloader() {
 
   return (
     <div className={`preloader ${done ? "is-done" : ""}`} role="status" aria-label="SSBWINGS is loading">
-      <div className="h-64 w-64 sm:h-80 sm:w-80">
-        <DotLottieReact src="/preloader.lottie" loop autoplay />
-      </div>
+      {lottie && (
+        <div className="h-64 w-64 sm:h-80 sm:w-80">
+          <DotLottieReact src="/preloader.lottie" loop autoplay />
+        </div>
+      )}
 
       <h1 className="font-display font-black uppercase leading-none tracking-[0.14em] text-6xl drop-shadow-[0_3px_14px_rgba(0,0,0,0.75)] sm:text-8xl">
         {WORD.split("").map((ch, i) => (

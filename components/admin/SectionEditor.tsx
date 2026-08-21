@@ -39,6 +39,14 @@ function FieldInput({ field, value, onChange }: { field: SectionField; value: un
   if (field.type === "rich") {
     return <RichText value={(value as string) ?? ""} onChange={(html) => onChange(html)} />;
   }
+  if (field.type === "select") {
+    return (
+      <select value={(value as string) ?? (field.options?.[0]?.value ?? "")} onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500">
+        {(field.options ?? []).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    );
+  }
   if (field.type === "tags") {
     const arr = Array.isArray(value) ? (value as string[]) : [];
     return <input value={arr.join(", ")} onChange={(e) => onChange(e.target.value.split(",").map((s) => s.trim()).filter(Boolean))}

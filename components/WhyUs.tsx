@@ -19,6 +19,7 @@ export default async function WhyUs() {
           <div className="lg:sticky lg:top-32">
             <SectionHeading
               kicker={c.kicker}
+              kickerSize={(c as { kickerSize?: string }).kickerSize}
               title={<span dangerouslySetInnerHTML={{ __html: c.title }} />}
               subtitle={c.subtitle}
             />

@@ -1,4 +1,4 @@
-import Preloader from "@/components/Preloader";
+import PreloaderSection from "@/components/PreloaderSection";
 import Cursor from "@/components/Cursor";
 import ModalProvider from "@/components/ModalProvider";
 import Navbar from "@/components/Navbar";
@@ -40,7 +40,7 @@ export default function SiteLayout({ children }: Readonly<{ children: React.Reac
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageViewTracker />
-      <Preloader />
+      <PreloaderSection />
       <Cursor />
       <ModalProvider>
         <Navbar />

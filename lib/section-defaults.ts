@@ -51,6 +51,24 @@ export const WHYUS_ITEMS = [
   { icon: "⚖️", title: "Merit-First, No False Promises", body: "No academy can 'guarantee' a recommendation. We build the officer; the Board does the rest — honestly, transparently." },
 ];
 
+export const STORY_GAPS = [
+  { icon: "🔍", title: "They don't know what the Board wants", body: "The SSB doesn't test knowledge — it tests 15 Officer Like Qualities. Most aspirants polish answers while assessors silently map their personality." },
+  { icon: "⚖️", title: "They don't know how they're assessed", body: "Three independent assessors — Psychologist, GTO and Interviewing Officer — cross-verify every response for five days. One rehearsed mask cannot fool all three." },
+  { icon: "📈", title: "They can't project under pressure", body: "Qualities buried under nervousness are invisible to the Board. Projection is a trainable skill — and it's exactly what we drill, day after day, on real GTO ground." },
+];
+
+export const RECENT_WINS = [
+  "GC Ashok Suthar — AIR-1 · SSC Tech · OTA Gaya",
+  "NC Khushvant Sharma — 10+2 Navy B.Tech · INA",
+  "GC Maan Singh — Sipahi to Gentleman Cadet · IMA",
+  "GC Chandan Sahani — CDS · IMA Dehradun",
+  "Recommended — 19 SSB Allahabad · NDA",
+  "Recommended — 22 SSB Bhopal · CDS OTA",
+  "Recommended — 4 AFSB Varanasi · AFCAT",
+  "Recommended — 33 SSB Bhopal · TES",
+  "Recommended — NSB Coimbatore · Navy SSC",
+];
+
 export const ABOUT_VALUES = [
   { icon: "🎯", title: "Merit Before Marketing", body: "We never promise recommendations. We promise assessor-grade preparation and honest feedback — the Board decides the rest." },
   { icon: "🤝", title: "Mentorship for Life", body: "Enroll once; stay family forever. Alumni return for free monthly practice sessions and to mentor the next batch." },
@@ -78,6 +96,9 @@ export const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
   services: SERVICES,
   cta: CTA,
   whyus_items: { items: WHYUS_ITEMS },
+  story_gaps: { items: STORY_GAPS },
+  recent_wins: { items: RECENT_WINS.map((text) => ({ text })) },
+  preloader: { lottie: "on" },
   about_values: { items: ABOUT_VALUES },
   about_mission: ABOUT_MISSION,
   gateways: { items: GATEWAYS },

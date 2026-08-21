@@ -1,5 +1,6 @@
 import Reveal from "./Reveal";
 import ContactForm from "./ContactForm";
+import { SocialIcon } from "./SocialIcons";
 import { getSettings, telHref } from "@/lib/content";
 
 export default async function ContactSection() {
@@ -50,15 +51,15 @@ export default async function ContactSection() {
             </ul>
 
             <div className="mt-8 flex gap-3">
-              {[
-                { label: "YouTube", href: SITE.youtube, icon: "▶" },
-                { label: "Instagram", href: SITE.instagram, icon: "◎" },
-                { label: "Telegram", href: SITE.telegram, icon: "✈" },
-              ].map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
+              {([
+                { label: "YouTube", href: SITE.youtube, icon: "youtube" as const },
+                { label: "Instagram", href: SITE.instagram, icon: "instagram" as const },
+                { label: "Telegram", href: SITE.telegram, icon: "telegram" as const },
+              ]).map((s) => (
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} title={s.label}
                   className="flex h-11 w-11 items-center justify-center rounded-xl text-ink shadow-[var(--shadow-raised)] transition-all duration-300 hover:-translate-y-1 hover:text-saffron-700"
                   style={{ background: "linear-gradient(180deg,#fffdf7,#efe7d3)" }}>
-                  <span aria-hidden>{s.icon}</span>
+                  <SocialIcon name={s.icon} />
                 </a>
               ))}
             </div>

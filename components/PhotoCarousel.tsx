@@ -10,6 +10,7 @@ export default function PhotoCarousel({
   sizes,
   ratio = "8/5",
   position = "center 28%",
+  showBadge = true,
 }: {
   images: string[];
   alt: string;
@@ -17,6 +18,7 @@ export default function PhotoCarousel({
   sizes?: string;
   ratio?: string;
   position?: string;
+  showBadge?: boolean;
 }) {
   const [i, setI] = useState(0);
 
@@ -41,14 +43,24 @@ export default function PhotoCarousel({
         />
       ))}
       {/* subtle caption badge */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-gradient-to-t from-navy-950/85 to-transparent px-3 pb-2 pt-8">
-        <span className="font-display text-[11px] font-bold uppercase tracking-wider text-gold-300">Recommended</span>
-        <span className="flex gap-1" aria-hidden>
-          {images.map((_, idx) => (
-            <span key={idx} className={`h-1.5 rounded-full transition-all ${idx === i ? "w-4 bg-gold-400" : "w-1.5 bg-white/50"}`} />
-          ))}
-        </span>
-      </div>
+      {showBadge ? (
+        <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-gradient-to-t from-navy-950/85 to-transparent px-3 pb-2 pt-8">
+          <span className="font-display text-[11px] font-bold uppercase tracking-wider text-gold-300">Recommended</span>
+          <span className="flex gap-1" aria-hidden>
+            {images.map((_, idx) => (
+              <span key={idx} className={`h-1.5 rounded-full transition-all ${idx === i ? "w-4 bg-gold-400" : "w-1.5 bg-white/50"}`} />
+            ))}
+          </span>
+        </div>
+      ) : (
+        images.length > 1 && (
+          <span className="absolute bottom-3 right-3 flex gap-1" aria-hidden>
+            {images.map((_, idx) => (
+              <span key={idx} className={`h-1.5 rounded-full transition-all ${idx === i ? "w-4 bg-gold-400" : "w-1.5 bg-white/60"}`} />
+            ))}
+          </span>
+        )
+      )}
     </div>
   );
 }

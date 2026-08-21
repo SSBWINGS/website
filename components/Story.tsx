@@ -2,31 +2,16 @@ import Image from "next/image";
 import Reveal from "./Reveal";
 import Link from "next/link";
 import { getPublished } from "@/lib/content";
-import { STORY } from "@/lib/section-defaults";
+import { STORY, STORY_GAPS } from "@/lib/section-defaults";
 
-const GAPS = [
-  {
-    num: "01",
-    title: "They don't know what the Board wants",
-    body: "The SSB doesn't test knowledge — it tests 15 Officer Like Qualities. Most aspirants polish answers while assessors silently map their personality.",
-    icon: "🔍",
-  },
-  {
-    num: "02",
-    title: "They don't know how they're assessed",
-    body: "Three independent assessors — Psychologist, GTO and Interviewing Officer — cross-verify every response for five days. One rehearsed mask cannot fool all three.",
-    icon: "⚖️",
-  },
-  {
-    num: "03",
-    title: "They can't project under pressure",
-    body: "Qualities buried under nervousness are invisible to the Board. Projection is a trainable skill — and it's exactly what we drill, day after day, on real GTO ground.",
-    icon: "📈",
-  },
-];
+type Gap = { icon: string; title: string; body: string };
 
 export default async function Story() {
-  const c = await getPublished("story", STORY);
+  const [c, gapsDoc] = await Promise.all([
+    getPublished("story", STORY),
+    getPublished<{ items: Gap[] }>("story_gaps", { items: STORY_GAPS }),
+  ]);
+  const GAPS = gapsDoc.items?.length ? gapsDoc.items : STORY_GAPS;
   return (
     <section id="story" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
@@ -40,12 +25,12 @@ export default async function Story() {
               <p className="rich-html mt-6 text-lg leading-relaxed text-ink-soft" dangerouslySetInnerHTML={{ __html: c.paragraph }} />
             </Reveal>
             <Reveal delay={250} className="mt-8 space-y-4">
-              {GAPS.map((g) => (
-                <div key={g.num} className="skeu-panel flex gap-4 p-5">
+              {GAPS.map((g, i) => (
+                <div key={g.title + i} className="skeu-panel flex gap-4 p-5">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-navy-950 text-2xl shadow-[var(--shadow-raised)]" aria-hidden>{g.icon}</span>
                   <div>
                     <h3 className="font-display text-lg font-bold uppercase text-ink">{g.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-ink-soft">{g.body}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-soft" dangerouslySetInnerHTML={{ __html: g.body }} />
                   </div>
                 </div>
               ))}

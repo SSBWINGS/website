@@ -52,7 +52,7 @@ export const ENTRIES: Entry[] = [
   { id: "cds-afa", name: "CDS – AFA (Air Force)", service: "Air Force", stage: "After Graduation", minAge: 19, maxAge: 24, genders: ["male"], education: ["graduate", "engineering"], requiresUnmarried: true, requiresPcm: true, how: "UPSC CDS written → AFSB → PABT → Medical" },
   { id: "af-met", name: "Meteorology Entry (Air Force)", service: "Air Force", stage: "After Graduation", minAge: 20, maxAge: 26, genders: ["male", "female"], education: ["postgraduate"], requiresUnmarried: false, how: "AFCAT written → AFSB → Medical" },
   { id: "cg-gd", name: "Coast Guard AC – General Duty", service: "Coast Guard", stage: "After Graduation", minAge: 21, maxAge: 25, genders: ["male"], education: ["graduate", "engineering"], requiresUnmarried: true, requiresPcm: true, how: "CGCAT → Selection Board → Medical" },
-  { id: "cg-pilot", name: "Coast Guard AC – Pilot / Navigator", service: "Coast Guard", stage: "After Graduation", minAge: 19, maxAge: 27, genders: ["male", "female"], education: ["graduate", "engineering"], requiresUnmarried: true, how: "CGCAT → Selection Board → PABT → Medical" },
+  { id: "cg-pilot", name: "Coast Guard AC – Pilot / Navigator", service: "Coast Guard", stage: "After Graduation", minAge: 19, maxAge: 27, genders: ["male"], education: ["graduate", "engineering"], requiresUnmarried: true, how: "CGCAT → Selection Board → PABT → Medical" },
   { id: "cg-tech", name: "Coast Guard AC – Technical", service: "Coast Guard", stage: "After Graduation", minAge: 21, maxAge: 25, genders: ["male"], education: ["engineering"], requiresUnmarried: true, how: "CGCAT → Selection Board → Medical" },
 ];
 

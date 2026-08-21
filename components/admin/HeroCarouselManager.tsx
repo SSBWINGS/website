@@ -6,7 +6,17 @@ import { createClient } from "@/lib/supabase/client";
 import { mediaUrl } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 
-export default function HeroCarouselManager({ initial, auto = false }: { initial: string[]; auto?: boolean }) {
+export default function HeroCarouselManager({
+  initial,
+  auto = false,
+  docKey = "hero_carousel",
+  label = "Hero Carousel",
+}: {
+  initial: string[];
+  auto?: boolean;
+  docKey?: string;
+  label?: string;
+}) {
   const supabase = createClient();
   const [images, setImages] = useState<string[]>(initial);
   const [busy, setBusy] = useState(false);
@@ -44,7 +54,7 @@ export default function HeroCarouselManager({ initial, auto = false }: { initial
     setBusy(true); setMsg(null);
     const doc = { images: imgs };
     const { error } = await supabase.from("site_content").upsert(
-      { key: "hero_carousel", label: "Hero Carousel", draft: doc, published: doc },
+      { key: docKey, label, draft: doc, published: doc },
       { onConflict: "key" },
     );
     setBusy(false);

@@ -121,6 +121,10 @@
 .glow-plus-text { animation: plus-glow-text 1.8s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .glow-plus, .glow-plus-text { animation: none; } }
 
+/* Tighten the gap between an interior page hero and the section right after it */
+.page-hero + * { padding-top: 1.5rem !important; }
+@media (min-width: 640px) { .page-hero + * { padding-top: 2.25rem !important; } }
+
 /* Skeleton loaders (shimmer) */
 @keyframes skeleton-shimmer { 100% { transform: translateX(100%); } }
 .skeleton {

@@ -15,6 +15,7 @@ export default async function ServicesStrip() {
         <SectionHeading
           center
           kicker={c.kicker}
+          kickerSize={(c as { kickerSize?: string }).kickerSize}
           title={<span dangerouslySetInnerHTML={{ __html: c.title }} />}
           subtitle={c.subtitle}
         />

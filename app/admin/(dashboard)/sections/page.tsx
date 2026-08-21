@@ -11,16 +11,18 @@ const PAGES: Page[] = [
     name: "Home", view: "/",
     items: [
       { label: "Hero", href: "/admin/sections/hero", hint: "Headline, badge, intro, rating" },
-      { label: "Hero Carousel", href: "/admin/hero-carousel", hint: "Rotating candidate photos" },
+      { label: "Hero Carousels", href: "/admin/hero-carousel", hint: "Main + candidate photos" },
       { label: "Wall of Honour", href: "/admin/candidates", hint: "Recommended candidate tiles" },
       { label: "Four Forces", href: "/admin/four-forces", hint: "Army/Navy/AF/ICG cards" },
       { label: "The Hard Truth", href: "/admin/sections/story", hint: "Story block" },
+      { label: "The Hard Truth — Cards", href: "/admin/sections/story_gaps", hint: "The three failure cards" },
       { label: "5-Day SSB Journey", href: "/admin/sections/journey", hint: "Day-by-day timeline" },
       { label: "Why Us — Heading", href: "/admin/sections/whyus" },
       { label: "Why Us — Cards", href: "/admin/sections/whyus_items", hint: "The six trust cards" },
       { label: "Course Cards", href: "/admin/courses", hint: "Tile text (links locked)" },
       { label: "Mentors", href: "/admin/mentors" },
       { label: "Scoreboard Stats", href: "/admin/stats" },
+      { label: "Recent Wins Marquee", href: "/admin/sections/recent_wins", hint: "Scrolling ticker" },
       { label: "Selection Tracker", href: "/admin/selections" },
       { label: "Batch & Exam Countdown", href: "/admin/countdown" },
       { label: "Testimonials", href: "/admin/testimonials" },
@@ -58,6 +60,7 @@ const PAGES: Page[] = [
     { label: "Footer & Contact", href: "/admin/settings" },
     { label: "SEO (all pages)", href: "/admin/seo" },
     { label: "Media Library", href: "/admin/media" },
+    { label: "Preloader", href: "/admin/sections/preloader", hint: "Aeroplane animation on/off" },
   ] },
 ];
 

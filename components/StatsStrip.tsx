@@ -3,23 +3,19 @@ import Counter from "./Counter";
 import Reveal from "./Reveal";
 import { STATS } from "@/lib/data";
 import { getPublished } from "@/lib/content";
+import { RECENT_WINS } from "@/lib/section-defaults";
 
 type Stat = { value: number; label: string };
 
-const RECENT = [
-  "GC Ashok Suthar — AIR-1 · SSC Tech · OTA Gaya",
-  "NC Khushvant Sharma — 10+2 Navy B.Tech · INA",
-  "GC Maan Singh — Sipahi to Gentleman Cadet · IMA",
-  "GC Chandan Sahani — CDS · IMA Dehradun",
-  "Recommended — 19 SSB Allahabad · NDA",
-  "Recommended — 22 SSB Bhopal · CDS OTA",
-  "Recommended — 4 AFSB Varanasi · AFCAT",
-  "Recommended — 33 SSB Bhopal · TES",
-  "Recommended — NSB Coimbatore · Navy SSC",
-];
-
 export default async function StatsStrip() {
-  const { items: stats } = await getPublished<{ items: Stat[] }>("stats", { items: STATS });
+  const [{ items: stats }, winsDoc] = await Promise.all([
+    getPublished<{ items: Stat[] }>("stats", { items: STATS }),
+    getPublished<{ items: (string | { text: string })[] }>("recent_wins", { items: RECENT_WINS }),
+  ]);
+  // Accept either plain strings or { text } rows from the CMS repeater.
+  const RECENT = (winsDoc.items?.length ? winsDoc.items : RECENT_WINS)
+    .map((w) => (typeof w === "string" ? w : w?.text ?? ""))
+    .filter(Boolean);
   return (
     <section id="results" className="relative overflow-hidden py-20 sm:py-24">
       {/* Guard-of-honour photo, softly lit */}

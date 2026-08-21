@@ -19,6 +19,14 @@ export type HeroContent = {
 
 export const HERO_DEFAULT: HeroContent = HERO;
 
+/** Main (large) hero frame photos — auto-rotating, CMS-editable. */
+export const HERO_MAIN_PHOTOS = [
+  "/images/pipping-ceremony.jpg",
+  "/images/hero-parade.jpg",
+  "/images/ima-guard.jpg",
+  "/images/ota-sunrise.jpg",
+];
+
 /** Recommended-candidate photos that auto-rotate in the hero collage (fallback). */
 export const RECO_PHOTOS = [
   "/images/students/tanishq.png",
@@ -57,7 +65,17 @@ const DEFAULT_STATS = [
   { value: 10, label: "All India Rank 1" },
 ];
 
-export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS, carousel = RECO_PHOTOS }: { content?: HeroContent; stats?: { value: number; label: string }[]; carousel?: string[] }) {
+export default function Hero({
+  content = HERO_DEFAULT,
+  stats = DEFAULT_STATS,
+  carousel = RECO_PHOTOS,
+  mainCarousel = HERO_MAIN_PHOTOS,
+}: {
+  content?: HeroContent;
+  stats?: { value: number; label: string }[];
+  carousel?: string[];
+  mainCarousel?: string[];
+}) {
   const typed = useTypewriter(ROLES);
 
   return (
@@ -120,17 +138,17 @@ export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS, ca
 
         {/* Right — photo collage: pipping ceremony + marching contingent (first on mobile) */}
         <div className="relative order-1 mx-auto w-full max-w-lg pb-10 sm:max-w-none sm:pb-16 lg:order-2 lg:pb-8">
-          {/* Main — commissioning "pipping" ceremony */}
+          {/* Main — auto-rotating carousel (CMS-editable) */}
           <div className="photo-frame card-lift relative z-10 w-full sm:ml-auto sm:w-[92%] sm:-rotate-2">
             <div>
-              <Image
-                src="/images/pipping-ceremony.jpg"
-                alt="A newly commissioned officer receives his rank stars at the pipping ceremony"
-                width={1000}
-                height={667}
-                priority
+              <PhotoCarousel
+                images={mainCarousel}
+                alt="Life at SSBWINGS — from the GTO ground to the pipping ceremony"
                 sizes="(min-width: 1024px) 46vw, 92vw"
-                className="kenburns h-auto w-full"
+                ratio="3/2"
+                interval={4200}
+                showBadge={false}
+                position="center 35%"
               />
             </div>
           </div>
@@ -142,13 +160,6 @@ export default function Hero({ content = HERO_DEFAULT, stats = DEFAULT_STATS, ca
                 alt="An SSBWINGS recommended candidate"
                 sizes="(min-width: 1024px) 26vw, 55vw"
               />
-            </div>
-          </div>
-          {/* Floating tricolour medal */}
-          <div className="absolute -right-1 -top-5 z-30 hidden animate-float lg:block">
-            <div className="skeu-plate flex h-24 w-24 flex-col items-center justify-center text-center">
-              <span className="font-display text-2xl font-black leading-none gold-text">AIR 1</span>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-ink-soft">10× Toppers</span>
             </div>
           </div>
         </div>
