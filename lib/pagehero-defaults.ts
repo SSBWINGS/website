@@ -69,6 +69,18 @@ export const PAGE_HEROES: Record<string, PageHeroDoc> = {
     subtitle: "The complete roll of SSBWINGS aspirants who walked out of the Board recommended — hundreds of real faces and chest numbers, from NDA and CDS to AFCAT, Navy and Coast Guard.",
     image: "/images/women-officers.jpg",
   },
+  academies: {
+    kicker: "Where Officers Are Forged", crumb: "Academies",
+    title: `The ${tri("Academies")}`,
+    subtitle: "IMA Dehradun, OTA Chennai, OTA Gaya, INA Ezhimala and AFA Dundigal — what each academy trains, who trains there and exactly how long each course runs.",
+    image: "/images/ima-guard.jpg",
+  },
+  medical: {
+    kicker: "After the Recommendation", crumb: "Medical",
+    title: `The SSB ${tri("Medical")} Process`,
+    subtitle: "The complete medical board process, academy-wise standards, common reasons for rejection and how the appeal system works.",
+    image: "/images/gto-training.jpg",
+  },
   resources: {
     kicker: "Free Study Material", crumb: "Resources",
     title: `SSB ${tri("Resources")}`,

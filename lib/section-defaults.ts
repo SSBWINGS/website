@@ -41,6 +41,8 @@ export const CTA = {
 
 import { PAGE_HEROES } from "@/lib/pagehero-defaults";
 import { DAYS, JOIN_ROUTES } from "@/lib/data";
+import { ACADEMIES_DOC } from "@/lib/academies";
+import { MEDICAL } from "@/lib/medical";
 
 export const WHYUS_ITEMS = [
   { icon: "🎖️", title: "Mentored by Ex-SSB Assessors", body: "Learn from officers who sat on the other side of the table — retired Interviewing Officers, GTOs and psychology experts who assessed thousands at real Boards." },
@@ -99,6 +101,8 @@ export const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
   story_gaps: { items: STORY_GAPS },
   recent_wins: { items: RECENT_WINS.map((text) => ({ text })) },
   preloader: { lottie: "on" },
+  academies: ACADEMIES_DOC,
+  medical: MEDICAL,
   about_values: { items: ABOUT_VALUES },
   about_mission: ABOUT_MISSION,
   gateways: { items: GATEWAYS },

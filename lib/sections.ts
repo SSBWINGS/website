@@ -46,6 +46,7 @@ const PAGE_LABEL: Record<string, string> = {
   about: "About", "ssb-process": "The 5-Day SSB", entries: "Entries", courses: "Courses",
   gallery: "Gallery", testimonials: "Testimonials", contact: "Contact", eligibility: "Eligibility Finder",
   "mock-tests": "Mock Tests", blog: "Blog", recommended: "Recommended", resources: "Resources",
+  academies: "Academies", medical: "Medical Process",
 };
 
 // One editable hero per interior page.
@@ -207,6 +208,69 @@ export const SECTIONS: SectionDef[] = [
         { key: "commission", label: "Commission", type: "text" },
       ] },
     ] }],
+  },
+  {
+    key: "academies", label: "Academies Content", page: "Academies",
+    description: "Heading plus every academy — photo, motto, intro, course table and highlights.",
+    previewPath: "/academies",
+    fields: [
+      { key: "kicker", label: "Kicker", type: "text" },
+      KICKER_SIZE_FIELD,
+      { key: "title", label: "Title (HTML allowed)", type: "text" },
+      { key: "subtitle", label: "Subtitle", type: "text" },
+      { key: "items", label: "Academies", type: "repeater", itemLabel: "Academy", itemFields: [
+        { key: "short", label: "Short name (IMA, INA, AFA…)", type: "text" },
+        { key: "name", label: "Full name", type: "text" },
+        { key: "motto", label: "Motto", type: "text" },
+        { key: "location", label: "Location", type: "text" },
+        { key: "service", label: "Service & commission", type: "text" },
+        { key: "established", label: "Established", type: "text" },
+        { key: "image", label: "Photo", type: "image" },
+        { key: "intro", label: "Introduction", type: "rich" },
+        { key: "courses", label: "Courses", type: "repeater", itemLabel: "Course", itemFields: [
+          { key: "name", label: "Course / entry", type: "text" },
+          { key: "duration", label: "Training duration", type: "text" },
+          { key: "who", label: "Who trains here", type: "text" },
+        ] },
+        { key: "highlights", label: "Highlights", type: "tags" },
+      ] },
+    ],
+  },
+  {
+    key: "medical", label: "Medical Content", page: "Medical Process",
+    description: "The full medical page — board stages, academy standards, rejections, appeals and FAQs.",
+    previewPath: "/medical",
+    fields: [
+      { key: "kicker", label: "Kicker", type: "text" },
+      KICKER_SIZE_FIELD,
+      { key: "processTitle", label: "Process heading", type: "text" },
+      { key: "processIntro", label: "Process intro", type: "text" },
+      { key: "stages", label: "Board stages", type: "repeater", itemLabel: "Stage", itemFields: [
+        { key: "icon", label: "Emoji / icon", type: "text" },
+        { key: "step", label: "Step label (e.g. Day 1)", type: "text" },
+        { key: "title", label: "Title", type: "text" },
+        { key: "detail", label: "Detail", type: "rich" },
+      ] },
+      { key: "image1", label: "Photo 1", type: "image" },
+      { key: "image2", label: "Photo 2", type: "image" },
+      { key: "standardsTitle", label: "Standards heading", type: "text" },
+      { key: "standardsIntro", label: "Standards intro", type: "text" },
+      { key: "standards", label: "Standards table", type: "repeater", itemLabel: "Row", itemFields: [
+        { key: "academy", label: "Academy / service", type: "text" },
+        { key: "height", label: "Height", type: "text" },
+        { key: "weight", label: "Weight", type: "text" },
+        { key: "vision", label: "Vision", type: "text" },
+        { key: "notes", label: "Notes", type: "text" },
+      ] },
+      { key: "commonTitle", label: "Common rejections heading", type: "text" },
+      { key: "common", label: "Common rejection reasons", type: "tags" },
+      { key: "appealTitle", label: "Appeal heading", type: "text" },
+      { key: "appealBody", label: "Appeal explanation", type: "rich" },
+      { key: "faqs", label: "Medical FAQs", type: "repeater", itemLabel: "FAQ", itemFields: [
+        { key: "q", label: "Question", type: "text" },
+        { key: "a", label: "Answer", type: "rich" },
+      ] },
+    ],
   },
   ...PAGE_HERO_SECTIONS,
 ];

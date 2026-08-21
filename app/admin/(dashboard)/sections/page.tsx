@@ -44,6 +44,14 @@ const PAGES: Page[] = [
     { label: "Three Gateways", href: "/admin/sections/gateways" },
     { label: "Entry Routes by Service", href: "/admin/sections/join_routes" },
   ] },
+  { name: "Academies", view: "/academies", items: [
+    { label: "Page Hero", href: "/admin/sections/pagehero.academies" },
+    { label: "Academies Content", href: "/admin/sections/academies", hint: "Each academy, courses & photos" },
+  ] },
+  { name: "Medical Process", view: "/medical", items: [
+    { label: "Page Hero", href: "/admin/sections/pagehero.medical" },
+    { label: "Medical Content", href: "/admin/sections/medical", hint: "Stages, standards, appeals, FAQs" },
+  ] },
   { name: "Eligibility Finder", view: "/eligibility", items: [{ label: "Page Hero", href: "/admin/sections/pagehero.eligibility" }] },
   { name: "Courses", view: "/courses", items: [
     { label: "Page Hero", href: "/admin/sections/pagehero.courses" },

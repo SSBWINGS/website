@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 const BASE = "https://www.ssbwings.com";
-const ROUTES = ["", "/about", "/ssb-process", "/entries", "/eligibility", "/courses", "/mock-tests", "/resources", "/gallery", "/recommended", "/blog", "/testimonials", "/contact"];
+const ROUTES = ["", "/about", "/ssb-process", "/entries", "/eligibility", "/academies", "/medical", "/courses", "/mock-tests", "/resources", "/gallery", "/recommended", "/blog", "/testimonials", "/contact"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return ROUTES.map((r) => ({
