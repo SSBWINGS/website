@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 
 export type MockQuestion = {
   id: string; type: "OIR" | "SRT"; question: string; options: string[];
@@ -32,7 +33,7 @@ export default function MockManager({ initial }: { initial: MockQuestion[] }) {
       if (type === "OIR" && options.length < 2) throw new Error("Add at least two options.");
       const { data, error } = await supabase.from("mock_questions").insert(payload).select("*").single();
       if (error) throw new Error(error.message);
-      setRows((r) => [...r, data as MockQuestion]);
+      setRows((r) => [...r, data as MockQuestion]); void bustCmsCache();
       setForm({ ...emptyOir }); setSrtText("");
       setMsg(null);
     } catch (e) {
@@ -45,14 +46,14 @@ export default function MockManager({ initial }: { initial: MockQuestion[] }) {
   async function togglePublished(r: MockQuestion) {
     const next = !r.published;
     setRows((rs) => rs.map((x) => (x.id === r.id ? { ...x, published: next } : x)));
-    await supabase.from("mock_questions").update({ published: next }).eq("id", r.id);
+    await supabase.from("mock_questions").update({ published: next }).eq("id", r.id); void bustCmsCache();
   }
   async function remove(id: string) {
     if (!confirm("Delete this question?")) return;
     const prev = rows;
     setRows((rs) => rs.filter((r) => r.id !== id));
     const { error } = await supabase.from("mock_questions").delete().eq("id", id);
-    if (error) { setRows(prev); alert(error.message); }
+    if (error) { setRows(prev); alert(error.message); } else void bustCmsCache();
   }
 
   return (

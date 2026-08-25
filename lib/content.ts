@@ -1,9 +1,16 @@
 import { cookies } from "next/headers";
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SITE } from "@/lib/data";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { coerceShape } from "@/lib/shape";
+
+/** How long published CMS reads are cached (seconds). Admin edits appear within
+ *  this window; publishing also busts the cache immediately via revalidateTag. */
+export const CMS_REVALIDATE = 300;
+export const CMS_TAG = "cms";
 
 /** Recursively sanitize every string in a CMS payload. Rich-text fields are
  *  rendered with dangerouslySetInnerHTML downstream, so we neutralize any
@@ -48,14 +55,32 @@ export const telHref = (p: string) => `tel:${(p || "").replace(/[^\d+]/g, "")}`;
  *
  * This lets the public site keep working before the CMS is populated.
  */
+/** Cached fetch of one published doc. Uses the cookie-free public client so the
+ *  result can be cached across requests — a page renders ~16 sections, and
+ *  without this every one of them is a separate Supabase round trip per visit. */
+const fetchPublishedDoc = unstable_cache(
+  async (key: string): Promise<Record<string, unknown> | null> => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("published_content")
+      .select("published")
+      .eq("key", key)
+      .maybeSingle();
+    if (error || !data?.published) return null;
+    return data.published as Record<string, unknown>;
+  },
+  ["cms-doc"],
+  { revalidate: CMS_REVALIDATE, tags: [CMS_TAG] },
+);
+
 export async function getPublished<T>(key: string, fallback: T): Promise<T> {
   if (!isSupabaseConfigured()) return fallback;
   try {
-    const supabase = await createClient();
-
     // Preview: an authenticated admin sees the DRAFT (RLS on site_content
     // restricts this to admins; everyone else silently gets published).
+    // Never cached — it is per-admin and must reflect edits immediately.
     if (await isPreview()) {
+      const supabase = await createClient();
       const { data: draftRow } = await supabase
         .from("site_content")
         .select("draft")
@@ -66,15 +91,9 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
       }
     }
 
-    const { data, error } = await supabase
-      .from("published_content")
-      .select("published")
-      .eq("key", key)
-      .maybeSingle();
-    if (error || !data?.published || Object.keys(data.published).length === 0) {
-      return fallback;
-    }
-    return deepSanitize(coerceShape({ ...fallback, ...(data.published as Partial<T>) }, fallback)) as T;
+    const published = await fetchPublishedDoc(key);
+    if (!published || Object.keys(published).length === 0) return fallback;
+    return deepSanitize(coerceShape({ ...fallback, ...(published as Partial<T>) }, fallback)) as T;
   } catch {
     return fallback;
   }
@@ -83,22 +102,42 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
 /** Fetch a published collection view (e.g. 'published_candidates'), else fallback.
  *  Pass `{ limit }` to fetch only what's rendered (e.g. the homepage wall) instead
  *  of pulling the whole table. */
-export async function getCollection<T>(
-  view: string,
-  fallback: T[],
-  opts?: { limit?: number; order?: { column: string; ascending?: boolean; nullsFirst?: boolean }[] },
-): Promise<T[]> {
-  if (!isSupabaseConfigured()) return fallback;
-  try {
-    const supabase = await createClient();
-    let query = supabase.from(view).select("*");
-    const orders = opts?.order ?? [{ column: "sort_order", ascending: true }];
+const fetchCollection = unstable_cache(
+  async (
+    view: string,
+    columns: string,
+    limit: number | undefined,
+    orders: { column: string; ascending?: boolean; nullsFirst?: boolean }[],
+  ): Promise<unknown[] | null> => {
+    const supabase = createPublicClient();
+    let query = supabase.from(view).select(columns);
     for (const o of orders) {
       query = query.order(o.column, { ascending: o.ascending ?? true, nullsFirst: o.nullsFirst ?? false });
     }
-    if (opts?.limit) query = query.limit(opts.limit);
+    if (limit) query = query.limit(limit);
     const { data, error } = await query;
-    if (error || !data || data.length === 0) return fallback;
+    if (error || !data) return null;
+    return data;
+  },
+  ["cms-collection"],
+  { revalidate: CMS_REVALIDATE, tags: [CMS_TAG] },
+);
+
+export async function getCollection<T>(
+  view: string,
+  fallback: T[],
+  opts?: {
+    limit?: number;
+    order?: { column: string; ascending?: boolean; nullsFirst?: boolean }[];
+    /** Only fetch the columns actually rendered — smaller payload, less egress. */
+    columns?: string;
+  },
+): Promise<T[]> {
+  if (!isSupabaseConfigured()) return fallback;
+  try {
+    const orders = opts?.order ?? [{ column: "sort_order", ascending: true }];
+    const data = await fetchCollection(view, opts?.columns ?? "*", opts?.limit, orders);
+    if (!data || data.length === 0) return fallback;
     return deepSanitize(data) as T[];
   } catch {
     return fallback;

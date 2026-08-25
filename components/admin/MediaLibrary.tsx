@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { mediaUrl } from "@/lib/supabase/media";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 
 const FOLDERS = ["library", "candidates", "testimonials", "mentors", "students", "services", "campus"];
@@ -28,7 +28,7 @@ export default function MediaLibrary() {
     setBusy(true);
     const f = await compressImage(raw);
     const path = `library/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
-    const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
+    const { error } = await supabase.storage.from("media").upload(path, f, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type });
     setBusy(false);
     if (error) return alert(error.message);
     setFolder("library");

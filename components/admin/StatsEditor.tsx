@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 
 type Stat = { value: number; label: string };
 
@@ -28,7 +29,7 @@ export default function StatsEditor({ initial }: { initial: Stat[] }) {
     });
     setBusy(false);
     if (error) return setMsg({ ok: false, text: error.message });
-    setMsg({ ok: true, text: "Saved & published — live on the site." });
+    setMsg({ ok: true, text: "Saved & published — live on the site." }); void bustCmsCache();
   }
 
   return (

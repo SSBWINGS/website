@@ -13,7 +13,7 @@ export default async function Testimonials({ heading = true }: { heading?: boole
     image_path: t.photo,
     sort_order: i,
   }));
-  const rows = await getCollection<Row>("published_testimonials", fallback);
+  const rows = await getCollection<Row>("published_testimonials", fallback, { columns: "name, rank, body, image_path, sort_order" });
   const items: TItem[] = rows.map((r) => ({
     name: r.name,
     rank: r.rank,

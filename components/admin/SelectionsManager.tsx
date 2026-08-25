@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 import type { Selection } from "@/lib/selection-defaults";
 
 type Row = Selection & { id: string; published: boolean; sort_order: number };
@@ -24,13 +25,13 @@ export default function SelectionsManager({ initial }: { initial: Row[] }) {
       .single();
     setBusy(false);
     if (error) return setMsg(error.message);
-    setRows((r) => [...r, data as Row]);
+    setRows((r) => [...r, data as Row]); void bustCmsCache();
     setForm({ year: form.year, exam: "", center: "", count: 1 });
   }
 
   async function patch(id: string, field: keyof Row, value: string | number | boolean) {
     setRows((rs) => rs.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
-    await supabase.from("selections").update({ [field]: value }).eq("id", id);
+    await supabase.from("selections").update({ [field]: value }).eq("id", id); void bustCmsCache();
   }
 
   async function remove(id: string) {
@@ -38,7 +39,7 @@ export default function SelectionsManager({ initial }: { initial: Row[] }) {
     const prev = rows;
     setRows((rs) => rs.filter((r) => r.id !== id));
     const { error } = await supabase.from("selections").delete().eq("id", id);
-    if (error) { setRows(prev); alert(error.message); }
+    if (error) { setRows(prev); alert(error.message); } else void bustCmsCache();
   }
 
   return (

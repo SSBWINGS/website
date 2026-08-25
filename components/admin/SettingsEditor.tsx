@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 
 const FIELDS: { key: string; label: string; hint?: string }[] = [
   { key: "name", label: "Brand name" },
@@ -34,7 +35,7 @@ export default function SettingsEditor({ initial }: { initial: Record<string, st
     });
     setBusy(false);
     if (error) return setMsg({ ok: false, text: error.message });
-    setMsg({ ok: true, text: "Saved & published. Changes are live on the site." });
+    setMsg({ ok: true, text: "Saved & published. Changes are live on the site." }); void bustCmsCache();
   }
 
   return (

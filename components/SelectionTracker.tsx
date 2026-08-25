@@ -3,7 +3,7 @@ import { SELECTIONS, type Selection } from "@/lib/selection-defaults";
 import CountUp from "./CountUp";
 
 export default async function SelectionTracker() {
-  const rows = await getCollection<Selection>("published_selections", SELECTIONS);
+  const rows = await getCollection<Selection>("published_selections", SELECTIONS, { columns: "year, exam, center, count, sort_order" });
   if (!rows.length) return null;
 
   const total = rows.reduce((s, r) => s + (r.count || 0), 0);

@@ -30,7 +30,7 @@ export default async function StudentWall({
     { column: "recommended_on", ascending: false, nullsFirst: false },
     { column: "sort_order", ascending: true },
   ];
-  const rows = await getCollection<Candidate>("published_candidates", fallback, { order, ...(limit ? { limit } : {}) });
+  const rows = await getCollection<Candidate>("published_candidates", fallback, { order, columns: "name, exam, image_path, sort_order, recommended_on", ...(limit ? { limit } : {}) });
   const list = limit ? rows.slice(0, limit) : rows;
 
   return (

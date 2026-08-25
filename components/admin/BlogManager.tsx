@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { mediaUrl } from "@/lib/supabase/media";
+import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import RichText from "./RichText";
 
@@ -40,7 +41,7 @@ export default function BlogManager({ initial }: { initial: Post[] }) {
   async function uploadCover(f: File): Promise<string> {
     const c = await compressImage(f);
     const path = `blog/${Date.now()}-${slugify(form.title || "post")}.webp`;
-    const { error } = await supabase.storage.from("media").upload(path, c, { upsert: true, contentType: c.type });
+    const { error } = await supabase.storage.from("media").upload(path, c, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: c.type });
     if (error) throw new Error(error.message);
     return path;
   }
@@ -71,7 +72,7 @@ export default function BlogManager({ initial }: { initial: Post[] }) {
         if (error) throw new Error(error.message);
         setPosts((ps) => [data as Post, ...ps]);
       }
-      setMsg({ ok: true, text: publish ? "Published — live on /blog." : "Saved as draft." });
+      setMsg({ ok: true, text: publish ? "Published — live on /blog." : "Saved as draft." }); void bustCmsCache();
       reset();
     } catch (err) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : "Failed to save." });
@@ -83,7 +84,7 @@ export default function BlogManager({ initial }: { initial: Post[] }) {
   async function togglePublish(p: Post) {
     const next = !p.published;
     setPosts((ps) => ps.map((x) => (x.id === p.id ? { ...x, published: next } : x)));
-    await supabase.from("posts").update({ published: next, published_at: next ? new Date().toISOString() : p.published_at }).eq("id", p.id);
+    await supabase.from("posts").update({ published: next, published_at: next ? new Date().toISOString() : p.published_at }).eq("id", p.id); void bustCmsCache();
   }
 
   async function remove(id: string) {

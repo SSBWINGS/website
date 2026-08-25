@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 import { SEO_PAGES } from "@/lib/seo-pages";
 
 type SeoDoc = { title: string; description: string };
@@ -23,6 +24,7 @@ export default function SeoEditor({ initial }: { initial: Record<string, SeoDoc>
     });
     setBusy("");
     setMsg({ key, ok: !error, text: error ? error.message : "Saved & published." });
+    if (!error) void bustCmsCache();
   }
 
   return (

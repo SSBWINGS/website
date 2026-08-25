@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Row = { id: string; type: string; question: string; options: string[]; sort_order: number };
 
 export default async function MockTestsPage() {
-  const all = await getCollection<Row>("published_mock_questions", []);
+  const all = await getCollection<Row>("published_mock_questions", [], { columns: "id, type, question, options, sort_order" });
   const oir: OirQuestion[] = all
     .filter((q) => q.type === "OIR" && Array.isArray(q.options) && q.options.length >= 2)
     .map((q) => ({ id: q.id, question: q.question, options: q.options }));

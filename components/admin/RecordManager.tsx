@@ -3,7 +3,8 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { mediaUrl } from "@/lib/supabase/media";
+import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import RichText from "./RichText";
 
@@ -51,7 +52,7 @@ export default function RecordManager({
     const c = await compressImage(f);
     const ext = c.name.split(".").pop()?.toLowerCase() || "webp";
     const path = `${table}/${Date.now()}-${slug(form[titleKey] || "item")}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, c, { upsert: true, contentType: c.type });
+    const { error } = await supabase.storage.from("media").upload(path, c, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: c.type });
     if (error) throw new Error(error.message);
     return path;
   }
@@ -71,14 +72,14 @@ export default function RecordManager({
         const { data, error } = await supabase.from(table).update(payload).eq("id", editingId).select("*").single();
         if (error) throw new Error(error.message);
         setRows((r) => r.map((x) => (x.id === editingId ? (data as Row) : x)));
-        setMsg({ ok: true, text: "Saved." });
+        setMsg({ ok: true, text: "Saved." }); void bustCmsCache();
       } else {
         payload.sort_order = rows.length ? Math.max(...rows.map((r) => r.sort_order)) + 1 : 0;
         payload.published = true;
         const { data, error } = await supabase.from(table).insert(payload).select("*").single();
         if (error) throw new Error(error.message);
         setRows((r) => [...r, data as Row]);
-        setMsg({ ok: true, text: "Added." });
+        setMsg({ ok: true, text: "Added." }); void bustCmsCache();
       }
       reset();
     } catch (err) {

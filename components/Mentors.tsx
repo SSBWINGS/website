@@ -16,7 +16,7 @@ export default async function Mentors({ heading = true }: { heading?: boolean })
     image_path: m.photo,
     sort_order: i,
   }));
-  const mentors = await getCollection<Row>("published_mentors", fallback);
+  const mentors = await getCollection<Row>("published_mentors", fallback, { columns: "name, role, specialty, bio, image_path, sort_order" });
 
   return (
     <section id="mentors" className="relative py-20 sm:py-24">

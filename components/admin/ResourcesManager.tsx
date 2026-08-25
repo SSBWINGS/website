@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 import { compressImage } from "@/lib/image-client";
+import { MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 
 export type Folder = { id: string; name: string; parent_id: string | null; sort_order: number };
 export type Resource = {
@@ -39,7 +41,7 @@ export default function ResourcesManager({ initialFolders, initialResources }: {
       .insert({ name: newFolder.trim(), parent_id: current }).select("*").single();
     setBusy(false);
     if (error) return setMsg(error.message);
-    setFolders((f) => [...f, data as Folder]); setNewFolder("");
+    setFolders((f) => [...f, data as Folder]); setNewFolder(""); void bustCmsCache();
   }
 
   async function deleteFolder(id: string) {
@@ -59,13 +61,13 @@ export default function ResourcesManager({ initialFolders, initialResources }: {
         const file = isImg ? await compressImage(raw) : raw;
         const safe = raw.name.replace(/[^a-zA-Z0-9._-]/g, "-");
         const path = `resources/${Date.now()}-${safe}`;
-        const { error } = await supabase.storage.from("media").upload(path, file, { upsert: true, contentType: file.type });
+        const { error } = await supabase.storage.from("media").upload(path, file, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: file.type });
         if (error) throw new Error(error.message);
         const { data, error: e2 } = await supabase.from("resources")
           .insert({ folder_id: current, kind: "file", title: raw.name.replace(/\.[^.]+$/, ""), path, mime: file.type })
           .select("*").single();
         if (e2) throw new Error(e2.message);
-        setResources((r) => [...r, data as Resource]);
+        setResources((r) => [...r, data as Resource]); void bustCmsCache();
       }
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "Upload failed.");
@@ -93,7 +95,7 @@ export default function ResourcesManager({ initialFolders, initialResources }: {
     const prev = resources;
     setResources((r) => r.filter((x) => x.id !== id));
     const { error } = await supabase.from("resources").delete().eq("id", id);
-    if (error) { setResources(prev); alert(error.message); }
+    if (error) { setResources(prev); alert(error.message); } else void bustCmsCache();
   }
 
   return (

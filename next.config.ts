@@ -49,6 +49,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "**.supabase.co" },
     ],
+    // Supabase Storage serves objects with `Cache-Control: no-cache`, so without
+    // a floor Vercel would re-fetch the original from Supabase constantly and
+    // burn egress. Hold optimised images for 31 days instead.
+    minimumCacheTTL: 2_678_400,
+    formats: ["image/avif", "image/webp"],
+    // Trim the generated variants — fewer sizes = fewer origin fetches.
+    deviceSizes: [640, 828, 1080, 1200, 1920],
+    imageSizes: [96, 200, 384],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

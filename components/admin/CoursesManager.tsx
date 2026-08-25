@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 import { asArray } from "@/lib/shape";
 
 export type CourseEdit = { tag: string; title: string; where: string; price: string; desc: string; features: string[] };
@@ -23,7 +24,7 @@ export default function CoursesManager({ initial }: { initial: CourseEdit[] }) {
       { onConflict: "key" },
     );
     setBusy(false);
-    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Saved & published — live on the Courses page." });
+    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Saved & published — live on the Courses page." }); if (!error) void bustCmsCache();
   }
 
   return (

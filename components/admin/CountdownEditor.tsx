@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
 import type { CountdownDoc, CountdownItem } from "@/lib/countdown-defaults";
 
 export default function CountdownEditor({ initial }: { initial: CountdownDoc }) {
@@ -26,7 +27,7 @@ export default function CountdownEditor({ initial }: { initial: CountdownDoc }) 
     });
     setBusy(false);
     if (error) return setMsg({ ok: false, text: error.message });
-    setMsg({ ok: true, text: "Saved & published — live on the site." });
+    setMsg({ ok: true, text: "Saved & published — live on the site." }); void bustCmsCache();
   }
 
   return (

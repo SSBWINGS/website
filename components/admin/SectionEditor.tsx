@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { mediaUrl } from "@/lib/supabase/media";
+import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import type { SectionDef, SectionField } from "@/lib/sections";
 import RichText from "./RichText";
@@ -13,7 +14,7 @@ const supabase = createClient();
 async function uploadImage(file: File): Promise<string> {
   const f = await compressImage(file);
   const path = `sections/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.webp`;
-  const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
+  const { error } = await supabase.storage.from("media").upload(path, f, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type });
   if (error) throw new Error(error.message);
   return path;
 }
@@ -139,7 +140,7 @@ export default function SectionEditor({ section, initial, canRollback }: { secti
     setBusy("save"); setMsg(null);
     const { error } = await supabase.from("site_content").upsert({ key: section.key, label: section.label, draft: form }, { onConflict: "key", ignoreDuplicates: false });
     setBusy("");
-    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Draft saved." });
+    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Draft saved." }); if (!error) void bustCmsCache();
   }
 
   async function publish() {
@@ -153,7 +154,7 @@ export default function SectionEditor({ section, initial, canRollback }: { secti
     setBusy("");
     if (error) return setMsg({ ok: false, text: error.message });
     await logActivity("publish", `section:${section.key}`);
-    setMsg({ ok: true, text: "Published! This is now live on the website." });
+    setMsg({ ok: true, text: "Published! This is now live on the website." }); void bustCmsCache();
   }
 
   async function rollback() {
@@ -167,7 +168,7 @@ export default function SectionEditor({ section, initial, canRollback }: { secti
     firstRun.current = true;
     setForm(ver.snapshot as Record<string, unknown>);
     setBusy("");
-    setMsg({ ok: true, text: "Rolled back to the previous version." });
+    setMsg({ ok: true, text: "Rolled back to the previous version." }); void bustCmsCache();
   }
 
   return (

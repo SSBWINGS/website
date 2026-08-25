@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { mediaUrl } from "@/lib/supabase/media";
+import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import type { FourForcesDoc, ForceCard } from "@/lib/four-forces";
 import { asArray } from "@/lib/shape";
@@ -23,7 +24,7 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
     try {
       const f = await compressImage(file);
       const path = `four-forces/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.webp`;
-      const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
+      const { error } = await supabase.storage.from("media").upload(path, f, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type });
       if (error) throw new Error(error.message);
       setCard(i, { image: path });
     } catch (err) {
@@ -40,7 +41,7 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
       { onConflict: "key" },
     );
     setBusy(false);
-    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Saved & published — live on the homepage." });
+    setMsg(error ? { ok: false, text: error.message } : { ok: true, text: "Saved & published — live on the homepage." }); if (!error) void bustCmsCache();
   }
 
   return (

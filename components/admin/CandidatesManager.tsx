@@ -3,7 +3,8 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { mediaUrl } from "@/lib/supabase/media";
+import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 
 export type Candidate = {
   id: string;
@@ -40,7 +41,7 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
   async function uploadImage(f: File): Promise<string> {
     const ext = f.name.split(".").pop()?.toLowerCase() || "jpg";
     const path = `candidates/${Date.now()}-${slug(name) || "candidate"}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(path, f, { upsert: true, contentType: f.type });
+    const { error } = await supabase.storage.from("media").upload(path, f, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type });
     if (error) throw new Error(error.message);
     return path;
   }
@@ -62,7 +63,7 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
       setRows((r) => sortCands([...r, data as Candidate]));
       setName(""); setExam(""); setFile(null); setDate(today());
       (document.getElementById("cand-file") as HTMLInputElement | null)?.value && ((document.getElementById("cand-file") as HTMLInputElement).value = "");
-      setMsg({ ok: true, text: "Candidate added." });
+      setMsg({ ok: true, text: "Candidate added." }); void bustCmsCache();
     } catch (err) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : "Failed to add." });
     } finally {
@@ -81,7 +82,7 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
   async function togglePublished(c: Candidate) {
     const next = !c.published;
     setRows((r) => r.map((x) => (x.id === c.id ? { ...x, published: next } : x)));
-    await supabase.from("recommended_candidates").update({ published: next }).eq("id", c.id);
+    await supabase.from("recommended_candidates").update({ published: next }).eq("id", c.id); void bustCmsCache();
   }
 
   async function move(index: number, dir: -1 | 1) {

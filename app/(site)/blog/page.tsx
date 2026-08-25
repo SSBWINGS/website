@@ -16,6 +16,7 @@ type Post = { id: string; slug: string; title: string; excerpt: string | null; c
 
 export default async function BlogList() {
   const posts = await getCollection<Post>("published_posts", [], {
+    columns: "id, slug, title, excerpt, cover_path, tag, author, published_at",
     order: [{ column: "published_at", ascending: false, nullsFirst: false }],
   });
 
