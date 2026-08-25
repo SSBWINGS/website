@@ -13,9 +13,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("academies");
 }
 
+/** CMS lists can arrive malformed (e.g. an empty repeater saved as ""), so never
+ *  trust the shape — always normalise to an array before rendering. */
+const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+const anchor = (s: unknown) => String(s ?? "").toLowerCase().replace(/\s+/g, "-") || "academy";
+
 export default async function AcademiesPage() {
   const doc = await getPublished<AcademiesDoc>("academies", ACADEMIES_DOC);
-  const items = doc.items?.length ? doc.items : ACADEMIES_DOC.items;
+  const items = asArray<AcademiesDoc["items"][number]>(doc.items);
+  const academies = items.length ? items : ACADEMIES_DOC.items;
 
   return (
     <main>
@@ -33,8 +39,8 @@ export default async function AcademiesPage() {
 
           {/* Quick jump */}
           <div className="mt-10 flex flex-wrap justify-center gap-2">
-            {items.map((a) => (
-              <a key={a.short} href={`#${a.short.toLowerCase().replace(/\s+/g, "-")}`}
+            {academies.map((a) => (
+              <a key={anchor(a.short) + a.name} href={`#${anchor(a.short)}`}
                 className="rounded-full border border-[rgba(43,36,22,0.18)] bg-paper px-4 py-1.5 font-display text-sm font-bold uppercase tracking-wide text-ink shadow-[var(--shadow-raised)] transition hover:text-saffron-700">
                 {a.short}
               </a>
@@ -43,8 +49,8 @@ export default async function AcademiesPage() {
         </div>
       </section>
 
-      {items.map((a, i) => (
-        <section key={a.short + i} id={a.short.toLowerCase().replace(/\s+/g, "-")}
+      {academies.map((a, i) => (
+        <section key={anchor(a.short) + i} id={anchor(a.short)}
           className={`relative py-14 sm:py-16 ${i % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
           <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
             <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.3fr]">
@@ -97,7 +103,7 @@ export default async function AcademiesPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[rgba(43,36,22,0.08)]">
-                        {(a.courses ?? []).map((c, j) => (
+                        {asArray<{ name: string; duration: string; who: string }>(a.courses).map((c, j) => (
                           <tr key={c.name + j}>
                             <td className="px-4 py-3 font-semibold text-ink">{c.name}</td>
                             <td className="whitespace-nowrap px-4 py-3 font-bold text-saffron-700">{c.duration}</td>
@@ -109,10 +115,10 @@ export default async function AcademiesPage() {
                   </div>
                 </Reveal>
 
-                {(a.highlights ?? []).length > 0 && (
+                {asArray<string>(a.highlights).length > 0 && (
                   <Reveal delay={180} className="mt-6">
                     <ul className="grid gap-2 sm:grid-cols-2">
-                      {a.highlights.map((h, j) => (
+                      {asArray<string>(a.highlights).map((h, j) => (
                         <li key={j} className="skeu-panel flex gap-2 p-3 text-sm text-ink-soft">
                           <span className="text-tri-green-600" aria-hidden>★</span> {h}
                         </li>

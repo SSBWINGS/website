@@ -77,7 +77,10 @@ function FieldInput({ field, value, onChange }: { field: SectionField; value: un
     const items = Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
     const itemFields = field.itemFields ?? [];
     const setItem = (i: number, k: string, v: unknown) => onChange(items.map((it, j) => (j === i ? { ...it, [k]: v } : it)));
-    const add = () => onChange([...items, Object.fromEntries(itemFields.map((f) => [f.key, f.type === "tags" ? [] : ""]))]);
+    // List-shaped fields (tags & nested repeaters) must start as arrays, not "".
+    const blank = () =>
+      Object.fromEntries(itemFields.map((f) => [f.key, f.type === "tags" || f.type === "repeater" ? [] : ""]));
+    const add = () => onChange([...items, blank()]);
     const remove = (i: number) => onChange(items.filter((_, j) => j !== i));
     const move = (i: number, d: -1 | 1) => { const j = i + d; if (j < 0 || j >= items.length) return; const c = [...items]; [c[i], c[j]] = [c[j], c[i]]; onChange(c); };
     return (

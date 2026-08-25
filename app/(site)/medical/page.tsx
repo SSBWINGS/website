@@ -13,12 +13,20 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("medical");
 }
 
+/** CMS lists can arrive malformed (e.g. an empty repeater saved as ""), so never
+ *  trust the shape — always normalise to an array before rendering. */
+const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+const pick = <T,>(v: unknown, fallback: T[]): T[] => {
+  const arr = asArray<T>(v);
+  return arr.length ? arr : fallback;
+};
+
 export default async function MedicalPage() {
   const d = await getPublished<MedicalDoc>("medical", MEDICAL);
-  const stages = d.stages?.length ? d.stages : MEDICAL.stages;
-  const standards = d.standards?.length ? d.standards : MEDICAL.standards;
-  const common = d.common?.length ? d.common : MEDICAL.common;
-  const faqs = d.faqs?.length ? d.faqs : MEDICAL.faqs;
+  const stages = pick(d.stages, MEDICAL.stages);
+  const standards = pick(d.standards, MEDICAL.standards);
+  const common = pick(d.common, MEDICAL.common);
+  const faqs = pick(d.faqs, MEDICAL.faqs);
 
   return (
     <main>
