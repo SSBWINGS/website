@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SITE } from "@/lib/data";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { coerceShape } from "@/lib/shape";
 
 /** Recursively sanitize every string in a CMS payload. Rich-text fields are
  *  rendered with dangerouslySetInnerHTML downstream, so we neutralize any
@@ -61,7 +62,7 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
         .eq("key", key)
         .maybeSingle();
       if (draftRow?.draft && Object.keys(draftRow.draft).length > 0) {
-        return deepSanitize({ ...fallback, ...(draftRow.draft as Partial<T>) }) as T;
+        return deepSanitize(coerceShape({ ...fallback, ...(draftRow.draft as Partial<T>) }, fallback)) as T;
       }
     }
 
@@ -73,7 +74,7 @@ export async function getPublished<T>(key: string, fallback: T): Promise<T> {
     if (error || !data?.published || Object.keys(data.published).length === 0) {
       return fallback;
     }
-    return deepSanitize({ ...fallback, ...(data.published as Partial<T>) }) as T;
+    return deepSanitize(coerceShape({ ...fallback, ...(data.published as Partial<T>) }, fallback)) as T;
   } catch {
     return fallback;
   }

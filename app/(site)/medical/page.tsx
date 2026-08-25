@@ -8,14 +8,12 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import CtaBanner from "@/components/CtaBannerSection";
 import { MEDICAL, type MedicalDoc } from "@/lib/medical";
+import { asArray } from "@/lib/shape";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("medical");
 }
 
-/** CMS lists can arrive malformed (e.g. an empty repeater saved as ""), so never
- *  trust the shape — always normalise to an array before rendering. */
-const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const pick = <T,>(v: unknown, fallback: T[]): T[] => {
   const arr = asArray<T>(v);
   return arr.length ? arr : fallback;

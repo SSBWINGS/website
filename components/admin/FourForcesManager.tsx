@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { mediaUrl } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import type { FourForcesDoc, ForceCard } from "@/lib/four-forces";
+import { asArray } from "@/lib/shape";
 
 export default function FourForcesManager({ initial }: { initial: FourForcesDoc }) {
   const supabase = createClient();
@@ -15,7 +16,7 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
 
   const setHead = (patch: Partial<FourForcesDoc>) => setDoc((d) => ({ ...d, ...patch }));
   const setCard = (i: number, patch: Partial<ForceCard>) =>
-    setDoc((d) => ({ ...d, cards: d.cards.map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
+    setDoc((d) => ({ ...d, cards: asArray<ForceCard>(d.cards).map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
 
   async function uploadImage(i: number, file: File) {
     setBusy(true); setMsg(null);
@@ -60,7 +61,7 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {doc.cards.map((c, i) => (
+        {asArray<ForceCard>(doc.cards).map((c, i) => (
           <div key={i} className="rounded-xl border border-slate-200 bg-white p-5">
             <div className="mb-3 flex items-center gap-3">
               <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-md bg-slate-100">
@@ -80,7 +81,7 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
               </div>
               <textarea value={c.desc} onChange={(e) => setCard(i, { desc: e.target.value })} rows={2} placeholder="Description"
                 className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm" />
-              <input value={c.entries.join(", ")} onChange={(e) => setCard(i, { entries: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
+              <input value={asArray<string>(c.entries).join(", ")} onChange={(e) => setCard(i, { entries: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
                 placeholder="Tags (comma-separated)" className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm" />
               <input value={c.blog} onChange={(e) => setCard(i, { blog: e.target.value })} placeholder="CTA link (e.g. /blog/join-indian-army)"
                 className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm" />

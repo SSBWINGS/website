@@ -8,14 +8,12 @@ import SectionHeading from "@/components/SectionHeading";
 import Reveal from "@/components/Reveal";
 import CtaBanner from "@/components/CtaBannerSection";
 import { ACADEMIES_DOC, type AcademiesDoc } from "@/lib/academies";
+import { asArray } from "@/lib/shape";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("academies");
 }
 
-/** CMS lists can arrive malformed (e.g. an empty repeater saved as ""), so never
- *  trust the shape — always normalise to an array before rendering. */
-const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const anchor = (s: unknown) => String(s ?? "").toLowerCase().replace(/\s+/g, "-") || "academy";
 
 export default async function AcademiesPage() {

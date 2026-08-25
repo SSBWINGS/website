@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { FOUR_FORCES, type FourForcesDoc } from "@/lib/four-forces";
+import { coerceShape } from "@/lib/shape";
 import FourForcesManager from "@/components/admin/FourForcesManager";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +8,9 @@ export const dynamic = "force-dynamic";
 export default async function FourForcesAdmin() {
   const supabase = await createClient();
   const { data } = await supabase.from("site_content").select("draft").eq("key", "four_forces").maybeSingle();
-  const initial = (data?.draft && Object.keys(data.draft).length ? data.draft : FOUR_FORCES) as FourForcesDoc;
+  const raw = (data?.draft && Object.keys(data.draft).length ? data.draft : FOUR_FORCES) as FourForcesDoc;
+  // Never hand the editor a malformed list (e.g. cards/entries saved as "").
+  const initial = coerceShape(raw, FOUR_FORCES);
   return (
     <div className="max-w-4xl">
       <h1 className="text-2xl font-bold text-slate-900">Four Forces · One Dream</h1>

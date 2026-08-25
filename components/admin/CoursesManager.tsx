@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { asArray } from "@/lib/shape";
 
 export type CourseEdit = { tag: string; title: string; where: string; price: string; desc: string; features: string[] };
 
@@ -52,7 +53,7 @@ export default function CoursesManager({ initial }: { initial: CourseEdit[] }) {
             <textarea value={c.desc} onChange={(e) => set(i, { desc: e.target.value })} rows={2} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
           </label>
           <label className="mt-3 block text-xs font-medium text-slate-500">Features (one per line)
-            <textarea value={c.features.join("\n")} onChange={(e) => set(i, { features: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
+            <textarea value={asArray<string>(c.features).join("\n")} onChange={(e) => set(i, { features: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) })}
               rows={5} className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
           </label>
         </div>
