@@ -27,6 +27,7 @@ const ITEMS: Item[] = [
   { href: "/admin/campus", label: "Campus Gallery", icon: "🏫" },
   { href: "/admin/air1", label: "AIR-1 Marquee", icon: "🥇" },
   { href: "/admin/google-reviews", label: "Google Reviews", icon: "⭐" },
+  { href: "/admin/sections/enquiry_popup", label: "Enquiry Popup", icon: "💌" },
   { href: "/admin/stats", label: "Scoreboard Stats", icon: "📊" },
   { href: "/admin/countdown", label: "Batch & Exam Countdown", icon: "⏱" },
   { href: "/admin/settings", label: "Footer & Contact", icon: "▤" },

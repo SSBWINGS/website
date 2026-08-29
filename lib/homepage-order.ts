@@ -17,6 +17,7 @@ export type HomeSectionKey =
   | "selection_tracker"
   | "journey"
   | "officer_banners"
+  | "videos"
   | "google_reviews"
   | "testimonials"
   | "instagram"
@@ -42,6 +43,7 @@ export const HOME_SECTIONS: HomeSectionMeta[] = [
   { key: "selection_tracker", label: "Selection Tracker", editHref: "/admin/selections" },
   { key: "journey", label: "5-Day SSB Journey", editHref: "/admin/sections/journey" },
   { key: "officer_banners", label: "Alumni in Uniform" },
+  { key: "videos", label: "YouTube Videos", hint: "Shares the Resources videos", editHref: "/admin/resources" },
   { key: "google_reviews", label: "Google Reviews", editHref: "/admin/google-reviews" },
   { key: "testimonials", label: "Testimonials", editHref: "/admin/testimonials" },
   { key: "instagram", label: "Instagram Feed" },

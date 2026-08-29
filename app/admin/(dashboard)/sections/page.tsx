@@ -34,6 +34,8 @@ const PAGES: Page[] = [
       { label: "Recent Wins Marquee", href: "/admin/sections/recent_wins" },
       { label: "Selection Tracker", href: "/admin/selections" },
       { label: "5-Day SSB Journey", href: "/admin/sections/journey" },
+      { label: "YouTube Videos", href: "/admin/resources", hint: "Same list as Resources" },
+      { label: "Videos — Heading", href: "/admin/sections/heading.videos" },
       { label: "Google Reviews", href: "/admin/google-reviews", hint: "Paste review links" },
       { label: "Testimonials", href: "/admin/testimonials" },
       { label: "FAQs", href: "/admin/faqs" },

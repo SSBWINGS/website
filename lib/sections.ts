@@ -68,6 +68,7 @@ const HEADING_KEYS: { key: string; label: string }[] = [
   { key: "mentors", label: "Mentors" },
   { key: "stats", label: "Scoreboard" },
   { key: "testimonials", label: "Testimonials" },
+  { key: "videos", label: "YouTube Videos" },
   { key: "google_reviews", label: "Google Reviews" },
 ];
 

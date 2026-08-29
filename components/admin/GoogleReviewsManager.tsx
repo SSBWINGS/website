@@ -31,28 +31,40 @@ export default function GoogleReviewsManager({
     const c = [...items]; [c[i], c[j]] = [c[j], c[i]]; setItems(c);
   };
 
-  async function addFromLink() {
-    if (!link.trim()) return;
+  /** Pull the latest reviews straight from Google (needs a Places API key). */
+  async function importFromGoogle() {
     setBusy(true); setMsg(null);
     try {
       const res = await fetch("/api/admin/google-review", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: link.trim() }),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}),
       });
-      const meta = await res.json();
-      if (!res.ok) throw new Error(meta.error || "Could not read that link.");
-      setItems((s) => [...s, {
-        url: meta.url, name: meta.name || "", rating: meta.rating || 5,
-        text: meta.text || "", avatar: "", date: "",
-      }]);
-      setLink("");
-      setMsg({ ok: true, text: meta.note || "Added — check the details below." });
-    } catch (err) {
-      // Still add a blank row so the admin can type it in manually.
-      setItems((s) => [...s, { url: link.trim(), name: "", rating: 5, text: "", avatar: "", date: "" }]);
-      setLink("");
-      setMsg({ ok: false, text: (err instanceof Error ? err.message : "Failed.") + " A blank review was added — fill it in below." });
+      const data = await res.json();
+      if (!data.ok) {
+        setMsg({ ok: false, text: data.error || "Could not import from Google." });
+        return;
+      }
+      const incoming: GoogleReview[] = (data.items ?? []).map(
+        (r: { url: string; name: string; rating: number; text: string; avatarUrl: string; date: string }) => ({
+          url: r.url, name: r.name, rating: r.rating, text: r.text, avatar: r.avatarUrl, date: r.date,
+        }),
+      );
+      // Skip anyone already on the wall.
+      setItems((cur) => {
+        const seen = new Set(cur.map((c) => (c.name + c.text).slice(0, 60)));
+        const fresh = incoming.filter((r) => !seen.has((r.name + r.text).slice(0, 60)));
+        setMsg({ ok: true, text: `Imported ${fresh.length} new review(s) from Google.` });
+        return [...cur, ...fresh];
+      });
+    } catch {
+      setMsg({ ok: false, text: "Could not reach Google — add the review manually below." });
     } finally { setBusy(false); }
+  }
+
+  /** Add an empty card to type a review into (always works). */
+  function addManual() {
+    setItems((s) => [...s, { url: link.trim(), name: "", rating: 5, text: "", avatar: "", date: "" }]);
+    setLink("");
+    setMsg({ ok: true, text: "Blank review added — fill in the reviewer, rating and text below." });
   }
 
   async function uploadAvatar(i: number, file: File) {
@@ -86,18 +98,29 @@ export default function GoogleReviewsManager({
   return (
     <div className="mt-6 space-y-5">
       <div className="rounded-xl border border-slate-200 bg-white p-5">
-        <label className="mb-1 block text-sm font-medium text-slate-700">Paste a Google review link</label>
-        <div className="flex flex-wrap gap-2">
-          <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://maps.app.goo.gl/…"
-            className="min-w-[240px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-          <button onClick={addFromLink} disabled={busy}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">
-            {busy ? "Reading…" : "+ Add review"}
-          </button>
-        </div>
-        <p className="mt-2 text-xs text-slate-400">
-          Google loads reviews with JavaScript, so we pull what we can from the link and you confirm the rest below.
+        <button onClick={importFromGoogle} disabled={busy}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">
+          {busy ? "Importing…" : "⭐ Import latest reviews from Google"}
+        </button>
+        <p className="mt-2 text-xs text-slate-500">
+          Pulls the newest reviews (name, rating, text and photo) automatically. Needs a
+          <b> Google Places API key</b> on the server — otherwise add reviews by hand below.
         </p>
+
+        <div className="mt-4 border-t border-slate-200 pt-4">
+          <label className="mb-1 block text-sm font-medium text-slate-700">Or add one manually</label>
+          <div className="flex flex-wrap gap-2">
+            <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="Review link (optional)"
+              className="min-w-[240px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+            <button onClick={addManual} disabled={busy}
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">
+              + Add blank review
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-slate-400">
+            Google blocks reading review text from a shared link, so pasting one alone cannot fill these in.
+          </p>
+        </div>
         <label className="mt-4 block text-sm font-medium text-slate-700">Google profile link (for the “See all reviews” button)</label>
         <input value={placeUrl} onChange={(e) => setPlaceUrl(e.target.value)}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />

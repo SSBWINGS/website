@@ -48,6 +48,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "i.ytimg.com" },
       { protocol: "https", hostname: "**.supabase.co" },
+      // Google reviewer profile photos (Places API)
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "maps.googleapis.com" },
     ],
     // Supabase Storage serves objects with `Cache-Control: no-cache`, so without
     // a floor Vercel would re-fetch the original from Supabase constantly and

@@ -19,6 +19,7 @@ import StatsStrip from "@/components/StatsStrip";
 import SelectionTracker from "@/components/SelectionTracker";
 import JourneySection from "@/components/JourneySection";
 import OfficerBanners from "@/components/OfficerBanners";
+import VideosSection from "@/components/VideosSection";
 import GoogleReviews from "@/components/GoogleReviews";
 import Testimonials from "@/components/Testimonials";
 import InstagramFeed from "@/components/InstagramFeed";
@@ -47,6 +48,7 @@ const SECTION_VIEWS: Record<HomeSectionKey, ReactNode> = {
   selection_tracker: <SelectionTracker />,
   journey: <JourneySection />,
   officer_banners: <OfficerBanners />,
+  videos: <VideosSection />,
   google_reviews: <GoogleReviews />,
   testimonials: <Testimonials />,
   instagram: <InstagramFeed />,
