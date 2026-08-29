@@ -9,6 +9,14 @@ export const HERO = {
   paragraph:
     "Five days at the Services Selection Board decide who wears the stars. At <strong>SSBWINGS</strong>, ex-SSB assessors rebuild you for every one of them — Screening, Psychology, GTO, Interview and Conference — until the Board sees what we see: <em>an officer</em>.",
   rating: "Rated 5.0 on Google by aspirants across India",
+  /** Static text before the animated word, e.g. "Become ". */
+  typedPrefix: "Become ",
+  /** The words the typewriter cycles through. */
+  typedWords: ["an Officer", "a Leader", "a Warrior", "Recommended"],
+  primaryCta: "Book Free Counselling",
+  primaryCtaHref: "/contact",
+  secondaryCta: "Courses",
+  secondaryCtaHref: "/courses",
 };
 
 export const STORY = {

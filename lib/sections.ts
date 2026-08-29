@@ -90,14 +90,20 @@ const HEADING_SECTIONS: SectionDef[] = HEADING_KEYS.map((h) => ({
 export const SECTIONS: SectionDef[] = [
   {
     key: "hero", label: "Hero", page: "Home",
-    description: "The headline, badge, intro paragraph and rating at the top of the homepage.",
+    description: "Every text in the homepage hero — badge, both heading lines, the animated typewriter words, paragraph, rating line and both buttons.",
     previewPath: "/",
     fields: [
       { key: "badge", label: "Badge (small pill text)", type: "text" },
       { key: "headingLine1", label: "Heading — line 1", type: "text" },
       { key: "headingLine2", label: "Heading — line 2", type: "text" },
+      { key: "typedPrefix", label: "Animated line — fixed start (e.g. \"Become \")", type: "text" },
+      { key: "typedWords", label: "Animated line — rotating words (comma-separated)", type: "tags" },
       { key: "paragraph", label: "Intro paragraph (fonts/colours/word-art)", type: "rich" },
-      { key: "rating", label: "Rating line", type: "text" },
+      { key: "rating", label: "Rating line (HTML allowed)", type: "text" },
+      { key: "primaryCta", label: "Primary button — label", type: "text" },
+      { key: "primaryCtaHref", label: "Primary button — link", type: "text" },
+      { key: "secondaryCta", label: "Secondary button — label", type: "text" },
+      { key: "secondaryCtaHref", label: "Secondary button — link", type: "text" },
     ],
   },
   {

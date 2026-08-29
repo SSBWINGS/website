@@ -6,7 +6,7 @@ import Link from "next/link";
 import Counter from "./Counter";
 import HeroShowcase from "./HeroShowcase";
 import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
-const ROLES = ["an Officer", "a Leader", "a Warrior", "Recommended"];
+import { asArray } from "@/lib/shape";
 
 import { HERO } from "@/lib/section-defaults";
 
@@ -16,6 +16,14 @@ export type HeroContent = {
   headingLine2: string;
   paragraph: string; // HTML
   rating: string;
+  /** Static text before the animated word, e.g. "Become ". */
+  typedPrefix?: string;
+  /** Words the typewriter cycles through. */
+  typedWords?: string[];
+  primaryCta?: string;
+  primaryCtaHref?: string;
+  secondaryCta?: string;
+  secondaryCtaHref?: string;
 };
 
 export const HERO_DEFAULT: HeroContent = HERO;
@@ -53,7 +61,10 @@ export default function Hero({
   stats?: { value: number; label: string }[];
   slides?: HeroSlide[];
 }) {
-  const typed = useTypewriter(ROLES);
+  // Everything in the headline is CMS-editable, including the animated words.
+  const words = asArray<string>(content.typedWords).filter(Boolean);
+  const roles = words.length ? words : (HERO.typedWords as string[]);
+  const typed = useTypewriter(roles);
 
   return (
     <section className="relative overflow-hidden">
@@ -88,7 +99,7 @@ export default function Hero({
             {content.headingLine1}
             <br /> {content.headingLine2}
             <br />
-            <span className="tricolour-text">Become {typed}</span>
+            <span className="tricolour-text">{content.typedPrefix ?? HERO.typedPrefix}{typed}</span>
             <span className="animate-pulse text-saffron-600">|</span>
           </h1>
 
@@ -98,13 +109,15 @@ export default function Hero({
           />
 
           <div className="mt-6 flex flex-wrap items-center gap-4">
-            <Link href="/contact" className="btn btn-saffron btn-shine text-base">
-              Book Free Counselling
+            <Link href={content.primaryCtaHref || HERO.primaryCtaHref} className="btn btn-saffron btn-shine text-base">
+              {content.primaryCta || HERO.primaryCta}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
-            <Link href="/courses" className="btn btn-outline btn-shine">Courses</Link>
+            <Link href={content.secondaryCtaHref || HERO.secondaryCtaHref} className="btn btn-outline btn-shine">
+              {content.secondaryCta || HERO.secondaryCta}
+            </Link>
           </div>
 
           <div className="mt-5 flex items-center gap-2 text-sm text-ink-soft">
