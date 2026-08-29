@@ -447,6 +447,16 @@ body {
 .btn-outline:hover { border-color: var(--color-gold-600); color: var(--color-gold-700); }
 .btn-outline:active { box-shadow: var(--shadow-pressed); }
 
+/* The two hero CTAs must read as a matched pair. Sizing them here (rather than
+   with utility classes) keeps them identical even though only one carries an
+   arrow icon — the icon no longer drives the height. */
+.hero-btn {
+  min-height: 3.3rem;
+  padding-inline: 2rem;
+  font-size: 1.0625rem;
+  line-height: 1;
+}
+
 .btn-shine::after {
   content: "";
   position: absolute;
