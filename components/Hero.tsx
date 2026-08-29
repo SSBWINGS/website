@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Counter from "./Counter";
-import PhotoCarousel from "./PhotoCarousel";
+import HeroShowcase from "./HeroShowcase";
+import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
 const ROLES = ["an Officer", "a Leader", "a Warrior", "Recommended"];
 
 import { HERO } from "@/lib/section-defaults";
@@ -18,28 +19,6 @@ export type HeroContent = {
 };
 
 export const HERO_DEFAULT: HeroContent = HERO;
-
-/** Main (large) hero frame photos — auto-rotating, CMS-editable. */
-export const HERO_MAIN_PHOTOS = [
-  "/images/pipping-ceremony.jpg",
-  "/images/hero-parade.jpg",
-  "/images/ima-guard.jpg",
-  "/images/ota-sunrise.jpg",
-];
-
-/** Recommended-candidate photos that auto-rotate in the hero collage (fallback). */
-export const RECO_PHOTOS = [
-  "/images/students/tanishq.png",
-  "/images/students/tejas.jpg",
-  "/images/students/yash.jpg",
-  "/images/students/rahul.jpg",
-  "/images/students/tanya.jpg",
-  "/images/students/harshvardhan.jpg",
-  "/images/students/khushi.jpg",
-  "/images/students/chaitanya.jpg",
-  "/images/students/harsh.jpg",
-  "/images/students/aditya.png",
-];
 
 function useTypewriter(words: string[]) {
   const [text, setText] = useState("");
@@ -68,13 +47,11 @@ const DEFAULT_STATS = [
 export default function Hero({
   content = HERO_DEFAULT,
   stats = DEFAULT_STATS,
-  carousel = RECO_PHOTOS,
-  mainCarousel = HERO_MAIN_PHOTOS,
+  slides = HERO_SLIDES,
 }: {
   content?: HeroContent;
   stats?: { value: number; label: string }[];
-  carousel?: string[];
-  mainCarousel?: string[];
+  slides?: HeroSlide[];
 }) {
   const typed = useTypewriter(ROLES);
 
@@ -127,41 +104,18 @@ export default function Hero({
                 <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
-            <Link href="/ssb-process" className="btn btn-outline btn-shine">Decode the 5-Day SSB</Link>
+            <Link href="/courses" className="btn btn-outline btn-shine">Courses</Link>
           </div>
 
           <div className="mt-5 flex items-center gap-2 text-sm text-ink-soft">
             <span className="flex text-gold-500" aria-hidden>★★★★★</span>
-            {content.rating}
+            <span dangerouslySetInnerHTML={{ __html: content.rating }} />
           </div>
         </div>
 
-        {/* Right — photo collage: pipping ceremony + marching contingent (first on mobile) */}
-        <div className="relative order-1 mx-auto w-full max-w-lg pb-10 sm:max-w-none sm:pb-16 lg:order-2 lg:pb-8">
-          {/* Main — auto-rotating carousel (CMS-editable) */}
-          <div className="photo-frame card-lift relative z-10 w-full sm:ml-auto sm:w-[92%] sm:-rotate-2">
-            <div>
-              <PhotoCarousel
-                images={mainCarousel}
-                alt="Life at SSBWINGS — from the GTO ground to the pipping ceremony"
-                sizes="(min-width: 1024px) 46vw, 92vw"
-                ratio="3/2"
-                interval={4200}
-                showBadge={false}
-                position="center 35%"
-              />
-            </div>
-          </div>
-          {/* Secondary — auto carousel of recommended candidates, overlapping */}
-          <div className="photo-frame card-lift absolute -bottom-6 left-0 z-20 w-[58%] rotate-3 sm:-bottom-10 sm:w-[52%]">
-            <div>
-              <PhotoCarousel
-                images={carousel}
-                alt="An SSBWINGS recommended candidate"
-                sizes="(min-width: 1024px) 26vw, 55vw"
-              />
-            </div>
-          </div>
+        {/* Right — commissioned-officer showcase */}
+        <div className="relative order-1 mx-auto w-full max-w-lg sm:max-w-none lg:order-2">
+          <HeroShowcase slides={slides} />
         </div>
       </div>
 

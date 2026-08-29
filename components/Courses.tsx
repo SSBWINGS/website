@@ -133,7 +133,7 @@ export default async function Courses({ heading = true }: { heading?: boolean })
                   </div>
 
                   <a href={book.buyUrl} target="_blank" rel="noopener noreferrer" className="btn btn-saffron btn-shine mt-6">
-                    Buy on Flipkart
+                    BUY
                     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden>
                       <path d="M7 17 17 7m0 0H9m8 0v8" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>

@@ -39,5 +39,10 @@ const OPTIONS: sanitizeHtmlLib.IOptions = {
 
 export function sanitizeHtml(input: string | null | undefined): string {
   if (!input) return "";
-  return sanitizeHtmlLib(String(input), OPTIONS);
+  const clean = sanitizeHtmlLib(String(input), OPTIONS);
+  // sanitize-html escapes bare "&" to "&amp;". Many CMS fields are rendered as
+  // plain text (not via innerHTML), where that shows literally as "&amp;" —
+  // so put the ampersand back. Safe: an entity in text position cannot create
+  // an element, and a bare "&" is valid in HTML text.
+  return clean.replace(/&amp;(?!(?:[a-zA-Z][a-zA-Z0-9]{1,8}|#\d{1,6}|#x[0-9a-fA-F]{1,6});)/g, "&");
 }

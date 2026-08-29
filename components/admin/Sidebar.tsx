@@ -21,7 +21,7 @@ const ITEMS: Item[] = [
   { href: "/admin/mock-tests", label: "Mock Tests", icon: "🧠" },
   { href: "/admin/resources", label: "Resources", icon: "📂" },
   { href: "/admin/sections", label: "Pages & Sections", icon: "✎" },
-  { href: "/admin/hero-carousel", label: "Hero Carousel", icon: "🖼" },
+  { href: "/admin/hero-showcase", label: "Hero Showcase", icon: "🖼" },
   { href: "/admin/four-forces", label: "Four Forces", icon: "🎖" },
   { href: "/admin/stats", label: "Scoreboard Stats", icon: "📊" },
   { href: "/admin/countdown", label: "Batch & Exam Countdown", icon: "⏱" },

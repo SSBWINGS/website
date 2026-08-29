@@ -11,7 +11,7 @@ const PAGES: Page[] = [
     name: "Home", view: "/",
     items: [
       { label: "Hero", href: "/admin/sections/hero", hint: "Headline, badge, intro, rating" },
-      { label: "Hero Carousels", href: "/admin/hero-carousel", hint: "Main + candidate photos" },
+      { label: "Hero Showcase", href: "/admin/hero-showcase", hint: "Officer photos + academy & term" },
       { label: "Wall of Honour", href: "/admin/candidates", hint: "Recommended candidate tiles" },
       { label: "Four Forces", href: "/admin/four-forces", hint: "Army/Navy/AF/ICG cards" },
       { label: "The Hard Truth", href: "/admin/sections/story", hint: "Story block" },

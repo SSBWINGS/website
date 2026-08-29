@@ -96,7 +96,6 @@ export default async function Footer() {
       <div className="border-t border-navy-800">
         <div className="mx-auto flex max-w-[1840px] flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-navy-200/70 sm:flex-row sm:px-8">
           <p>© {new Date().getFullYear()} SSBWINGS. All rights reserved.</p>
-          <p>Champions of Discipline, Dedication &amp; Determination 🇮🇳</p>
         </div>
         <p className="mx-auto max-w-[1840px] px-4 pb-5 text-center text-xs text-navy-200/70 sm:px-8">
           Developed with <span className="text-red-500" aria-hidden>❤</span> by{" "}

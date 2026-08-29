@@ -30,7 +30,7 @@ export const PAGE_HEROES: Record<string, PageHeroDoc> = {
   gallery: {
     kicker: "Wall of Honour", crumb: "Gallery",
     title: `Faces of ${tri("Recommendation")}`,
-    subtitle: "Every photograph here is a real SSBWINGS aspirant who walked out of the Board recommended. Discipline, dedication and determination — made visible.",
+    subtitle: "Every photograph here is a real SSBWINGS alumnus who walked out of the Board recommended. Discipline, dedication and determination — made visible.",
     image: "/images/women-officers.jpg",
   },
   testimonials: {

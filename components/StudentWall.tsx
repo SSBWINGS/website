@@ -41,7 +41,7 @@ export default async function StudentWall({
             center
             kicker="Wall of Honour"
             title={<>Our <span className="tricolour-text">Recommended</span> Cadets</>}
-            subtitle="Real faces, real chest numbers. Every photograph below is an SSBWINGS aspirant who walked out recommended — from NDA to CDS, AFCAT to Navy."
+            subtitle="Real faces, real chest numbers. Every photograph below is an SSBWINGS alumnus who walked out recommended — from NDA to CDS, AFCAT to Navy."
           />
         )}
 

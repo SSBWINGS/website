@@ -28,7 +28,7 @@ export const FOUR_FORCES_CARDS: ForceCard[] = [
     entries: ["NDA", "CDS IMA/OTA", "TES", "TGC", "ACC"], blog: "/blog/join-indian-army",
   },
   {
-    name: "Indian Navy", motto: "Śaṁ No Varuṇaḥ",
+    name: "Indian Navy", motto: "Sham No Varunah",
     desc: "INA Ezhimala & beyond — 10+2 B.Tech, Navy SSC (GS/X, Pilot, Logistics, ATC). Command the deep blue.",
     image: "/images/services/navy-op.jpg",
     alt: "Indian Navy frigate INS Shivalik underway at sea",

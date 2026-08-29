@@ -159,7 +159,7 @@ export type Service = "army" | "navy" | "airforce";
 
 export const SERVICES: { id: Service; name: string; motto: string; color: string }[] = [
   { id: "army", name: "Indian Army", motto: "Service Before Self", color: "army" },
-  { id: "navy", name: "Indian Navy", motto: "Śaṁ No Varuṇaḥ", color: "navy" },
+  { id: "navy", name: "Indian Navy", motto: "Sham No Varunah", color: "navy" },
   { id: "airforce", name: "Indian Air Force", motto: "Touch the Sky with Glory", color: "air" },
 ];
 
@@ -490,7 +490,7 @@ export const JOIN_ROUTES: {
   {
     id: "navy",
     name: "Indian Navy",
-    motto: "Śaṁ No Varuṇaḥ",
+    motto: "Sham No Varunah",
     grad: "linear-gradient(160deg,#22508f,#142c52)",
     image: "/images/services/navy-op.jpg",
     academy: "INA Ezhimala",

@@ -63,3 +63,16 @@ test("keeps safe links and hardens target=_blank", () => {
   assert.ok(out.includes("https://ssbwings.com"));
   assert.ok(/rel="[^"]*noopener[^"]*"/.test(out));
 });
+
+test("bare & survives for plain-text rendering (no &amp;)", () => {
+  assert.equal(sanitizeHtml("Discipline, Dedication & Determination"), "Discipline, Dedication & Determination");
+  assert.equal(sanitizeHtml("A & B <strong>x</strong>"), "A & B <strong>x</strong>");
+});
+
+test("real entities are preserved, script still stripped", () => {
+  // A genuine entity must not be mangled into a raw character.
+  assert.equal(sanitizeHtml("5 &lt; 10"), "5 &lt; 10");
+  // An escaped entity stays escaped — it must never become a live <b> tag.
+  assert.equal(sanitizeHtml("&amp;lt;b&amp;gt;"), "&amp;lt;b&amp;gt;");
+  assert.ok(!/script/i.test(sanitizeHtml("a & b <script>alert(1)</script>")));
+});
