@@ -49,6 +49,16 @@ export default function CountdownEditor({ initial }: { initial: CountdownDoc }) 
               <option value="exam">Exam</option>
               <option value="batch">Batch</option>
             </select>
+            <label className="flex items-center gap-1 text-xs text-slate-500" title="Card background">
+              BG
+              <input type="color" value={it.bg || "#0a1524"} onChange={(e) => update(i, { bg: e.target.value })}
+                className="h-7 w-8 cursor-pointer rounded border border-slate-300 bg-transparent p-0.5" />
+            </label>
+            <label className="flex items-center gap-1 text-xs text-slate-500" title="Text colour">
+              Text
+              <input type="color" value={it.fg || "#ffffff"} onChange={(e) => update(i, { fg: e.target.value })}
+                className="h-7 w-8 cursor-pointer rounded border border-slate-300 bg-transparent p-0.5" />
+            </label>
             <button onClick={() => remove(i)} className="rounded border border-red-200 px-1.5 text-xs text-red-600 hover:bg-red-50">✕</button>
           </div>
         ))}

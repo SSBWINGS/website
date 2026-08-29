@@ -8,6 +8,8 @@ import ChatBot from "@/components/ChatBot";
 import BackToTop from "@/components/BackToTop";
 import PageViewTracker from "@/components/PageViewTracker";
 import PreviewBar from "@/components/PreviewBar";
+import { getPublished } from "@/lib/content";
+import { ENQUIRY_POPUP, type EnquiryPopupDoc } from "@/lib/homepage-defaults";
 
 const SITE_URL = "https://www.ssbwings.com";
 
@@ -35,14 +37,15 @@ const jsonLd = {
   ],
 };
 
-export default function SiteLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function SiteLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const popup = await getPublished<EnquiryPopupDoc>("enquiry_popup", ENQUIRY_POPUP);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <PageViewTracker />
       <PreloaderSection />
       <Cursor />
-      <ModalProvider>
+      <ModalProvider popup={popup}>
         <Navbar />
         {children}
         <Footer />

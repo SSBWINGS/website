@@ -1,4 +1,4 @@
-export type CountdownItem = { label: string; date: string; kind?: "batch" | "exam" };
+export type CountdownItem = { label: string; date: string; kind?: "batch" | "exam"; bg?: string; fg?: string };
 export type CountdownDoc = { heading: string; items: CountdownItem[] };
 
 /** Fallback shown before the CMS is populated. Dates are ISO (YYYY-MM-DD). */

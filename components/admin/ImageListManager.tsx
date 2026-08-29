@@ -1,0 +1,118 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
+import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
+import { compressImage } from "@/lib/image-client";
+import { asArray } from "@/lib/shape";
+
+/** Reusable "a list of images" editor for simple gallery-style CMS docs. */
+export default function ImageListManager({
+  initial,
+  docKey,
+  label,
+  folder,
+  note,
+}: {
+  initial: string[];
+  docKey: string;
+  label: string;
+  folder: string;
+  note?: string;
+}) {
+  const supabase = createClient();
+  const [images, setImages] = useState<string[]>(asArray<string>(initial));
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const added: string[] = [];
+      for (const raw of files) {
+        const f = await compressImage(raw);
+        const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`;
+        const { error } = await supabase.storage.from("media").upload(path, f, {
+          cacheControl: MEDIA_CACHE_CONTROL,
+          upsert: true,
+          contentType: f.type,
+        });
+        if (error) throw new Error(error.message);
+        added.push(path);
+      }
+      setImages((im) => [...im, ...added]);
+    } catch (err) {
+      setMsg({ ok: false, text: err instanceof Error ? err.message : "Upload failed." });
+    } finally {
+      setBusy(false);
+      e.target.value = "";
+    }
+  }
+
+  const move = (i: number, d: -1 | 1) => {
+    const j = i + d;
+    if (j < 0 || j >= images.length) return;
+    const c = [...images];
+    [c[i], c[j]] = [c[j], c[i]];
+    setImages(c);
+  };
+  const remove = (i: number) => setImages((im) => im.filter((_, j) => j !== i));
+
+  async function save() {
+    setBusy(true);
+    setMsg(null);
+    const doc = { images };
+    const { error } = await supabase
+      .from("site_content")
+      .upsert({ key: docKey, label, draft: doc, published: doc }, { onConflict: "key" });
+    setBusy(false);
+    if (error) return setMsg({ ok: false, text: error.message });
+    setMsg({ ok: true, text: "Saved & published — live on the site." });
+    void bustCmsCache();
+  }
+
+  return (
+    <div className="mt-6 space-y-5">
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          {busy ? "Working…" : "⬆ Upload images"}
+          <input type="file" accept="image/*" multiple onChange={onUpload} className="hidden" disabled={busy} />
+        </label>
+        {note && <p className="mt-2 text-xs text-slate-400">{note}</p>}
+      </div>
+
+      {images.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500">
+          No images yet — the site is showing the built-in defaults.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5">
+          {images.map((p, i) => (
+            <figure key={p + i} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+              <div className="relative aspect-square bg-slate-100">
+                <Image src={mediaUrl(p)} alt="" fill sizes="200px" className="object-cover" />
+              </div>
+              <figcaption className="flex items-center justify-between gap-1 p-1.5">
+                <div className="flex gap-1">
+                  <button onClick={() => move(i, -1)} className="rounded border border-slate-200 px-1.5 text-slate-600 hover:bg-slate-50">←</button>
+                  <button onClick={() => move(i, 1)} className="rounded border border-slate-200 px-1.5 text-slate-600 hover:bg-slate-50">→</button>
+                </div>
+                <button onClick={() => remove(i)} className="rounded border border-red-200 px-1.5 text-xs text-red-600 hover:bg-red-50">✕</button>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+
+      {msg && <p className={`rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}
+      <button onClick={save} disabled={busy} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">
+        {busy ? "Saving…" : "Save & publish"}
+      </button>
+    </div>
+  );
+}

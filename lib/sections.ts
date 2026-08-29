@@ -59,6 +59,32 @@ const PAGE_HERO_SECTIONS: SectionDef[] = Object.keys(PAGE_HEROES).map((k) => ({
   fields: HERO_FIELDS,
 }));
 
+/** Every homepage section heading is editable under `heading.<key>`. */
+const HEADING_KEYS: { key: string; label: string }[] = [
+  { key: "wall", label: "Wall of Honour" },
+  { key: "courses", label: "Courses" },
+  { key: "campus", label: "Campus Gallery" },
+  { key: "books", label: "Books" },
+  { key: "mentors", label: "Mentors" },
+  { key: "stats", label: "Scoreboard" },
+  { key: "testimonials", label: "Testimonials" },
+  { key: "google_reviews", label: "Google Reviews" },
+];
+
+const HEADING_SECTIONS: SectionDef[] = HEADING_KEYS.map((h) => ({
+  key: `heading.${h.key}`,
+  label: `${h.label} — Heading`,
+  page: "Home",
+  description: "Kicker, title and subtitle for this section.",
+  previewPath: "/",
+  fields: [
+    { key: "kicker", label: "Kicker", type: "text" },
+    KICKER_SIZE_FIELD,
+    { key: "title", label: "Title (HTML allowed)", type: "text" },
+    { key: "subtitle", label: "Subtitle", type: "text" },
+  ],
+}));
+
 /** Editable page sections backed by `site_content` documents. */
 export const SECTIONS: SectionDef[] = [
   {
@@ -272,6 +298,35 @@ export const SECTIONS: SectionDef[] = [
       ] },
     ],
   },
+  {
+    key: "entry_counts", label: "Entries Marquee", page: "Home",
+    description: "Entries shown in the scrolling band and how many were recommended in each.",
+    previewPath: "/",
+    fields: [{ key: "items", label: "Entries", type: "repeater", itemLabel: "Entry", itemFields: [
+      { key: "entry", label: "Entry name", type: "text" },
+      { key: "count", label: "Recommended count", type: "text" },
+    ] }],
+  },
+  {
+    key: "courses_note", label: "Courses — Facilities Note", page: "Home",
+    description: "The line under the course cards about boarding & lodging.",
+    previewPath: "/",
+    fields: [{ key: "text", label: "Note", type: "rich" }],
+  },
+  {
+    key: "enquiry_popup", label: "Enquiry Popup", page: "Site-wide",
+    description: "The pop-up that greets visitors shortly after the site loads.",
+    previewPath: "/",
+    fields: [
+      { key: "enabled", label: "Show the popup", type: "select",
+        options: [{ value: "on", label: "On" }, { value: "off", label: "Off" }] },
+      { key: "title", label: "Title", type: "text" },
+      { key: "subtitle", label: "Sub-line", type: "text" },
+      { key: "body", label: "Message", type: "rich" },
+      { key: "delayMs", label: "Delay before it opens (milliseconds)", type: "text" },
+    ],
+  },
+  ...HEADING_SECTIONS,
   ...PAGE_HERO_SECTIONS,
 ];
 

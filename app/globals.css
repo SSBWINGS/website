@@ -70,8 +70,8 @@
   --text-7xl: 4.75rem;     --text-7xl--line-height: 0.98;
   --text-8xl: 6.25rem;     --text-8xl--line-height: 0.96;
 
-  --animate-marquee: marquee 34s linear infinite;
-  --animate-marquee-slow: marquee 60s linear infinite;
+  --animate-marquee: marquee 48s linear infinite;
+  --animate-marquee-slow: marquee 85s linear infinite;
   --animate-float: float 6s ease-in-out infinite;
   --animate-shimmer: shimmer 2.8s linear infinite;
   --animate-wave: wave 3.5s ease-in-out infinite;

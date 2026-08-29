@@ -10,6 +10,7 @@ import {
 } from "react";
 import Image from "next/image";
 import ContactForm from "./ContactForm";
+import { ENQUIRY_POPUP, type EnquiryPopupDoc } from "@/lib/homepage-defaults";
 
 const ModalContext = createContext<{ open: () => void; close: () => void }>({
   open: () => {},
@@ -18,8 +19,10 @@ const ModalContext = createContext<{ open: () => void; close: () => void }>({
 
 export const useContactModal = () => useContext(ModalContext);
 
-export default function ModalProvider({ children }: { children: ReactNode }) {
+export default function ModalProvider({ children, popup = ENQUIRY_POPUP }: { children: ReactNode; popup?: EnquiryPopupDoc }) {
   const [isOpen, setIsOpen] = useState(false);
+  const autoOpen = popup.enabled !== "off";
+  const delay = Number(popup.delayMs) || 900;
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
@@ -27,12 +30,13 @@ export default function ModalProvider({ children }: { children: ReactNode }) {
   // Auto-open the enquiry popup shortly after the preloader finishes.
   // Fires once per page load (event-driven, with a timed fallback).
   useEffect(() => {
+    if (!autoOpen) return;
     let opened = false;
     let openTimer: ReturnType<typeof setTimeout>;
     const trigger = () => {
       if (opened) return;
       opened = true;
-      openTimer = setTimeout(() => setIsOpen(true), 900);
+      openTimer = setTimeout(() => setIsOpen(true), delay);
     };
     window.addEventListener("ssbw:loaded", trigger, { once: true });
     // Fallback in case the loader was already gone before we mounted
@@ -42,7 +46,7 @@ export default function ModalProvider({ children }: { children: ReactNode }) {
       clearTimeout(fallback);
       clearTimeout(openTimer);
     };
-  }, []);
+  }, [autoOpen, delay]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
@@ -84,18 +88,16 @@ export default function ModalProvider({ children }: { children: ReactNode }) {
                 <Image src="/logo-black.png" alt="" width={44} height={44} className="h-10 w-10 object-contain" />
                 <div>
                   <p className="font-display text-xl font-extrabold uppercase leading-none tracking-wide gold-text">
-                    Book Free Counselling
+                    {popup.title}
                   </p>
                   <p className="text-[11px] uppercase tracking-[0.2em] text-ink-soft">
-                    Talk to a mentor, not a salesperson
+                    {popup.subtitle}
                   </p>
                 </div>
               </div>
 
-              <p className="mt-3 text-sm leading-snug text-ink-soft">
-                New batches open every month — seats are limited. Share your details and
-                we&apos;ll map your entry &amp; timeline, free of cost.
-              </p>
+              <p className="rich-html mt-3 text-sm leading-snug text-ink-soft"
+                dangerouslySetInnerHTML={{ __html: popup.body }} />
 
               <div className="mt-4">
                 <ContactForm compact />

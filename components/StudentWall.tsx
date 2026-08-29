@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
-import SectionHeading from "./SectionHeading";
+import CmsSectionHeading from "./CmsSectionHeading";
 import { STUDENTS } from "@/lib/data";
 import { getCollection } from "@/lib/content";
 import { mediaUrl } from "@/lib/supabase/media";
@@ -37,11 +37,13 @@ export default async function StudentWall({
     <section id="wall-of-honour" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         {heading && (
-          <SectionHeading
-            center
-            kicker="Wall of Honour"
-            title={<>Our <span className="tricolour-text">Recommended</span> Cadets</>}
-            subtitle="Real faces, real chest numbers. Every photograph below is an SSBWINGS alumnus who walked out recommended — from NDA to CDS, AFCAT to Navy."
+          <CmsSectionHeading
+            sectionKey="wall"
+            fallback={{
+              kicker: "Wall of Honour",
+              title: 'Our <span class="tricolour-text">Recommended</span> Cadets',
+              subtitle: "Real faces, real chest numbers. Every photograph below is an SSBWINGS alumnus who walked out recommended — from NDA to CDS, AFCAT to Navy.",
+            }}
           />
         )}
 

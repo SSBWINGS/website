@@ -2,10 +2,33 @@
 
 import { useState, type FormEvent } from "react";
 
+/** Every officer entry an aspirant can target — kept in step with lib/data ENTRIES. */
 const ENTRY_OPTIONS = [
-  "NDA", "CDS", "AFCAT", "TES", "TGC", "10+2 Navy B.Tech",
-  "SSC Tech", "NCC Special Entry", "Indian Coast Guard",
-  "Service Entry (ACC / PC-SL / SCO)", "Other / Not sure yet",
+  "NDA & NA",
+  "10+2 TES (Technical Entry)",
+  "10+2 B.Tech Cadet Entry (Navy)",
+  "CDS – IMA (Permanent)",
+  "CDS – OTA / SSC",
+  "CDS – INA (Navy)",
+  "CDS – AFA (Air Force Academy)",
+  "TGC (Technical Graduate Course)",
+  "SSC (Tech) – Men & Women",
+  "SSC Executive – GS(X) & Technical",
+  "SSC Pilot / Observer",
+  "SSC Logistics / ATC / Education / Law",
+  "AFCAT – Flying Branch",
+  "AFCAT – Ground Duty (Technical)",
+  "AFCAT – Ground Duty (Non-Technical)",
+  "Meteorology Entry",
+  "NCC Special Entry",
+  "JAG (Judge Advocate General)",
+  "ICG Asst Commandant – General Duty",
+  "ICG AC – Pilot / Navigator",
+  "ICG AC – Technical",
+  "ACC (Army Cadet College)",
+  "SCO (Special Commissioned Officer)",
+  "PC (SL) – Permanent Commission",
+  "Other / Not sure yet",
 ];
 
 type Status = "idle" | "sending" | "success" | "error";

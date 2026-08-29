@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Reveal from "./Reveal";
-import SectionHeading from "./SectionHeading";
+import CmsSectionHeading from "./CmsSectionHeading";
 import { MENTORS } from "@/lib/data";
 import { getCollection } from "@/lib/content";
 import { mediaUrl } from "@/lib/supabase/media";
@@ -22,11 +22,13 @@ export default async function Mentors({ heading = true }: { heading?: boolean })
     <section id="mentors" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         {heading && (
-          <SectionHeading
-            center
-            kicker="Your Commanding Officers"
-            title={<>Trained by Those Who <span className="tricolour-text">Selected</span></>}
-            subtitle="Every wing of the SSB — Psychology, GTO and Interview — is led by a mentor who has lived it from the assessor's chair."
+          <CmsSectionHeading
+            sectionKey="mentors"
+            fallback={{
+              kicker: "Your Commanding Officers",
+              title: 'Mentored by <span class="tricolour-text">Ex-SSB Assessors</span>',
+              subtitle: "Every wing of the SSB — Psychology, GTO and Interview — is led by a mentor who has lived it from the assessor's chair.",
+            }}
           />
         )}
 

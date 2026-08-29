@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Counter from "./Counter";
 import Reveal from "./Reveal";
+import CmsSectionHeading from "./CmsSectionHeading";
 import { STATS } from "@/lib/data";
 import { getPublished } from "@/lib/content";
 import { RECENT_WINS } from "@/lib/section-defaults";
@@ -25,10 +26,10 @@ export default async function StatsStrip() {
       </div>
 
       <div className="relative mx-auto max-w-[1840px] px-4 sm:px-8">
-        <Reveal className="text-center">
-          <p className="kicker justify-center">Proof, Not Promises</p>
-          <h2 className="section-title mt-4 text-4xl sm:text-5xl">The Scoreboard <span className="tricolour-text">Speaks</span></h2>
-        </Reveal>
+        <CmsSectionHeading
+          sectionKey="stats"
+          fallback={{ kicker: "Proof, Not Promises", title: 'The Scoreboard <span class="tricolour-text">Speaks</span>' }}
+        />
 
         <div className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
           {stats.map((s, i) => (
