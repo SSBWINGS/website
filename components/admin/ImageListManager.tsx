@@ -8,6 +8,14 @@ import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import { asArray } from "@/lib/shape";
 
+/** Thumbnail shapes. The frame matches the artwork so nothing is cropped and
+ *  the admin can actually read the names on wide banner images. */
+const SHAPES = {
+  square: { box: "aspect-square", grid: "grid-cols-2 sm:grid-cols-4 lg:grid-cols-5", size: "220px" },
+  tall: { box: "aspect-[2/3]", grid: "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6", size: "200px" },
+  wide: { box: "aspect-[3/1]", grid: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3", size: "560px" },
+} as const;
+
 /** Reusable "a list of images" editor for simple gallery-style CMS docs. */
 export default function ImageListManager({
   initial,
@@ -15,13 +23,16 @@ export default function ImageListManager({
   label,
   folder,
   note,
+  shape = "square",
 }: {
   initial: string[];
   docKey: string;
   label: string;
   folder: string;
   note?: string;
+  shape?: keyof typeof SHAPES;
 }) {
+  const thumb = SHAPES[shape];
   const supabase = createClient();
   const [images, setImages] = useState<string[]>(asArray<string>(initial));
   const [busy, setBusy] = useState(false);
@@ -91,16 +102,22 @@ export default function ImageListManager({
           No images yet — the site is showing the built-in defaults.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-5">
+        <div className={`grid gap-4 ${thumb.grid}`}>
           {images.map((p, i) => (
             <figure key={p + i} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-              <div className="relative aspect-square bg-slate-100">
-                <Image src={mediaUrl(p)} alt="" fill sizes="200px" className="object-cover" />
+              {/* object-contain, not cover: the whole image must stay readable
+                  here even when its shape differs from the frame. */}
+              <div className={`relative ${thumb.box} bg-slate-800`}>
+                <Image src={mediaUrl(p)} alt="" fill sizes={thumb.size} className="object-contain" />
               </div>
               <figcaption className="flex items-center justify-between gap-1 p-1.5">
-                <div className="flex gap-1">
-                  <button onClick={() => move(i, -1)} className="rounded border border-slate-200 px-1.5 text-slate-600 hover:bg-slate-50">←</button>
-                  <button onClick={() => move(i, 1)} className="rounded border border-slate-200 px-1.5 text-slate-600 hover:bg-slate-50">→</button>
+                <div className="flex items-center gap-1">
+                  {/* Position, so the order is legible while reordering. */}
+                  <span className="rounded bg-slate-100 px-1.5 text-xs font-semibold text-slate-500">{i + 1}</span>
+                  <button onClick={() => move(i, -1)} disabled={i === 0}
+                    className="rounded border border-slate-200 px-1.5 text-slate-600 hover:bg-slate-50 disabled:opacity-30">←</button>
+                  <button onClick={() => move(i, 1)} disabled={i === images.length - 1}
+                    className="rounded border border-slate-200 px-1.5 text-slate-600 hover:bg-slate-50 disabled:opacity-30">→</button>
                 </div>
                 <button onClick={() => remove(i)} className="rounded border border-red-200 px-1.5 text-xs text-red-600 hover:bg-red-50">✕</button>
               </figcaption>

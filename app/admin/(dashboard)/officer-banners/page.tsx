@@ -21,6 +21,7 @@ export default async function OfficerBannersAdmin() {
         docKey="officer_banners"
         label="Now Serving — Alumni Banners"
         folder="officers"
+        shape="wide"
         note="Use ← → to reorder and ✕ to remove. The list is split in half: the first half scrolls left, the second half scrolls right."
       />
     </div>

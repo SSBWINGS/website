@@ -18,6 +18,7 @@ export default async function Air1Admin() {
         docKey="air1_images"
         label="AIR-1 Marquee"
         folder="air1"
+        shape="tall"
         note="These scroll continuously below the entries marquee."
       />
     </div>
