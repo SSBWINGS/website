@@ -109,6 +109,18 @@ export const SECTIONS: SectionDef[] = [
     ],
   },
   {
+    key: "courses_options", label: "Course Prices", page: "Home",
+    description: "Show or hide the price on every course card, on the homepage and the Courses page at once.",
+    previewPath: "/courses",
+    fields: [{
+      key: "showPrices", label: "Course prices", type: "select",
+      options: [
+        { value: "on", label: "Show prices on the course cards" },
+        { value: "off", label: "Hide prices — enquire for fees" },
+      ],
+    }],
+  },
+  {
     key: "selection_tracker", label: "Selection Tracker", page: "Home",
     description: "The 'Proven Results' block — its heading, the three number cards and the bar-chart title. Leave a number override blank to keep counting it from the Selection Tracker rows.",
     previewPath: "/",

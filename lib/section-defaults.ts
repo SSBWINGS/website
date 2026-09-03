@@ -51,7 +51,7 @@ import { PAGE_HEROES } from "@/lib/pagehero-defaults";
 import { DAYS, JOIN_ROUTES } from "@/lib/data";
 import { ACADEMIES_DOC } from "@/lib/academies";
 import { MEDICAL } from "@/lib/medical";
-import { ENTRY_COUNTS, COURSES_NOTE, ENQUIRY_POPUP } from "@/lib/homepage-defaults";
+import { ENTRY_COUNTS, COURSES_NOTE, COURSES_OPTIONS, ENQUIRY_POPUP } from "@/lib/homepage-defaults";
 import { TRACKER } from "@/lib/selection-defaults";
 
 export const WHYUS_ITEMS = [
@@ -113,6 +113,7 @@ export const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
   preloader: { lottie: "on" },
   entry_counts: { items: ENTRY_COUNTS },
   courses_note: { text: COURSES_NOTE },
+  courses_options: COURSES_OPTIONS,
   enquiry_popup: ENQUIRY_POPUP,
   selection_tracker: TRACKER,
   academies: ACADEMIES_DOC,

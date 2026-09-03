@@ -1,10 +1,8 @@
 import { getPublished } from "@/lib/content";
-import { STATS } from "@/lib/data";
+import { STATS, type Stat } from "@/lib/data";
 import { mediaUrl } from "@/lib/supabase/media";
 import Hero, { HERO_DEFAULT, type HeroContent } from "./Hero";
 import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
-
-type Stat = { value: number; label: string };
 
 export default async function HeroSection() {
   const [content, statsDoc, slidesDoc] = await Promise.all([

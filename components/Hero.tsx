@@ -58,7 +58,7 @@ export default function Hero({
   slides = HERO_SLIDES,
 }: {
   content?: HeroContent;
-  stats?: { value: number; label: string }[];
+  stats?: { value: number; label: string; suffix?: string }[];
   slides?: HeroSlide[];
 }) {
   // Everything in the headline is CMS-editable, including the animated words.
@@ -134,10 +134,10 @@ export default function Hero({
 
       {/* Stat plates */}
       <div className="relative mx-auto -mb-8 grid max-w-[1840px] grid-cols-2 gap-3 px-4 pb-4 sm:px-8 md:grid-cols-4">
-        {stats.map((s) => (
-          <div key={s.label} className="skeu-plate card-lift px-4 py-3.5 text-center">
+        {stats.map((s, i) => (
+          <div key={s.label + i} className="skeu-plate card-lift px-4 py-3.5 text-center">
             <p className="font-display text-3xl font-black leading-none gold-text sm:text-4xl">
-              <Counter target={s.value} />
+              <Counter target={s.value} suffix={s.suffix ?? "+"} />
             </p>
             <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">{s.label}</p>
           </div>

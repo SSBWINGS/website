@@ -2,11 +2,9 @@ import Image from "next/image";
 import Counter from "./Counter";
 import Reveal from "./Reveal";
 import CmsSectionHeading from "./CmsSectionHeading";
-import { STATS } from "@/lib/data";
+import { STATS, type Stat } from "@/lib/data";
 import { getPublished } from "@/lib/content";
 import { RECENT_WINS } from "@/lib/section-defaults";
-
-type Stat = { value: number; label: string };
 
 export default async function StatsStrip() {
   const [{ items: stats }, winsDoc] = await Promise.all([
@@ -33,9 +31,9 @@ export default async function StatsStrip() {
 
         <div className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
           {stats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 80}>
+            <Reveal key={s.label + i} delay={i * 80}>
               <div className="skeu-plate card-lift px-4 py-6 text-center">
-                <p className="font-display text-4xl font-black leading-none gold-text sm:text-5xl"><Counter target={s.value} /></p>
+                <p className="font-display text-4xl font-black leading-none gold-text sm:text-5xl"><Counter target={s.value} suffix={s.suffix ?? "+"} /></p>
                 <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.12em] text-ink-soft">{s.label}</p>
               </div>
             </Reveal>

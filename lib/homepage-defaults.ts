@@ -23,6 +23,10 @@ export const AIR1_IMAGES: string[] = Array.from({ length: 15 }, (_, i) => `/imag
 /** Campus gallery images. */
 export const CAMPUS_IMAGES: string[] = Array.from({ length: 12 }, (_, i) => `/images/campus/imagestwo-${i + 15}.jpg`);
 
+/** Display switches for the courses section. */
+export type CoursesOptions = { showPrices: string };
+export const COURSES_OPTIONS: CoursesOptions = { showPrices: "on" };
+
 /** Hostel / facilities note under the courses section. */
 export const COURSES_NOTE =
   "We offer boarding and lodging facilities on first come first serve basis";

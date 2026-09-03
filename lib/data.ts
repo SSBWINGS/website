@@ -72,13 +72,16 @@ export const BOOKS: BookItem[] = [
   },
 ];
 
-export const STATS = [
-  { value: 677, label: "Recommendations" },
-  { value: 3450, label: "Alumni Officers Family" },
-  { value: 175, label: "NDA Entries" },
-  { value: 168, label: "OTA Entries" },
-  { value: 125, label: "AFCAT Entries" },
-  { value: 10, label: "All India Rank 1" },
+/** Scoreboard cards. `suffix` is appended after the number — "+" by default,
+ *  but an admin can blank it out or use "%", "★" and so on. */
+export type Stat = { value: number; label: string; suffix?: string };
+export const STATS: Stat[] = [
+  { value: 677, label: "Recommendations", suffix: "+" },
+  { value: 3450, label: "Alumni Officers Family", suffix: "+" },
+  { value: 175, label: "NDA Entries", suffix: "+" },
+  { value: 168, label: "OTA Entries", suffix: "+" },
+  { value: 125, label: "AFCAT Entries", suffix: "+" },
+  { value: 10, label: "All India Rank 1", suffix: "+" },
 ];
 
 // Every officer-entry scheme across the four Indian Armed Forces (Army, Navy,

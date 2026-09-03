@@ -5,7 +5,7 @@ import CmsSectionHeading from "./CmsSectionHeading";
 import { COURSES } from "@/lib/data";
 import { mediaUrl } from "@/lib/supabase/media";
 import { getPublished, getSettings } from "@/lib/content";
-import { COURSES_NOTE } from "@/lib/homepage-defaults";
+import { COURSES_NOTE, COURSES_OPTIONS, type CoursesOptions } from "@/lib/homepage-defaults";
 
 // Fields an admin may safely edit; payment URL, button, styling & image stay in code.
 type CourseEdit = { tag: string; title: string; where: string; price: string; desc: string; features: string[] };
@@ -14,11 +14,14 @@ const pickSafe = (c: (typeof COURSES)[number]): CourseEdit => ({
 });
 
 export default async function Courses({ heading = true }: { heading?: boolean }) {
-  const [doc, noteDoc, SITE] = await Promise.all([
+  const [doc, noteDoc, optionsDoc, SITE] = await Promise.all([
     getPublished<{ items: CourseEdit[] }>("courses_cards", { items: COURSES.map(pickSafe) }),
     getPublished<{ text: string }>("courses_note", { text: COURSES_NOTE }),
+    getPublished<CoursesOptions>("courses_options", COURSES_OPTIONS),
     getSettings(),
   ]);
+  // "off" hides every price without the admin having to clear each card.
+  const showPrices = optionsDoc.showPrices !== "off";
   // Merge editable text over the protected code card (enrollUrl, cta, highlight, image kept).
   const cards = COURSES.map((c, i) => ({ ...c, ...(doc.items?.[i] ?? {}) }));
   return (
@@ -55,7 +58,7 @@ export default async function Courses({ heading = true }: { heading?: boolean })
 
                 <h3 className="mt-5 section-title text-3xl">{c.title}</h3>
                 <p className="mt-1 font-display text-sm font-semibold uppercase tracking-[0.18em] text-saffron-700">{c.where}</p>
-                {c.price && (
+                {showPrices && c.price && (
                   <p className="mt-3 font-display text-3xl font-black text-ink">
                     {c.price}
                     <span className="ml-2 align-middle text-xs font-semibold uppercase tracking-wide text-ink-soft">all inclusive</span>
