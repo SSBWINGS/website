@@ -5,7 +5,6 @@ import CmsHero from "@/components/CmsHero";
 import AchievementCards from "@/components/AchievementCards";
 import OfficerBanners from "@/components/OfficerBanners";
 import CtaBanner from "@/components/CtaBannerSection";
-import SectionHeading from "@/components/SectionHeading";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("gallery");
@@ -27,11 +26,6 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      <section className="pt-4">
-        <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
-          <SectionHeading center kicker="Now Serving" title={<>Our Alumni in <span className="tricolour-text">Uniform</span></>} subtitle="From aspirant to commissioned officer — a few of the many who now serve the nation." />
-        </div>
-      </section>
       <OfficerBanners />
 
       <AchievementCards />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import CmsHero from "@/components/CmsHero";
+import { getSettings, mapHref } from "@/lib/content";
 import ContactSection from "@/components/ContactSection";
 import Faq from "@/components/Faq";
 
@@ -8,7 +9,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("contact");
 }
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const SITE = await getSettings();
   return (
     <main>
       <CmsHero pageKey="contact" />
@@ -16,16 +18,21 @@ export default function ContactPage() {
 
       <section className="pb-8">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
-          <div className="photo-frame overflow-hidden">
+          <a href={mapHref(SITE)} target="_blank" rel="noopener noreferrer"
+            className="photo-frame block overflow-hidden" aria-label="Open SSBWINGS on Google Maps">
             <iframe
-              title="SSBWINGS location — C-56/43, Sector 62, Noida"
-              src="https://maps.google.com/maps?q=SSBWINGS%2C%20C-56%2F43%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=16&output=embed"
-              className="h-[380px] w-full rounded-xl"
+              title={`${SITE.name} location — ${SITE.address}`}
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(SITE.address)}&z=16&output=embed`}
+              className="pointer-events-none h-[380px] w-full rounded-xl"
               loading="lazy"
-              allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
             />
-          </div>
+          </a>
+          <p className="mt-3 text-center text-sm text-ink-soft">
+            <a href={mapHref(SITE)} target="_blank" rel="noopener noreferrer" className="font-semibold text-saffron-700 hover:underline">
+              Open in Google Maps →
+            </a>
+          </p>
         </div>
       </section>
 

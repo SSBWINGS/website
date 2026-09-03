@@ -70,6 +70,8 @@ const HEADING_KEYS: { key: string; label: string }[] = [
   { key: "testimonials", label: "Testimonials" },
   { key: "videos", label: "YouTube Videos" },
   { key: "google_reviews", label: "Google Reviews" },
+  { key: "instagram", label: "Instagram / YouTube" },
+  { key: "officer_banners", label: "Now Serving — Alumni" },
 ];
 
 const HEADING_SECTIONS: SectionDef[] = HEADING_KEYS.map((h) => ({
@@ -104,6 +106,23 @@ export const SECTIONS: SectionDef[] = [
       { key: "primaryCtaHref", label: "Primary button — link", type: "text" },
       { key: "secondaryCta", label: "Secondary button — label", type: "text" },
       { key: "secondaryCtaHref", label: "Secondary button — link", type: "text" },
+    ],
+  },
+  {
+    key: "selection_tracker", label: "Selection Tracker", page: "Home",
+    description: "The 'Proven Results' block — its heading, the three number cards and the bar-chart title. Leave a number override blank to keep counting it from the Selection Tracker rows.",
+    previewPath: "/",
+    fields: [
+      { key: "kicker", label: "Kicker", type: "text" },
+      { key: "heading", label: "Heading", type: "text" },
+      { key: "subtitle", label: "Sub-line under the heading", type: "text" },
+      { key: "totalLabel", label: "Card 1 — label", type: "text" },
+      { key: "totalOverride", label: "Card 1 — number override (blank = auto)", type: "text" },
+      { key: "yearsLabel", label: "Card 2 — label", type: "text" },
+      { key: "yearsOverride", label: "Card 2 — number override (blank = auto)", type: "text" },
+      { key: "centresLabel", label: "Card 3 — label", type: "text" },
+      { key: "centresOverride", label: "Card 3 — number override (blank = auto)", type: "text" },
+      { key: "barsHeading", label: "Bar chart heading", type: "text" },
     ],
   },
   {

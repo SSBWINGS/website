@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import ContactForm from "./ContactForm";
 import { ENQUIRY_POPUP, type EnquiryPopupDoc } from "@/lib/homepage-defaults";
+import { CONTACT_FORM, type ContactFormDoc } from "@/lib/form-defaults";
 
 const ModalContext = createContext<{ open: () => void; close: () => void }>({
   open: () => {},
@@ -19,7 +20,15 @@ const ModalContext = createContext<{ open: () => void; close: () => void }>({
 
 export const useContactModal = () => useContext(ModalContext);
 
-export default function ModalProvider({ children, popup = ENQUIRY_POPUP }: { children: ReactNode; popup?: EnquiryPopupDoc }) {
+export default function ModalProvider({
+  children,
+  popup = ENQUIRY_POPUP,
+  form = CONTACT_FORM,
+}: {
+  children: ReactNode;
+  popup?: EnquiryPopupDoc;
+  form?: ContactFormDoc;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const autoOpen = popup.enabled !== "off";
   const delay = Number(popup.delayMs) || 900;
@@ -100,7 +109,7 @@ export default function ModalProvider({ children, popup = ENQUIRY_POPUP }: { chi
                 dangerouslySetInnerHTML={{ __html: popup.body }} />
 
               <div className="mt-4">
-                <ContactForm compact />
+                <ContactForm compact config={form} />
               </div>
             </div>
           </div>

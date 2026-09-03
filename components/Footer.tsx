@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/data";
-import { getSettings, telHref } from "@/lib/content";
+import { getSettings, telHref, mapHref } from "@/lib/content";
 import { SocialIcon } from "./SocialIcons";
+import { mediaUrl } from "@/lib/supabase/media";
 
 export default async function Footer() {
   const SITE = await getSettings();
@@ -39,7 +40,7 @@ export default async function Footer() {
                 </li>
               ))}
               <li className="col-span-2">
-                <a href={SITE.brochure} download className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1">
+                <a href={mediaUrl(SITE.brochure)} download className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1">
                   ⬇ Download 2026 Brochure
                 </a>
               </li>
@@ -48,7 +49,7 @@ export default async function Footer() {
 
           <div>
             <h3 className="font-display text-lg font-bold uppercase tracking-widest text-gold-400">Find Us</h3>
-            <a href="https://maps.google.com/maps?q=SSBWINGS%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=16" target="_blank" rel="noopener noreferrer"
+            <a href={mapHref(SITE)} target="_blank" rel="noopener noreferrer"
               className="mt-5 block overflow-hidden rounded-xl border border-navy-700/60">
               <iframe
                 title="SSBWINGS location — Sector 62, Noida"
@@ -63,10 +64,15 @@ export default async function Footer() {
           <div>
             <h3 className="font-display text-lg font-bold uppercase tracking-widest text-gold-400">Contact HQ</h3>
             <address className="mt-5 space-y-3 text-sm not-italic text-navy-100/85">
-              <p>{SITE.address}</p>
               <p>
-                <a href={telHref(SITE.phone1)} className="transition-colors hover:text-gold-300">{SITE.phone1}</a><br />
-                <a href={telHref(SITE.phone2)} className="transition-colors hover:text-gold-300">{SITE.phone2}</a>
+                <a href={mapHref(SITE)} target="_blank" rel="noopener noreferrer"
+                  className="transition-colors hover:text-gold-300">{SITE.address}</a>
+              </p>
+              <p>
+                <a href={telHref(SITE.phone1)} className="transition-colors hover:text-gold-300">{SITE.phone1}</a>
+                {SITE.phone2 ? (
+                  <><br /><a href={telHref(SITE.phone2)} className="transition-colors hover:text-gold-300">{SITE.phone2}</a></>
+                ) : null}
               </p>
               <p><a href={`mailto:${SITE.email}`} className="transition-colors hover:text-gold-300">{SITE.email}</a></p>
             </address>

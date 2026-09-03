@@ -1,39 +1,23 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-
-/** Every officer entry an aspirant can target — kept in step with lib/data ENTRIES. */
-const ENTRY_OPTIONS = [
-  "NDA & NA",
-  "10+2 TES (Technical Entry)",
-  "10+2 B.Tech Cadet Entry (Navy)",
-  "CDS – IMA (Permanent)",
-  "CDS – OTA / SSC",
-  "CDS – INA (Navy)",
-  "CDS – AFA (Air Force Academy)",
-  "TGC (Technical Graduate Course)",
-  "SSC (Tech) – Men & Women",
-  "SSC Executive – GS(X) & Technical",
-  "SSC Pilot / Observer",
-  "SSC Logistics / ATC / Education / Law",
-  "AFCAT – Flying Branch",
-  "AFCAT – Ground Duty (Technical)",
-  "AFCAT – Ground Duty (Non-Technical)",
-  "Meteorology Entry",
-  "NCC Special Entry",
-  "JAG (Judge Advocate General)",
-  "ICG Asst Commandant – General Duty",
-  "ICG AC – Pilot / Navigator",
-  "ICG AC – Technical",
-  "ACC (Army Cadet College)",
-  "SCO (Special Commissioned Officer)",
-  "PC (SL) – Permanent Commission",
-  "Other / Not sure yet",
-];
+import { SITE } from "@/lib/data";
+import {
+  CONTACT_FORM,
+  type ContactField,
+  type ContactFormDoc,
+} from "@/lib/form-defaults";
 
 type Status = "idle" | "sending" | "success" | "error";
 
-export default function ContactForm({ compact = false }: { compact?: boolean }) {
+export default function ContactForm({
+  compact = false,
+  config = CONTACT_FORM,
+}: {
+  compact?: boolean;
+  /** CMS-editable labels, placeholders, required flags and dropdown options. */
+  config?: ContactFormDoc;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -63,43 +47,82 @@ export default function ContactForm({ compact = false }: { compact?: boolean }) 
     ? "mb-1 block font-display text-xs font-bold uppercase tracking-wider text-ink"
     : "mb-1.5 block font-display text-sm font-bold uppercase tracking-wider text-ink";
 
+  const shown = config.fields.filter((f) => f.enabled);
+  const find = (key: ContactField["key"]) => shown.find((f) => f.key === key);
+
+  /** Label + the red asterisk that marks a mandatory field. */
+  const Label = ({ f }: { f: ContactField }) => (
+    <label htmlFor={`cf-${f.key}`} className={labelCls}>
+      {f.label}
+      {f.required && (
+        <span className="ml-0.5 text-red-600" aria-hidden>
+          *
+        </span>
+      )}
+    </label>
+  );
+
+  /** One <select> built from a CMS-managed option list. */
+  const Dropdown = ({ f, options }: { f: ContactField; options: string[] }) => (
+    <div>
+      <Label f={f} />
+      <select id={`cf-${f.key}`} name={f.key} required={f.required} defaultValue="" className="field">
+        <option value="" disabled={f.required}>
+          {f.placeholder || `Select ${f.label.toLowerCase()}`}
+        </option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const name = find("name");
+  const phone = find("phone");
+  const email = find("email");
+  const entry = find("entry");
+  const batch = find("batch");
+  const statusField = find("status");
+  const message = find("message");
+
   return (
     <form onSubmit={onSubmit} aria-label="Enquiry form" className={compact ? "space-y-3" : "space-y-4"}>
       <div className={compact ? "grid grid-cols-2 gap-3" : "grid gap-4 sm:grid-cols-2"}>
-        <div>
-          <label htmlFor="cf-name" className={labelCls}>
-            Full Name *
-          </label>
-          <input id="cf-name" name="name" required minLength={2} maxLength={80} placeholder="e.g. Arjun Singh" className="field" />
-        </div>
-        <div>
-          <label htmlFor="cf-phone" className={labelCls}>
-            Phone *
-          </label>
-          <input id="cf-phone" name="phone" type="tel" required pattern="[0-9+\-\s]{10,15}" placeholder="+91 XXXXX XXXXX" className="field" />
-        </div>
-        <div>
-          <label htmlFor="cf-email" className={labelCls}>
-            Email *
-          </label>
-          <input id="cf-email" name="email" type="email" required placeholder="you@example.com" className="field" />
-        </div>
-        <div>
-          <label htmlFor="cf-entry" className={labelCls}>
-            Target Entry *
-          </label>
-          <select id="cf-entry" name="entry" required defaultValue="" className="field">
-            <option value="" disabled>Select your entry</option>
-            {ENTRY_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
-          </select>
-        </div>
+        {name && (
+          <div>
+            <Label f={name} />
+            <input id="cf-name" name="name" required={name.required} minLength={2} maxLength={80}
+              placeholder={name.placeholder} className="field" />
+          </div>
+        )}
+        {phone && (
+          <div>
+            <Label f={phone} />
+            <input id="cf-phone" name="phone" type="tel" required={phone.required} pattern="[0-9+\-\s]{10,15}"
+              placeholder={phone.placeholder} className="field" />
+          </div>
+        )}
+        {email && (
+          <div>
+            <Label f={email} />
+            <input id="cf-email" name="email" type="email" required={email.required}
+              placeholder={email.placeholder} className="field" />
+          </div>
+        )}
+        {entry && <Dropdown f={entry} options={config.entryOptions} />}
+        {batch && <Dropdown f={batch} options={config.batchOptions} />}
+        {statusField && <Dropdown f={statusField} options={config.statusOptions} />}
       </div>
-      <div>
-        <label htmlFor="cf-msg" className={labelCls}>
-          Message
-        </label>
-        <textarea id="cf-msg" name="message" rows={compact ? 2 : 3} maxLength={2000} placeholder="Attempt history, Board date, or any question…" className="field resize-y" />
-      </div>
+
+      {message && (
+        <div>
+          <Label f={message} />
+          <textarea id="cf-message" name="message" required={message.required} rows={compact ? 2 : 3}
+            maxLength={2000} placeholder={message.placeholder} className="field resize-y" />
+        </div>
+      )}
 
       {/* Honeypot */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" />
@@ -110,22 +133,22 @@ export default function ContactForm({ compact = false }: { compact?: boolean }) 
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden />
             Transmitting…
           </>
-        ) : "Request Free Callback →"}
+        ) : config.submitLabel}
       </button>
 
       <div aria-live="polite">
         {status === "success" && (
           <p className="journey-panel rounded-xl border border-tri-green-500/40 bg-tri-green-50 px-4 py-3 text-sm font-medium text-tri-green-700">
-            ✅ Message received, future officer! A mentor will contact you within 24 hours.
+            ✅ {config.successMessage}
           </p>
         )}
         {status === "error" && (
           <p className="journey-panel rounded-xl border border-saffron-600/40 bg-saffron-50 px-4 py-3 text-sm font-medium text-saffron-700">
-            ⚠️ {errorMsg} — or call us at +91 95605 10035.
+            ⚠️ {errorMsg} — or call us at {SITE.phone1}.
           </p>
         )}
       </div>
-      <p className="text-center text-xs text-ink-soft">🔒 Your details stay with SSBWINGS. We never share them.</p>
+      <p className="text-center text-xs text-ink-soft">{config.privacyNote}</p>
     </form>
   );
 }

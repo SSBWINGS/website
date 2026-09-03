@@ -6,13 +6,16 @@
 export const SITE = {
   name: "SSBWINGS",
   tagline: "We give shape to your Dreams",
-  phone1: "+91 95605 10035",
-  phone1Href: "tel:+919560510035",
-  phone2: "+91 95605 10036",
-  phone2Href: "tel:+919560510036",
-  whatsapp: "https://wa.me/919560510035?text=Jai%20Hind!%20I%20want%20to%20know%20more%20about%20SSBWINGS%20courses.",
+  phone1: "+91 95605 10036",
+  phone1Href: "tel:+919560510036",
+  // Second line retired — leave blank and the site hides it everywhere.
+  phone2: "",
+  phone2Href: "",
+  whatsapp: "https://wa.me/919560510036?text=Jai%20Hind!%20I%20want%20to%20know%20more%20about%20SSBWINGS%20courses.",
   email: "marketing@ssbwings.com",
   address: "C-56/43, Institutional Area, Phase 2, Sector 62, Noida, Delhi NCR — 201309",
+  /** Opens the academy on Google Maps — every address on the site links here. */
+  mapUrl: "https://maps.google.com/maps?q=SSBWINGS%2C%20C-56%2F43%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=16",
   instagram: "https://www.instagram.com/ssbwings",
   youtube: "https://www.youtube.com/@ssbwings",
   telegram: "https://t.me/ssbwings",

@@ -1,10 +1,15 @@
 import Reveal from "./Reveal";
 import ContactForm from "./ContactForm";
 import { SocialIcon } from "./SocialIcons";
-import { getSettings, telHref } from "@/lib/content";
+import { getSettings, telHref, mapHref, getPublished } from "@/lib/content";
+import { CONTACT_FORM, resolveContactForm } from "@/lib/form-defaults";
 
 export default async function ContactSection() {
-  const SITE = await getSettings();
+  const [SITE, formDoc] = await Promise.all([
+    getSettings(),
+    getPublished<unknown>("contact_form", CONTACT_FORM),
+  ]);
+  const form = resolveContactForm(formDoc);
   return (
     <section id="contact" className="relative py-20 sm:py-24">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
@@ -22,7 +27,11 @@ export default async function ContactSection() {
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-navy-950 text-gold-400 shadow-[var(--shadow-raised)]" aria-hidden>📍</span>
                 <div>
                   <p className="font-display font-bold uppercase tracking-wide text-ink">Academy Campus</p>
-                  <p className="text-sm text-ink-soft">{SITE.address}</p>
+                  <a href={mapHref(SITE)} target="_blank" rel="noopener noreferrer"
+                    className="text-sm text-ink-soft underline-offset-2 hover:text-saffron-700 hover:underline">
+                    {SITE.address}
+                  </a>
+                  <p className="mt-0.5 text-xs text-ink-soft/70">Tap to open in Google Maps →</p>
                 </div>
               </li>
               <li className="flex items-start gap-4">
@@ -30,7 +39,10 @@ export default async function ContactSection() {
                 <div>
                   <p className="font-display font-bold uppercase tracking-wide text-ink">Call the Ops Room</p>
                   <p className="text-sm text-ink-soft">
-                    <a href={telHref(SITE.phone1)} className="hover:text-saffron-700">{SITE.phone1}</a> · <a href={telHref(SITE.phone2)} className="hover:text-saffron-700">{SITE.phone2}</a>
+                    <a href={telHref(SITE.phone1)} className="hover:text-saffron-700">{SITE.phone1}</a>
+                    {SITE.phone2 ? (
+                      <> · <a href={telHref(SITE.phone2)} className="hover:text-saffron-700">{SITE.phone2}</a></>
+                    ) : null}
                   </p>
                 </div>
               </li>
@@ -68,7 +80,7 @@ export default async function ContactSection() {
           <Reveal direction="right" delay={120}>
             <div className="skeu-panel p-8 sm:p-10">
               <div className="tricolour-bar -mx-8 -mt-8 mb-8 h-1.5 sm:-mx-10 sm:-mt-10" aria-hidden />
-              <ContactForm />
+              <ContactForm config={form} />
             </div>
           </Reveal>
         </div>

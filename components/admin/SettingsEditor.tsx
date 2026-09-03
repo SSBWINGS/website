@@ -3,15 +3,17 @@
 import { useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
+import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 
 const FIELDS: { key: string; label: string; hint?: string }[] = [
   { key: "name", label: "Brand name" },
   { key: "tagline", label: "Tagline" },
   { key: "phone1", label: "Phone 1" },
-  { key: "phone2", label: "Phone 2" },
+  { key: "phone2", label: "Phone 2", hint: "Leave blank to show only one number across the site" },
   { key: "email", label: "Email" },
   { key: "whatsapp", label: "WhatsApp link", hint: "Full https://wa.me/… URL" },
   { key: "address", label: "Address" },
+  { key: "mapUrl", label: "Google Maps link", hint: "Every address on the site opens this. Blank = searches the address above." },
   { key: "instagram", label: "Instagram URL" },
   { key: "youtube", label: "YouTube URL" },
   { key: "telegram", label: "Telegram URL" },
@@ -22,6 +24,29 @@ export default function SettingsEditor({ initial }: { initial: Record<string, st
   const [form, setForm] = useState<Record<string, string>>(initial);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  /** Upload a replacement brochure PDF and point the site at it. */
+  async function uploadBrochure(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      return setMsg({ ok: false, text: "Please choose a PDF file." });
+    }
+    if (file.size > 25 * 1024 * 1024) {
+      return setMsg({ ok: false, text: "That PDF is over 25 MB — please compress it first." });
+    }
+    setBusy(true); setMsg(null);
+    // Timestamped name so browsers and the CDN never serve the previous file.
+    const path = `brochure/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+    const { error } = await supabase.storage.from("media").upload(path, file, {
+      cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: "application/pdf",
+    });
+    setBusy(false);
+    if (error) return setMsg({ ok: false, text: error.message });
+    setForm((s2) => ({ ...s2, brochure: path }));
+    setMsg({ ok: true, text: "Brochure uploaded — press Save & publish to make it live." });
+  }
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -50,6 +75,26 @@ export default function SettingsEditor({ initial }: { initial: Record<string, st
           </div>
         ))}
       </div>
+      <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-sm font-semibold text-slate-800">Brochure (PDF)</p>
+        <p className="mt-0.5 text-xs text-slate-500">
+          Linked from the footer, the Courses page and the chatbot. Uploading a new file replaces it everywhere.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            {busy ? "Working…" : "⬆ Upload new brochure"}
+            <input type="file" accept="application/pdf,.pdf" onChange={uploadBrochure} className="hidden" disabled={busy} />
+          </label>
+          {form.brochure && (
+            <a href={mediaUrl(form.brochure)} target="_blank" rel="noopener noreferrer"
+              className="text-sm font-medium text-blue-700 underline">
+              View current brochure ↗
+            </a>
+          )}
+        </div>
+        <p className="mt-2 break-all text-[11px] text-slate-400">{form.brochure || "No brochure set"}</p>
+      </div>
+
       {msg && <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}
       <button type="submit" disabled={busy} className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60">
         {busy ? "Saving…" : "Save & publish"}

@@ -10,6 +10,8 @@ type Payload = {
   email?: string;
   phone?: string;
   entry?: string;
+  batch?: string;
+  status?: string;
   message?: string;
   company?: string; // honeypot
 };
@@ -47,6 +49,8 @@ export async function POST(req: Request) {
   const email = body.email?.trim() ?? "";
   const phone = body.phone?.trim() ?? "";
   const entry = body.entry?.trim() ?? "";
+  const batch = body.batch?.trim().slice(0, 120) ?? "";
+  const currentStatus = body.status?.trim().slice(0, 120) ?? "";
   const message = body.message?.trim() ?? "";
 
   if (name.length < 2 || name.length > 80) {
@@ -63,7 +67,15 @@ export async function POST(req: Request) {
   }
 
   // Capture the lead in the CRM first (best-effort, independent of email).
-  await saveEnquiry({ name, email, phone, entry, message, source: "contact_form" });
+  await saveEnquiry({
+    name,
+    email,
+    phone,
+    entry,
+    message,
+    source: "contact_form",
+    meta: { batch, status: currentStatus },
+  });
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -80,6 +92,8 @@ export async function POST(req: Request) {
     ["Email", email],
     ["Phone", phone],
     ["Target Entry", entry || "—"],
+    ["Preferred Batch", batch || "—"],
+    ["Current Status", currentStatus || "—"],
     ["Message", message || "—"],
   ]
     .map(

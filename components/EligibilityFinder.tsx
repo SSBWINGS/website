@@ -17,6 +17,7 @@ export default function EligibilityFinder() {
   const [marital, setMarital] = useState<Marital>("unmarried");
   const [education, setEducation] = useState<Education>("10+2");
   const [pcm, setPcm] = useState(true);
+  const [serving, setServing] = useState(false);
   const [results, setResults] = useState<Entry[] | null>(null);
 
   // lead capture
@@ -31,7 +32,7 @@ export default function EligibilityFinder() {
       setResults([]);
       return;
     }
-    const input: EligibilityInput = { age: a, gender, marital, education, pcm };
+    const input: EligibilityInput = { age: a, gender, marital, education, pcm, serving };
     setResults(findEligible(input));
     setSent(false);
     setLeadMsg(null);
@@ -50,7 +51,7 @@ export default function EligibilityFinder() {
           source: "eligibility",
           entry: (results ?? [])[0]?.name ?? "",
           message: `Eligible for: ${entries || "none"}`,
-          meta: { age, gender, marital, education, pcm, count: results?.length ?? 0 },
+          meta: { age, gender, marital, education, pcm, serving, count: results?.length ?? 0 },
         }),
       });
       const json = await res.json();
@@ -100,7 +101,12 @@ export default function EligibilityFinder() {
           </div>
           <label className="flex items-center gap-2 text-sm font-medium text-slate-700 sm:col-span-2">
             <input type="checkbox" checked={pcm} onChange={(e) => setPcm(e.target.checked)} className="h-4 w-4 rounded border-slate-300" />
-            I had Physics, Chemistry &amp; Maths (PCM) in Class 12
+            I had Physics &amp; Maths in Class 12
+          </label>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 sm:col-span-2">
+            <input type="checkbox" checked={serving} onChange={(e) => setServing(e.target.checked)} className="h-4 w-4 rounded border-slate-300" />
+            I am already serving in the Armed Forces (soldier / sailor / airman / JCO / NCO)
+            <span className="text-xs font-normal text-slate-500">— unlocks ACC, SCO and PC(SL)</span>
           </label>
         </div>
         <button onClick={compute}

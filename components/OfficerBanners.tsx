@@ -1,11 +1,27 @@
 import Image from "next/image";
+import { getPublished } from "@/lib/content";
+import { mediaUrl } from "@/lib/supabase/media";
 import { OFFICER_BANNERS } from "@/lib/data";
+import { asArray } from "@/lib/shape";
+import CmsSectionHeading from "./CmsSectionHeading";
 
-export default function OfficerBanners() {
+/**
+ * "Now Serving" marquee of commissioned alumni.
+ *
+ * One CMS document (`officer_banners`) backs both the homepage section and the
+ * Gallery page, so adding, removing or reordering an image in the admin panel
+ * changes both at once.
+ */
+export default async function OfficerBanners() {
+  const doc = await getPublished<{ images: string[] }>("officer_banners", { images: OFFICER_BANNERS });
+  const saved = asArray<string>(doc.images).filter(Boolean);
+  const items = (saved.length ? saved : OFFICER_BANNERS).map(mediaUrl);
+  if (!items.length) return null;
+
   // Two rows scrolling opposite directions
-  const half = Math.ceil(OFFICER_BANNERS.length / 2);
-  const rowA = OFFICER_BANNERS.slice(0, half);
-  const rowB = OFFICER_BANNERS.slice(half);
+  const half = Math.ceil(items.length / 2);
+  const rowA = items.slice(0, half);
+  const rowB = items.slice(half);
 
   const Row = ({ items, reverse }: { items: string[]; reverse?: boolean }) => (
     <div className="marquee overflow-hidden">
@@ -23,9 +39,19 @@ export default function OfficerBanners() {
 
   return (
     <section className="relative overflow-hidden py-6">
+      <div className="mx-auto max-w-[1840px] px-4 pb-8 sm:px-8">
+        <CmsSectionHeading
+          sectionKey="officer_banners"
+          fallback={{
+            kicker: "Now Serving",
+            title: 'Our Alumni in <span class="tricolour-text">Uniform</span>',
+            subtitle: "From aspirant to commissioned officer — a few of the many who now serve the nation.",
+          }}
+        />
+      </div>
       <div className="space-y-4">
         <Row items={rowA} />
-        <Row items={rowB} reverse />
+        {rowB.length > 0 && <Row items={rowB} reverse />}
       </div>
     </section>
   );

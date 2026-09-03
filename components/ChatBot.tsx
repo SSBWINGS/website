@@ -9,6 +9,8 @@ type Msg = { from: "bot" | "user"; text: string; links?: Link[] };
 type Entry = { id: string; keys: string[]; a: string; links?: Link[] };
 
 const WA = SITE.whatsapp;
+/** Stands in for the brochure until render, when the CMS value is known. */
+const BROCHURE_TOKEN = "__brochure__";
 
 const KB: Entry[] = [
   {
@@ -104,7 +106,7 @@ const KB: Entry[] = [
     id: "brochure",
     keys: ["brochure", "pdf", "download", "prospectus"],
     a: "Here's our 2026 brochure — everything about courses, batches and the academy in one PDF.",
-    links: [{ label: "Download 2026 Brochure (PDF)", href: SITE.brochure, download: true }],
+    links: [{ label: "Download 2026 Brochure (PDF)", href: BROCHURE_TOKEN, download: true }],
   },
   {
     id: "app",
@@ -159,7 +161,7 @@ function answer(input: string): Msg {
   };
 }
 
-export default function ChatBot() {
+export default function ChatBot({ brochure = SITE.brochure }: { brochure?: string } = {}) {
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [input, setInput] = useState("");
@@ -253,11 +255,12 @@ export default function ChatBot() {
                   {m.links && (
                     <div className="mt-2 flex flex-col gap-1.5">
                       {m.links.map((l) => {
-                        const external = l.href.startsWith("http");
+                        const href = l.href === BROCHURE_TOKEN ? brochure : l.href;
+                        const external = href.startsWith("http");
                         return (
                           <a
                             key={l.label}
-                            href={l.href}
+                            href={href}
                             {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                             {...(l.download ? { download: true } : {})}
                             className="rounded-lg bg-saffron-500 px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wide text-white transition hover:brightness-105"

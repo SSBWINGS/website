@@ -42,7 +42,7 @@ export const HOME_SECTIONS: HomeSectionMeta[] = [
   { key: "stats", label: "Scoreboard + Recent Wins", editHref: "/admin/stats" },
   { key: "selection_tracker", label: "Selection Tracker", editHref: "/admin/selections" },
   { key: "journey", label: "5-Day SSB Journey", editHref: "/admin/sections/journey" },
-  { key: "officer_banners", label: "Alumni in Uniform" },
+  { key: "officer_banners", label: "Alumni in Uniform", hint: "\"Now Serving\" marquee", editHref: "/admin/officer-banners" },
   { key: "videos", label: "YouTube Videos", hint: "Shares the Resources videos", editHref: "/admin/resources" },
   { key: "google_reviews", label: "Google Reviews", editHref: "/admin/google-reviews" },
   { key: "testimonials", label: "Testimonials", editHref: "/admin/testimonials" },

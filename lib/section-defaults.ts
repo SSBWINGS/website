@@ -52,6 +52,7 @@ import { DAYS, JOIN_ROUTES } from "@/lib/data";
 import { ACADEMIES_DOC } from "@/lib/academies";
 import { MEDICAL } from "@/lib/medical";
 import { ENTRY_COUNTS, COURSES_NOTE, ENQUIRY_POPUP } from "@/lib/homepage-defaults";
+import { TRACKER } from "@/lib/selection-defaults";
 
 export const WHYUS_ITEMS = [
   { icon: "🎖️", title: "Mentored by Ex-SSB Assessors", body: "Learn from officers who sat on the other side of the table — retired Interviewing Officers, GTOs and psychology experts who assessed thousands at real Boards." },
@@ -113,6 +114,7 @@ export const SECTION_DEFAULTS: Record<string, Record<string, unknown>> = {
   entry_counts: { items: ENTRY_COUNTS },
   courses_note: { text: COURSES_NOTE },
   enquiry_popup: ENQUIRY_POPUP,
+  selection_tracker: TRACKER,
   academies: ACADEMIES_DOC,
   medical: MEDICAL,
   about_values: { items: ABOUT_VALUES },

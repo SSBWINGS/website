@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
 import CmsSectionHeading from "./CmsSectionHeading";
-import { COURSES, SITE } from "@/lib/data";
-import { getPublished } from "@/lib/content";
+import { COURSES } from "@/lib/data";
+import { mediaUrl } from "@/lib/supabase/media";
+import { getPublished, getSettings } from "@/lib/content";
 import { COURSES_NOTE } from "@/lib/homepage-defaults";
 
 // Fields an admin may safely edit; payment URL, button, styling & image stay in code.
@@ -13,9 +14,10 @@ const pickSafe = (c: (typeof COURSES)[number]): CourseEdit => ({
 });
 
 export default async function Courses({ heading = true }: { heading?: boolean }) {
-  const [doc, noteDoc] = await Promise.all([
+  const [doc, noteDoc, SITE] = await Promise.all([
     getPublished<{ items: CourseEdit[] }>("courses_cards", { items: COURSES.map(pickSafe) }),
     getPublished<{ text: string }>("courses_note", { text: COURSES_NOTE }),
+    getSettings(),
   ]);
   // Merge editable text over the protected code card (enrollUrl, cta, highlight, image kept).
   const cards = COURSES.map((c, i) => ({ ...c, ...(doc.items?.[i] ?? {}) }));
@@ -33,7 +35,7 @@ export default async function Courses({ heading = true }: { heading?: boolean })
         )}
 
         <div className="mt-8 flex justify-center">
-          <a href={SITE.brochure} download className="btn btn-outline btn-shine">
+          <a href={mediaUrl(SITE.brochure)} download className="btn btn-outline btn-shine">
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
               <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

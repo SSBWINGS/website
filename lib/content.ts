@@ -46,6 +46,11 @@ export async function getSettings(): Promise<SiteSettings> {
 /** tel: href from a display phone number. */
 export const telHref = (p: string) => `tel:${(p || "").replace(/[^\d+]/g, "")}`;
 
+/** Google Maps link for the academy. Falls back to a search on the address
+ *  itself so the link still works if the admin clears the map URL. */
+export const mapHref = (s: { mapUrl?: string; address?: string }) =>
+  s.mapUrl?.trim() || `https://maps.google.com/maps?q=${encodeURIComponent(s.address ?? "")}`;
+
 /**
  * Content layer with graceful fallback.
  *
