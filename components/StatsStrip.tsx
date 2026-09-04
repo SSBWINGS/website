@@ -16,7 +16,7 @@ export default async function StatsStrip() {
     .map((w) => (typeof w === "string" ? w : w?.text ?? ""))
     .filter(Boolean);
   return (
-    <section id="results" className="relative overflow-hidden py-12 sm:py-16">
+    <section id="results" className="relative overflow-hidden py-9 sm:py-12">
       {/* Guard-of-honour photo, softly lit */}
       <div className="absolute inset-0" aria-hidden>
         <Image src="/images/ima-guard.jpg" alt="" fill sizes="100vw" className="object-cover object-center opacity-[0.12]" />

@@ -1,79 +1,87 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { clampOffset, coverScale, cropRect, outputSize, type CropInput } from "./crop.ts";
+import {
+  clampOffset,
+  containScale,
+  coverScale,
+  drawRect,
+  minZoom,
+  outputSize,
+  type CropInput,
+} from "./crop.ts";
 
-/** A 4000×3000 photo (4:3) shown in a 600×200 frame (3:1) — the officer-banner case. */
+/** A 4000×3000 photo (4:3) in a 600×200 frame (3:1) — the officer-banner case. */
 const wide: CropInput = { imageW: 4000, imageH: 3000, viewW: 600, viewH: 200, zoom: 1, offsetX: 0, offsetY: 0 };
+/** A portrait photo in a square frame — the candidate-wall case. */
+const square: CropInput = { imageW: 1000, imageH: 1500, viewW: 400, viewH: 400, zoom: 1, offsetX: 0, offsetY: 0 };
 
 const close = (a: number, b: number, msg?: string) =>
   assert.ok(Math.abs(a - b) < 0.001, `${msg ?? ""} expected ${b}, got ${a}`);
 
-test("cover scale fills the frame's tighter dimension", () => {
-  // 600/4000 = 0.15, 200/3000 = 0.0667 → must take the larger so nothing gaps.
-  close(coverScale(wide), 0.15);
+test("cover fills the frame, contain fits inside it", () => {
+  close(coverScale(wide), 0.15); // 600/4000 beats 200/3000
+  close(containScale(wide), 200 / 3000);
 });
 
-test("an un-panned crop is centred and spans the full width", () => {
-  const r = cropRect(wide);
-  close(r.sw, 4000, "full width is visible");
-  close(r.sh, 200 / 0.15, "height is the frame height in source pixels");
-  close(r.sx, 0);
-  close(r.sy, (3000 - r.sh) / 2, "vertically centred");
+test("minimum zoom shows the whole image, and is 1 when shapes already match", () => {
+  assert.ok(minZoom(wide) < 1, "a 4:3 photo in a 3:1 frame can be zoomed out");
+  close(minZoom({ imageW: 900, imageH: 300, viewW: 600, viewH: 200, zoom: 1, offsetX: 0, offsetY: 0 }), 1);
 });
 
-test("the crop never leaves the image, however far it is panned", () => {
-  for (const [dx, dy] of [[99999, 99999], [-99999, -99999], [500, -400]]) {
-    const r = cropRect({ ...wide, offsetX: dx, offsetY: dy });
-    assert.ok(r.sx >= 0 && r.sy >= 0, "origin inside the image");
-    assert.ok(r.sx + r.sw <= wide.imageW + 0.001, "right edge inside the image");
-    assert.ok(r.sy + r.sh <= wide.imageH + 0.001, "bottom edge inside the image");
+test("at zoom 1 the image covers the frame with nothing showing through", () => {
+  const out = outputSize(wide, 1800);
+  const r = drawRect(wide, out);
+  assert.ok(r.dx <= 0.001 && r.dy <= 0.001, "no gap at the top-left");
+  assert.ok(r.dx + r.dw >= out.width - 0.001, "no gap on the right");
+  assert.ok(r.dy + r.dh >= out.height - 0.001, "no gap at the bottom");
+});
+
+test("at minimum zoom the whole image sits inside the frame", () => {
+  const i = { ...wide, zoom: minZoom(wide) };
+  const out = outputSize(i, 1800);
+  const r = drawRect(i, out);
+  assert.ok(r.dx >= -0.001 && r.dy >= -0.001, "image starts inside the canvas");
+  assert.ok(r.dx + r.dw <= out.width + 0.001, "image ends inside the canvas");
+  assert.ok(r.dy + r.dh <= out.height + 0.001, "image ends inside the canvas");
+  // Which means background is visible on the left and right — the point of it.
+  assert.ok(r.dx > 1, "background shows beside a photo that is too tall to fill");
+});
+
+test("the export always keeps the frame's ratio, whatever the photo's shape", () => {
+  for (const i of [wide, square, { ...wide, zoom: 2 }, { ...square, zoom: minZoom(square) }]) {
+    const out = outputSize(i, 1800);
+    close(out.width / out.height, i.viewW / i.viewH, "frame ratio preserved");
   }
 });
 
+test("the export is capped, and is never upscaled past the source", () => {
+  const out = outputSize(wide, 1800);
+  assert.ok(Math.max(out.width, out.height) <= 1800);
+
+  // A frame showing a small image must not invent pixels.
+  const small = outputSize({ imageW: 300, imageH: 300, viewW: 400, viewH: 400, zoom: 1, offsetX: 0, offsetY: 0 }, 1800);
+  assert.ok(small.width <= 300, `expected <= 300 source px, got ${small.width}`);
+});
+
+test("panning is bounded both when the image overflows and when it is smaller", () => {
+  // Overflowing (zoom 1, 4:3 photo in a 3:1 frame): vertical slack only.
+  const over = clampOffset({ ...wide, offsetX: 9999, offsetY: 9999 });
+  close(over.x, 0, "width exactly fills the frame, so no horizontal pan");
+  close(over.y, (3000 * 0.15 - 200) / 2);
+
+  // Zoomed out past cover: the image is now narrower than the frame and may be
+  // positioned within the background, but never dragged outside it.
+  const i = { ...wide, zoom: minZoom(wide), offsetX: 9999, offsetY: 9999 };
+  const c = clampOffset(i);
+  const s = coverScale(i) * i.zoom;
+  close(c.x, Math.abs(wide.imageW * s - wide.viewW) / 2);
+  assert.ok(c.x > 0, "there is room to slide the image inside the frame");
+});
+
 test("panning moves the crop the opposite way, at source scale", () => {
-  const base = cropRect(wide);
-  // Dragging the image 30px right reveals what was 30/0.15 = 200px to its left.
-  const moved = cropRect({ ...wide, offsetY: 30 });
-  close(base.sy - moved.sy, 200);
-});
-
-test("zooming in narrows the crop proportionally", () => {
-  const r1 = cropRect(wide);
-  const r2 = cropRect({ ...wide, zoom: 2 });
-  close(r2.sw, r1.sw / 2);
-  close(r2.sh, r1.sh / 2);
-});
-
-test("clamping keeps the image covering the frame", () => {
-  // Cover here is width-driven (600/4000 = 0.15 beats 200/3000), so the image
-  // renders 600x450 in a 600x200 frame: pinned across, 125px of slack down.
-  const c = clampOffset({ ...wide, offsetX: 5000, offsetY: 5000 });
-  close(c.x, 0, "no horizontal pan — the width exactly fills the frame");
-  close(c.y, (3000 * 0.15 - 200) / 2, "vertical pan is limited to the overflow");
-
-  // A frame the same shape as the photo has no slack in either direction.
-  const square = clampOffset({ imageW: 1000, imageH: 1000, viewW: 400, viewH: 400, zoom: 1, offsetX: 999, offsetY: 999 });
-  assert.deepEqual(square, { x: 0, y: 0 });
-
-  // Zooming in creates slack both ways.
-  const z = clampOffset({ imageW: 1000, imageH: 1000, viewW: 400, viewH: 400, zoom: 2, offsetX: 999, offsetY: 999 });
-  assert.ok(z.x > 0 && z.y > 0, "zoomed in, the image can be panned");
-});
-
-test("a portrait crop into a portrait frame keeps the whole height", () => {
-  // AIR-1 cards: 5:7 frame, a 1000×1400 source is already that shape.
-  const r = cropRect({ imageW: 1000, imageH: 1400, viewW: 500, viewH: 700, zoom: 1, offsetX: 0, offsetY: 0 });
-  close(r.sw, 1000);
-  close(r.sh, 1400);
-});
-
-test("output is capped on its longest edge and keeps the crop's ratio", () => {
-  const r = cropRect(wide);
-  const o = outputSize(r, 1800);
-  assert.equal(Math.max(o.width, o.height), 1800);
-  close(o.width / o.height, r.sw / r.sh, "aspect preserved");
-
-  // A crop smaller than the cap is never upscaled.
-  const small = outputSize({ sx: 0, sy: 0, sw: 300, sh: 200 }, 1800);
-  assert.deepEqual(small, { width: 300, height: 200 });
+  const out = outputSize(wide, 1800);
+  const a = drawRect(wide, out);
+  const b = drawRect({ ...wide, offsetY: 30 }, out);
+  // Dragging down by 30 screen px moves the painted image down by 30 * k.
+  close(b.dy - a.dy, 30 * (out.width / wide.viewW));
 });

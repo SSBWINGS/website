@@ -1,43 +1,70 @@
 /** Geometry for the admin image cropper.
  *
- *  Pure and dependency-free so it can be unit-tested without a DOM: the crop
- *  dialog shows the image scaled to *cover* a frame, and this maps that frame
- *  back onto the source pixels the canvas should copy.
+ *  Pure and dependency-free so it can be unit-tested without a DOM.
+ *
+ *  The frame's shape is fixed by whichever section the image belongs to — the
+ *  admin only ever moves and zooms. Zoom 1 is "the image exactly covers the
+ *  frame"; zooming below that shrinks the image inside the frame and the gap
+ *  is painted with a background colour, so an awkwardly-shaped photo can still
+ *  be used whole without ever changing the frame's ratio.
  */
 
 export type CropInput = {
   /** Source size after any 90° rotation has been applied. */
   imageW: number;
   imageH: number;
-  /** The crop frame on screen. */
+  /** The frame on screen. */
   viewW: number;
   viewH: number;
-  /** 1 = image exactly covers the frame. */
+  /** 1 = image exactly covers the frame; below 1 leaves background showing. */
   zoom: number;
   /** Pan, in screen pixels, of the image centre from the frame centre. */
   offsetX: number;
   offsetY: number;
 };
 
-export type CropRect = { sx: number; sy: number; sw: number; sh: number };
+const usable = (i: Pick<CropInput, "imageW" | "imageH" | "viewW" | "viewH">) =>
+  i.imageW > 0 && i.imageH > 0 && i.viewW > 0 && i.viewH > 0;
 
-/** Scale at which the image just covers the frame, before zoom. */
+/** Scale at which the image just covers the frame (edges may overflow). */
 export function coverScale(i: Pick<CropInput, "imageW" | "imageH" | "viewW" | "viewH">): number {
-  if (!i.imageW || !i.imageH || !i.viewW || !i.viewH) return 1;
+  if (!usable(i)) return 1;
   return Math.max(i.viewW / i.imageW, i.viewH / i.imageH);
 }
 
-/** How far the image may be panned before an edge would enter the frame. */
+/** Scale at which the whole image fits inside the frame (gaps may show). */
+export function containScale(i: Pick<CropInput, "imageW" | "imageH" | "viewW" | "viewH">): number {
+  if (!usable(i)) return 1;
+  return Math.min(i.viewW / i.imageW, i.viewH / i.imageH);
+}
+
+/**
+ * Lowest zoom worth offering: the point where the entire image is visible.
+ * Always ≤ 1, and exactly 1 when the photo already matches the frame's shape
+ * (there is nothing to zoom out of).
+ */
+export function minZoom(i: Pick<CropInput, "imageW" | "imageH" | "viewW" | "viewH">): number {
+  if (!usable(i)) return 1;
+  return containScale(i) / coverScale(i);
+}
+
+/**
+ * How far the image may be panned on each axis.
+ *
+ * The absolute difference covers both directions at once: when the image
+ * overflows the frame you may pan across the overflow, and when it is smaller
+ * than the frame you may position it anywhere inside — either way it can never
+ * be dragged past an edge.
+ */
 export function panBounds(i: CropInput): { maxX: number; maxY: number } {
   const s = coverScale(i) * i.zoom;
   return {
-    maxX: Math.max(0, (i.imageW * s - i.viewW) / 2),
-    maxY: Math.max(0, (i.imageH * s - i.viewH) / 2),
+    maxX: Math.abs(i.imageW * s - i.viewW) / 2,
+    maxY: Math.abs(i.imageH * s - i.viewH) / 2,
   };
 }
 
-/** Clamp a pan so the image always fills the frame — no blank edges can be
- *  exported, whatever the admin drags. */
+/** Clamp a pan to those bounds. */
 export function clampOffset(i: CropInput): { x: number; y: number } {
   const { maxX, maxY } = panBounds(i);
   return {
@@ -46,26 +73,39 @@ export function clampOffset(i: CropInput): { x: number; y: number } {
   };
 }
 
-/** The source-pixel rectangle currently framed. Always inside the image. */
-export function cropRect(i: CropInput): CropRect {
+/**
+ * Size of the exported canvas. Always the frame's shape, and never larger than
+ * the source resolution the frame is showing — so a crop is never upscaled.
+ */
+export function outputSize(i: CropInput, maxEdge: number): { width: number; height: number } {
+  if (!usable(i)) return { width: 1, height: 1 };
   const s = coverScale(i) * i.zoom;
-  const sw = Math.min(i.imageW, i.viewW / s);
-  const sh = Math.min(i.imageH, i.viewH / s);
-  const cx = i.imageW / 2 - i.offsetX / s;
-  const cy = i.imageH / 2 - i.offsetY / s;
+  let w = i.viewW / s; // source pixels spanned by the frame
+  let h = w * (i.viewH / i.viewW); // keep the frame's ratio exactly
+  const k = Math.min(1, maxEdge / Math.max(w, h));
   return {
-    sx: Math.max(0, Math.min(i.imageW - sw, cx - sw / 2)),
-    sy: Math.max(0, Math.min(i.imageH - sh, cy - sh / 2)),
-    sw,
-    sh,
+    width: Math.max(1, Math.round(w * k)),
+    height: Math.max(1, Math.round(h * k)),
   };
 }
 
-/** Output size for a crop, capped on its longest edge. */
-export function outputSize(rect: CropRect, maxEdge: number): { width: number; height: number } {
-  const scale = Math.min(1, maxEdge / Math.max(rect.sw, rect.sh));
+/**
+ * Where to paint the image on that canvas. Anything the image does not cover
+ * is the background colour, which is why this returns a destination rectangle
+ * rather than a source crop.
+ */
+export function drawRect(
+  i: CropInput,
+  out: { width: number; height: number },
+): { dx: number; dy: number; dw: number; dh: number } {
+  const s = coverScale(i) * i.zoom;
+  const k = i.viewW > 0 ? out.width / i.viewW : 1; // output px per screen px
+  const dw = i.imageW * s * k;
+  const dh = i.imageH * s * k;
   return {
-    width: Math.max(1, Math.round(rect.sw * scale)),
-    height: Math.max(1, Math.round(rect.sh * scale)),
+    dx: out.width / 2 + i.offsetX * k - dw / 2,
+    dy: out.height / 2 + i.offsetY * k - dh / 2,
+    dw,
+    dh,
   };
 }

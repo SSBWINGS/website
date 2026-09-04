@@ -25,7 +25,7 @@ export default async function Courses({ heading = true }: { heading?: boolean })
   // Merge editable text over the protected code card (enrollUrl, cta, highlight, image kept).
   const cards = COURSES.map((c, i) => ({ ...c, ...(doc.items?.[i] ?? {}) }));
   return (
-    <section id="courses" className="relative pb-6 pt-12 sm:pb-8 sm:pt-16">
+    <section id="courses" className="relative pb-5 pt-9 sm:pb-6 sm:pt-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         {heading && (
           <CmsSectionHeading

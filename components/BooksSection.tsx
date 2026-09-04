@@ -6,7 +6,7 @@ import { BOOKS } from "@/lib/data";
 /** The two SSBWINGS books, as their own movable homepage section. */
 export default function BooksSection() {
   return (
-    <section className="relative py-12 sm:py-16">
+    <section className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <CmsSectionHeading
           sectionKey="books"

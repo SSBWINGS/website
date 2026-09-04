@@ -23,7 +23,7 @@ export default async function MockTestsPage() {
     <main>
       <CmsHero pageKey="mock-tests" />
 
-      <section className="bg-[#faf6ec] px-4 pb-10 pt-8 sm:pb-16 sm:pt-10">
+      <section className="bg-[#faf6ec] px-4 pb-8 pt-6 sm:pb-12 sm:pt-8">
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <h2 className="text-2xl font-bold text-[#0a1524]">OIR — Officer Intelligence Rating</h2>
           <p className="mt-2 text-sm text-slate-600">Pick the best answer for each question, then submit to see your score and explanations.</p>
@@ -32,7 +32,7 @@ export default async function MockTestsPage() {
       </section>
 
       {srt.length > 0 && (
-        <section className="border-t border-slate-200 bg-white px-4 py-10 sm:py-14">
+        <section className="border-t border-slate-200 bg-white px-4 py-8 sm:py-10">
           <div className="mx-auto max-w-3xl">
             <div className="mb-8 text-center">
               <h2 className="text-2xl font-bold text-[#0a1524]">SRT — Situation Reaction Test</h2>

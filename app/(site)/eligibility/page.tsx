@@ -11,7 +11,7 @@ export default function EligibilityPage() {
   return (
     <main>
       <CmsHero pageKey="eligibility" />
-      <section className="bg-[#faf6ec] px-4 pb-10 pt-8 sm:pb-16 sm:pt-10">
+      <section className="bg-[#faf6ec] px-4 pb-8 pt-6 sm:pb-12 sm:pt-8">
         <EligibilityFinder />
       </section>
     </main>

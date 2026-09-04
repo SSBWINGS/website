@@ -9,7 +9,7 @@ export type FaqItem = { question: string; answer: string };
 export default function FaqAccordion({ items, heading = true }: { items: FaqItem[]; heading?: boolean }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="relative py-12 sm:py-16">
+    <section id="faq" className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-4xl px-4 sm:px-8">
         {heading && (
           <SectionHeading center kicker="Intel Briefing" title={<>Questions, <span className="tricolour-text">Answered Straight</span></>} />

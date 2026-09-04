@@ -25,7 +25,7 @@ export default function TestimonialsCarousel({ items, heading = true }: { items:
   const s = items[Math.min(idx, items.length - 1)];
 
   return (
-    <section id="testimonials" className="relative py-12 sm:py-16">
+    <section id="testimonials" className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-5xl px-4 sm:px-8">
         {heading && (
           <SectionHeading

@@ -11,7 +11,7 @@ export default async function ContactSection() {
   ]);
   const form = resolveContactForm(formDoc);
   return (
-    <section id="contact" className="relative py-12 sm:py-16">
+    <section id="contact" className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr]">
           <Reveal direction="left">

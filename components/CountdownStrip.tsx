@@ -13,7 +13,7 @@ export default async function CountdownStrip() {
   const kickerColor = doc.kickerColor || "#f2d519";
 
   return (
-    <section className="relative overflow-hidden py-10 sm:py-12" style={{ background: bg }}>
+    <section className="relative overflow-hidden py-8 sm:py-10" style={{ background: bg }}>
       <div className="mx-auto max-w-6xl px-4">
         <div className="mb-8 text-center">
           <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: kickerColor }}>

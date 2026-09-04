@@ -1,31 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clampOffset, coverScale, cropRect, outputSize } from "@/lib/crop";
+import { clampOffset, coverScale, drawRect, minZoom, outputSize } from "@/lib/crop";
 
 /** Longest edge kept from the source before cropping — bounds canvas memory
  *  on phone photos without visibly softening anything we output. */
 const MAX_SOURCE = 2600;
-/** Longest edge of the exported crop. */
+/** Longest edge of the exported image. */
 const MAX_OUTPUT = 1800;
 
+/** Backdrop colours for the gaps left when a photo is zoomed out below the
+ *  frame. Cream and navy match the two backgrounds used across the site. */
+const BACKDROPS = ["#ffffff", "#faf6ec", "#0a1524", "#000000", "#e8e2d4"];
+
 export type CropOptions = {
-  /** Width ÷ height of the frame this image lands in. Omit for a free crop. */
+  /** Width ÷ height of the frame this image lands in. Fixed by the section —
+   *  never editable, so what the admin sees is what the site renders. */
   aspect?: number;
   /** Shown in the dialog so the admin knows where the image will appear. */
   label?: string;
   /** Set for avatars so the preview is masked as a circle. */
   round?: boolean;
 };
-
-const FREE_RATIOS: { label: string; value: number | null }[] = [
-  { label: "Original", value: null },
-  { label: "1:1", value: 1 },
-  { label: "4:3", value: 4 / 3 },
-  { label: "3:4", value: 3 / 4 },
-  { label: "16:9", value: 16 / 9 },
-  { label: "3:1", value: 3 },
-];
 
 /** Downscale the picked file once, so panning stays smooth on big photos. */
 async function loadSource(file: File): Promise<HTMLCanvasElement> {
@@ -45,7 +41,7 @@ async function loadSource(file: File): Promise<HTMLCanvasElement> {
   return c;
 }
 
-/** The source rotated by a multiple of 90°, so cropping is plain arithmetic. */
+/** The source rotated by a multiple of 90°, so the maths stays arithmetic. */
 function rotateCanvas(src: HTMLCanvasElement, deg: number): HTMLCanvasElement {
   if (deg % 360 === 0) return src;
   const quarter = ((deg % 360) + 360) % 360;
@@ -72,7 +68,7 @@ export default function ImageCropper({
   const [rotation, setRotation] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [ratio, setRatio] = useState<number | null>(aspect ?? null);
+  const [backdrop, setBackdrop] = useState(BACKDROPS[0]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,7 +88,6 @@ export default function ImageCropper({
     return () => ro.disconnect();
   }, []);
 
-  // Decode once; the rotated copy is derived from this on demand.
   useEffect(() => {
     let alive = true;
     loadSource(file)
@@ -103,12 +98,6 @@ export default function ImageCropper({
     };
   }, [file]);
 
-  // A new rotation or ratio invalidates the current pan.
-  useEffect(() => {
-    setOffset({ x: 0, y: 0 });
-    setZoom(1);
-  }, [rotation, ratio]);
-
   // Memoised: without this the whole image would be re-rotated on every
   // pointer move, which stutters badly on a large photo.
   const rotated = useMemo(() => (source ? rotateCanvas(source, rotation) : null), [source, rotation]);
@@ -117,19 +106,31 @@ export default function ImageCropper({
   const preview = useMemo(() => (rotated ? rotated.toDataURL("image/webp", 0.9) : ""), [rotated]);
   const effW = rotated?.width ?? 0;
   const effH = rotated?.height ?? 0;
-  /** No ratio chosen → the frame simply follows the image. */
-  const boxRatio = ratio ?? (effW && effH ? effW / effH : 1);
 
-  /** Scale at which the image exactly covers the frame (see lib/crop.ts). */
+  /** Fixed by the destination. With no destination shape (the media library)
+   *  the photo keeps its own, so nothing is cropped away by surprise. */
+  const boxRatio = aspect ?? (effW && effH ? effW / effH : 1);
+
   const cover = coverScale({ imageW: effW, imageH: effH, viewW: view.w, viewH: view.h });
+  const floor = minZoom({ imageW: effW, imageH: effH, viewW: view.w, viewH: view.h });
 
-  /** Keep the image covering the frame, so no empty edges can be exported. */
+  // A fresh rotation restarts from "fills the frame".
+  useEffect(() => {
+    setOffset({ x: 0, y: 0 });
+    setZoom(1);
+  }, [rotation]);
+
   const clamp = useCallback(
     (next: { x: number; y: number }, z: number) => {
       if (!effW || !view.w) return next;
       return clampOffset({
-        imageW: effW, imageH: effH, viewW: view.w, viewH: view.h,
-        zoom: z, offsetX: next.x, offsetY: next.y,
+        imageW: effW,
+        imageH: effH,
+        viewW: view.w,
+        viewH: view.h,
+        zoom: z,
+        offsetX: next.x,
+        offsetY: next.y,
       });
     },
     [effW, effH, view.w, view.h],
@@ -152,25 +153,37 @@ export default function ImageCropper({
     drag.current = null;
   };
 
+  /** True once the photo no longer fills the frame — the backdrop is showing. */
+  const showsBackdrop = zoom < 0.999 && floor < 0.999;
+
   async function apply() {
     if (!rotated || !view.w) return;
     setBusy(true);
     setError(null);
     try {
-      // Map the frame back onto the rotated image, in its own pixels.
-      const rect = cropRect({
-        imageW: effW, imageH: effH, viewW: view.w, viewH: view.h,
-        zoom, offsetX: offset.x, offsetY: offset.y,
-      });
-      const size = outputSize(rect, MAX_OUTPUT);
+      const input = {
+        imageW: effW,
+        imageH: effH,
+        viewW: view.w,
+        viewH: view.h,
+        zoom,
+        offsetX: offset.x,
+        offsetY: offset.y,
+      };
+      const size = outputSize(input, MAX_OUTPUT);
+      const rect = drawRect(input, size);
 
       const out = document.createElement("canvas");
       out.width = size.width;
       out.height = size.height;
       const ctx = out.getContext("2d");
       if (!ctx) throw new Error("Canvas unavailable");
+      // Paint the backdrop first: whatever the photo does not cover keeps the
+      // frame's exact ratio instead of leaving transparent edges.
+      ctx.fillStyle = backdrop;
+      ctx.fillRect(0, 0, out.width, out.height);
       ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(rotated, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, out.width, out.height);
+      ctx.drawImage(rotated, rect.dx, rect.dy, rect.dw, rect.dh);
 
       const blob: Blob | null = await new Promise((r) => out.toBlob(r, "image/webp", 0.9));
       if (!blob) throw new Error("Could not export the image");
@@ -181,34 +194,47 @@ export default function ImageCropper({
     }
   }
 
-  const btn = "rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50";
+  const btn =
+    "rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40";
+  const step = (d: number) => setZoom((z) => Math.min(4, Math.max(floor, Number((z + d).toFixed(3)))));
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 p-4" role="dialog" aria-modal="true" aria-label="Crop image">
-      <div className="max-h-[95vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900">Position &amp; crop</h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              {label ? <>Fitting the frame used by <b>{label}</b>. </> : null}
-              Drag to move, zoom with the slider, and rotate if it came out sideways.
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 p-2 sm:p-4">
+      {/* One window: the dialog never exceeds the viewport and never scrolls —
+          the frame simply takes whatever height the fixed chrome leaves. */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Position and crop image"
+        className="flex max-h-[calc(100dvh-1rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)]"
+      >
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-2.5">
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-bold text-slate-900">Position &amp; crop</h2>
+            <p className="truncate text-[11px] text-slate-500">
+              {label ? `Frame used by ${label}` : "Drag to move · zoom to fit"}
             </p>
           </div>
-          <button onClick={() => onDone(null)} className="rounded-full px-2 text-xl leading-none text-slate-400 hover:text-slate-700" aria-label="Cancel">
+          <button
+            onClick={() => onDone(null)}
+            className="shrink-0 rounded-full px-2 text-xl leading-none text-slate-400 hover:text-slate-700"
+            aria-label="Cancel"
+          >
             ✕
           </button>
         </div>
 
-        {/* Crop frame — exactly the shape the image will appear in. */}
-        <div className="mt-4 flex justify-center">
+        {/* The frame — fixed to the destination's shape, sized to fit whatever
+            space is left, so it works on a phone as well as a desktop. */}
+        <div className="flex min-h-0 flex-1 items-center justify-center bg-slate-50 p-3">
           <div
             ref={viewRef}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
-            className={`relative w-full max-w-[440px] cursor-move touch-none select-none overflow-hidden bg-slate-800 ${round ? "rounded-full" : "rounded-lg"}`}
-            style={{ aspectRatio: String(boxRatio) }}
+            className={`relative max-h-full max-w-full cursor-move touch-none select-none overflow-hidden ${round ? "rounded-full" : "rounded-lg"}`}
+            style={{ aspectRatio: String(boxRatio), width: 448, background: backdrop }}
           >
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -225,7 +251,7 @@ export default function ImageCropper({
                 }}
               />
             ) : (
-              <div className="absolute inset-0 grid place-items-center text-sm text-slate-300">Loading…</div>
+              <div className="absolute inset-0 grid place-items-center text-sm text-slate-400">Loading…</div>
             )}
             {!round && (
               <div className="pointer-events-none absolute inset-0 border border-white/40" aria-hidden>
@@ -238,57 +264,71 @@ export default function ImageCropper({
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <label className="flex flex-1 items-center gap-2 text-xs font-medium text-slate-600">
-            Zoom
+        <div className="shrink-0 border-t border-slate-100 px-4 py-2.5">
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => step(-0.1)} disabled={zoom <= floor + 0.001} className={btn} title="Zoom out">
+              −
+            </button>
             <input
-              type="range" min={1} max={4} step={0.01} value={zoom}
+              type="range"
+              min={floor}
+              max={4}
+              step={0.01}
+              value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              className="flex-1 accent-blue-600"
+              className="min-w-0 flex-1 accent-blue-600"
+              aria-label="Zoom"
             />
-          </label>
-          <button type="button" onClick={() => setRotation((r) => r - 90)} className={btn} title="Rotate left">↺ 90°</button>
-          <button type="button" onClick={() => setRotation((r) => r + 90)} className={btn} title="Rotate right">↻ 90°</button>
-          <button
-            type="button"
-            onClick={() => { setZoom(1); setOffset({ x: 0, y: 0 }); setRotation(0); }}
-            className={btn}
-          >
-            Reset
-          </button>
-        </div>
-
-        {/* Only offered where the destination has no fixed shape. */}
-        {aspect === undefined && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-slate-500">Shape</span>
-            {FREE_RATIOS.map((r) => (
-              <button
-                key={r.label}
-                type="button"
-                onClick={() => setRatio(r.value)}
-                className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${
-                  ratio === r.value ? "border-blue-500 bg-blue-50 text-blue-700" : "border-slate-300 text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
+            <button type="button" onClick={() => step(0.1)} disabled={zoom >= 4} className={btn} title="Zoom in">
+              +
+            </button>
+            <button type="button" onClick={() => setRotation((r) => r - 90)} className={btn} title="Rotate left">
+              ↺
+            </button>
+            <button type="button" onClick={() => setRotation((r) => r + 90)} className={btn} title="Rotate right">
+              ↻
+            </button>
           </div>
-        )}
 
-        {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+          {/* Only relevant once the photo has been zoomed past "fills the frame". */}
+          {showsBackdrop && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="shrink-0 text-[11px] font-medium text-slate-500">Background</span>
+              {BACKDROPS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setBackdrop(c)}
+                  aria-label={`Background ${c}`}
+                  className={`h-5 w-5 rounded-full border ${backdrop === c ? "ring-2 ring-blue-500 ring-offset-1" : "border-slate-300"}`}
+                  style={{ background: c }}
+                />
+              ))}
+              <input
+                type="color"
+                value={backdrop}
+                onChange={(e) => setBackdrop(e.target.value)}
+                className="h-6 w-8 cursor-pointer rounded border border-slate-300 bg-white p-0.5"
+                aria-label="Custom background colour"
+              />
+            </div>
+          )}
 
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={() => onDone(null)} className={btn} disabled={busy}>Cancel</button>
-          <button
-            type="button"
-            onClick={apply}
-            disabled={busy || !source}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-          >
-            {busy ? "Working…" : "Use this crop"}
-          </button>
+          {error && <p className="mt-2 rounded-lg bg-red-50 px-2.5 py-1.5 text-xs text-red-700">{error}</p>}
+
+          <div className="mt-2.5 flex justify-end gap-2">
+            <button type="button" onClick={() => onDone(null)} className={btn} disabled={busy}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={apply}
+              disabled={busy || !source}
+              className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+            >
+              {busy ? "Working…" : "Use this image"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

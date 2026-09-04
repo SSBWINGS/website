@@ -19,7 +19,7 @@ export default async function Mentors({ heading = true }: { heading?: boolean })
   const mentors = await getCollection<Row>("published_mentors", fallback, { columns: "name, role, specialty, bio, image_path, sort_order" });
 
   return (
-    <section id="mentors" className="relative py-12 sm:py-16">
+    <section id="mentors" className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         {heading && (
           <CmsSectionHeading

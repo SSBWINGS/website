@@ -10,7 +10,7 @@ export default async function ServicesStrip() {
   const c = await getPublished<FourForcesDoc>("four_forces", FOUR_FORCES);
   const cards = c.cards?.length ? c.cards : FOUR_FORCES.cards;
   return (
-    <section className="relative py-12 sm:py-16">
+    <section className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <SectionHeading
           center

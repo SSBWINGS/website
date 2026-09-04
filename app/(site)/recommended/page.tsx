@@ -36,7 +36,7 @@ export default async function RecommendedPage() {
     <main>
       <CmsHero pageKey="recommended" />
 
-      <section className="relative py-10 sm:py-14">
+      <section className="relative py-8 sm:py-10">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           {initial.length === 0 ? (
             <p className="rounded-2xl border border-[rgba(43,36,22,0.12)] bg-paper-2 p-10 text-center text-ink-soft">

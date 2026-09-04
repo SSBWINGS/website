@@ -30,7 +30,7 @@ export default async function AboutPage() {
     <main>
       <CmsHero pageKey="about" />
 
-      <section className="relative py-12 sm:py-16">
+      <section className="relative py-9 sm:py-12">
         <div className="mx-auto grid max-w-[1840px] items-center gap-12 px-4 sm:px-8 lg:grid-cols-2">
           <Reveal direction="left">
             <p className="kicker">{mission.kicker}</p>
@@ -55,7 +55,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="relative py-12 sm:py-16">
+      <section className="relative py-9 sm:py-12">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           <SectionHeading center kicker="What We Stand For" title={<>Our <span className="tricolour-text">Core Values</span></>} />
           <div className="mt-12 grid gap-6 md:grid-cols-3">

@@ -34,7 +34,7 @@ export default async function StudentWall({
   const list = limit ? rows.slice(0, limit) : rows;
 
   return (
-    <section id="wall-of-honour" className="relative py-12 sm:py-16">
+    <section id="wall-of-honour" className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         {heading && (
           <CmsSectionHeading

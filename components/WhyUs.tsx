@@ -13,7 +13,7 @@ export default async function WhyUs() {
   ]);
   const USPS = itemsDoc.items?.length ? itemsDoc.items : WHYUS_ITEMS;
   return (
-    <section id="why-us" className="relative py-12 sm:py-16">
+    <section id="why-us" className="relative py-9 sm:py-12">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.6fr]">
           <div className="lg:sticky lg:top-32">
