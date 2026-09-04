@@ -32,7 +32,7 @@ export default async function EntriesPage() {
       <CmsHero pageKey="entries" />
 
       {/* Three gateways */}
-      <section className="relative py-20 sm:py-24">
+      <section className="relative py-12 sm:py-16">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           <SectionHeading
             center
@@ -61,7 +61,7 @@ export default async function EntriesPage() {
 
       {/* Per-service entry routes */}
       {routes.map((svc, si) => (
-        <section key={svc.id} className={`relative py-16 sm:py-20 ${si % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
+        <section key={svc.id} className={`relative py-10 sm:py-14 ${si % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
           <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
             <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.4fr]">
               {/* Service banner — sticks beside its own route cards on desktop */}
@@ -116,7 +116,7 @@ export default async function EntriesPage() {
       ))}
 
       {/* Common thread */}
-      <section className="relative py-16">
+      <section className="relative py-12 sm:py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-8">
           <Reveal>
             <div className="skeu-plate p-8 sm:p-10">

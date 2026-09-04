@@ -50,7 +50,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
   return (
     <main className="bg-[#faf6ec]">
-      <article className="mx-auto max-w-3xl px-4 py-14 sm:py-20">
+      <article className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
         <nav className="mb-6 text-xs font-semibold uppercase tracking-wider text-slate-500">
           <Link href="/blog" className="hover:text-[#b8860b]">← Back to blog</Link>
         </nav>

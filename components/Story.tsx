@@ -13,7 +13,7 @@ export default async function Story() {
   ]);
   const GAPS = gapsDoc.items?.length ? gapsDoc.items : STORY_GAPS;
   return (
-    <section id="story" className="relative py-20 sm:py-24">
+    <section id="story" className="relative py-12 sm:py-16">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
           <div>

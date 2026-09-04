@@ -28,7 +28,7 @@ export default async function SelectionTracker() {
   ].filter((c) => c.label);
 
   return (
-    <section className="bg-[#faf8f1] py-16">
+    <section className="bg-[#faf8f1] py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4">
         <div className="mb-10 text-center">
           {doc.kicker && <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#b8860b]">{doc.kicker}</span>}

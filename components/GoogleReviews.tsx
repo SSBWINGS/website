@@ -27,7 +27,7 @@ export default async function GoogleReviews() {
   if (!items.length) return null;
 
   return (
-    <section className="relative py-20 sm:py-24">
+    <section className="relative py-12 sm:py-16">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <CmsSectionHeading
           sectionKey="google_reviews"

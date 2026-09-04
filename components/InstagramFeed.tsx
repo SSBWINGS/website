@@ -8,7 +8,7 @@ export default async function InstagramFeed() {
   const handle = (SITE.instagram || "").replace(/\/+$/, "").split("/").pop() || "ssbwings";
 
   return (
-    <section className="relative overflow-hidden py-20 sm:py-24">
+    <section className="relative overflow-hidden py-12 sm:py-16">
       <div
         className="absolute inset-0 opacity-90"
         style={{ background: "linear-gradient(135deg,#fff4e6 0%, #faf6ec 45%, #e9f7e9 100%)" }}

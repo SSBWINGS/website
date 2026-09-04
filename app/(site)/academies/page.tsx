@@ -25,7 +25,7 @@ export default async function AcademiesPage() {
     <main>
       <CmsHero pageKey="academies" />
 
-      <section className="relative py-16 sm:py-20">
+      <section className="relative py-10 sm:py-14">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           <SectionHeading
             center
@@ -49,7 +49,7 @@ export default async function AcademiesPage() {
 
       {academies.map((a, i) => (
         <section key={anchor(a.short) + i} id={anchor(a.short)}
-          className={`relative py-14 sm:py-16 ${i % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
+          className={`relative py-10 sm:py-12 ${i % 2 === 1 ? "bg-cream-dark/40" : ""}`}>
           <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
             <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.3fr]">
               {/* Academy banner */}

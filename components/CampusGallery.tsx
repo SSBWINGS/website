@@ -14,7 +14,7 @@ export default async function CampusGallery() {
   if (!list.length) return null;
 
   return (
-    <section className="relative pb-20 pt-10 sm:pb-24 sm:pt-12">
+    <section className="relative pb-12 pt-6 sm:pb-16 sm:pt-8">
       <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
         <CmsSectionHeading
           sectionKey="campus"

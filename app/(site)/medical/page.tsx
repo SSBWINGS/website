@@ -31,7 +31,7 @@ export default async function MedicalPage() {
       <CmsHero pageKey="medical" />
 
       {/* Process */}
-      <section className="relative py-14 sm:py-16">
+      <section className="relative py-10 sm:py-12">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           <SectionHeading
             center
@@ -74,7 +74,7 @@ export default async function MedicalPage() {
       </section>
 
       {/* Standards table */}
-      <section className="relative bg-cream-dark/40 py-14 sm:py-16">
+      <section className="relative bg-cream-dark/40 py-10 sm:py-12">
         <div className="mx-auto max-w-[1840px] px-4 sm:px-8">
           <SectionHeading center kicker="Know the Bar" title={<span dangerouslySetInnerHTML={{ __html: d.standardsTitle }} />} subtitle={d.standardsIntro} />
           <div className="mt-10 overflow-x-auto rounded-xl border border-[rgba(43,36,22,0.12)] bg-white">
@@ -106,7 +106,7 @@ export default async function MedicalPage() {
       </section>
 
       {/* Common rejections + appeal */}
-      <section className="relative py-14 sm:py-16">
+      <section className="relative py-10 sm:py-12">
         <div className="mx-auto grid max-w-[1840px] gap-10 px-4 sm:px-8 lg:grid-cols-2">
           <Reveal>
             <h2 className="section-title text-3xl sm:text-4xl" dangerouslySetInnerHTML={{ __html: d.commonTitle }} />
@@ -130,7 +130,7 @@ export default async function MedicalPage() {
       </section>
 
       {/* FAQs */}
-      <section className="relative bg-cream-dark/40 py-14 sm:py-16">
+      <section className="relative bg-cream-dark/40 py-10 sm:py-12">
         <div className="mx-auto max-w-4xl px-4 sm:px-8">
           <SectionHeading center kicker="Medical Queries" title={<>Frequently Asked <span className="tricolour-text">Questions</span></>} />
           <div className="mt-10 space-y-3">
