@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clampOffset, coverScale, drawRect, minZoom, outputSize } from "@/lib/crop";
+import { clampOffset, coverScale, drawRect, fitBox, minZoom, outputSize } from "@/lib/crop";
 
 /** Longest edge kept from the source before cropping — bounds canvas memory
  *  on phone photos without visibly softening anything we output. */
@@ -72,16 +72,18 @@ export default function ImageCropper({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const viewRef = useRef<HTMLDivElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
-  /** Frame size in state — the transform depends on it, so reading the DOM
-   *  during render would leave the first paint (and any resize) wrong. */
-  const [view, setView] = useState({ w: 0, h: 0 });
+  /** The space the frame may occupy. Measured rather than left to CSS: a
+   *  percentage max-height cannot resolve against a flex parent with no
+   *  definite height, which let the frame keep its natural size and spill over
+   *  the header and buttons. */
+  const [avail, setAvail] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
-    const el = viewRef.current;
+    const el = boxRef.current;
     if (!el) return;
-    const measure = () => setView({ w: el.clientWidth, h: el.clientHeight });
+    const measure = () => setAvail({ w: el.clientWidth, h: el.clientHeight });
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -110,6 +112,9 @@ export default function ImageCropper({
   /** Fixed by the destination. With no destination shape (the media library)
    *  the photo keeps its own, so nothing is cropped away by surprise. */
   const boxRatio = aspect ?? (effW && effH ? effW / effH : 1);
+
+  /** Largest box of the required shape that fits the space available. */
+  const view = useMemo(() => fitBox(avail, boxRatio), [avail, boxRatio]);
 
   const cover = coverScale({ imageW: effW, imageH: effH, viewW: view.w, viewH: view.h });
   const floor = minZoom({ imageW: effW, imageH: effH, viewW: view.w, viewH: view.h });
@@ -206,7 +211,7 @@ export default function ImageCropper({
         role="dialog"
         aria-modal="true"
         aria-label="Position and crop image"
-        className="flex max-h-[calc(100dvh-1rem)] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-h-[calc(100dvh-2rem)]"
+        className="flex h-[calc(100dvh-1rem)] max-h-[46rem] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:h-[calc(100dvh-2rem)]"
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-2.5">
           <div className="min-w-0">
@@ -226,41 +231,42 @@ export default function ImageCropper({
 
         {/* The frame — fixed to the destination's shape, sized to fit whatever
             space is left, so it works on a phone as well as a desktop. */}
-        <div className="flex min-h-0 flex-1 items-center justify-center bg-slate-50 p-3">
-          <div
-            ref={viewRef}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={endDrag}
-            onPointerCancel={endDrag}
-            className={`relative max-h-full max-w-full cursor-move touch-none select-none overflow-hidden ${round ? "rounded-full" : "rounded-lg"}`}
-            style={{ aspectRatio: String(boxRatio), width: 448, background: backdrop }}
-          >
-            {preview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={preview}
-                alt=""
-                draggable={false}
-                className="pointer-events-none absolute left-1/2 top-1/2 max-w-none"
-                style={{
-                  width: effW,
-                  height: effH,
-                  transform: `translate(-50%,-50%) translate(${offset.x}px, ${offset.y}px) scale(${cover * zoom})`,
-                  transformOrigin: "center",
-                }}
-              />
-            ) : (
-              <div className="absolute inset-0 grid place-items-center text-sm text-slate-400">Loading…</div>
-            )}
-            {!round && (
-              <div className="pointer-events-none absolute inset-0 border border-white/40" aria-hidden>
-                <div className="absolute inset-y-0 left-1/3 w-px bg-white/25" />
-                <div className="absolute inset-y-0 left-2/3 w-px bg-white/25" />
-                <div className="absolute inset-x-0 top-1/3 h-px bg-white/25" />
-                <div className="absolute inset-x-0 top-2/3 h-px bg-white/25" />
-              </div>
-            )}
+        <div className="relative min-h-0 flex-1 bg-slate-50">
+          <div ref={boxRef} className="absolute inset-3 flex items-center justify-center overflow-hidden">
+            <div
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={endDrag}
+              onPointerCancel={endDrag}
+              className={`relative shrink-0 cursor-move touch-none select-none overflow-hidden ${round ? "rounded-full" : "rounded-lg"}`}
+              style={{ width: view.w, height: view.h, background: backdrop }}
+            >
+              {preview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={preview}
+                  alt=""
+                  draggable={false}
+                  className="pointer-events-none absolute left-1/2 top-1/2 max-w-none"
+                  style={{
+                    width: effW,
+                    height: effH,
+                    transform: `translate(-50%,-50%) translate(${offset.x}px, ${offset.y}px) scale(${cover * zoom})`,
+                    transformOrigin: "center",
+                  }}
+                />
+              ) : (
+                <div className="absolute inset-0 grid place-items-center text-sm text-slate-400">Loading…</div>
+              )}
+              {!round && (
+                <div className="pointer-events-none absolute inset-0 border border-white/40" aria-hidden>
+                  <div className="absolute inset-y-0 left-1/3 w-px bg-white/25" />
+                  <div className="absolute inset-y-0 left-2/3 w-px bg-white/25" />
+                  <div className="absolute inset-x-0 top-1/3 h-px bg-white/25" />
+                  <div className="absolute inset-x-0 top-2/3 h-px bg-white/25" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

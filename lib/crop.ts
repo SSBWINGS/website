@@ -109,3 +109,17 @@ export function drawRect(
     dh,
   };
 }
+
+/**
+ * Largest box of a given shape that fits inside the space available.
+ *
+ * The crop frame is sized from this rather than by CSS: a percentage
+ * max-height cannot resolve against a flex parent with no definite height, so
+ * the frame kept its natural size and flex centring spilled it over the
+ * dialog's header and buttons.
+ */
+export function fitBox(avail: { w: number; h: number }, ratio: number): { w: number; h: number } {
+  if (avail.w <= 0 || avail.h <= 0 || !(ratio > 0) || !Number.isFinite(ratio)) return { w: 0, h: 0 };
+  const w = Math.min(avail.w, avail.h * ratio);
+  return { w, h: w / ratio };
+}

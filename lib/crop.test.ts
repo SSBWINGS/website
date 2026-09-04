@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   clampOffset,
+  fitBox,
   containScale,
   coverScale,
   drawRect,
@@ -84,4 +85,23 @@ test("panning moves the crop the opposite way, at source scale", () => {
   const b = drawRect({ ...wide, offsetY: 30 }, out);
   // Dragging down by 30 screen px moves the painted image down by 30 * k.
   close(b.dy - a.dy, 30 * (out.width / wide.viewW));
+});
+
+test("the crop frame always fits the space it is given", () => {
+  const avail = { w: 488, h: 574 };
+  for (const ratio of [1, 4 / 3, 3 / 4, 3, 5 / 7, 16 / 9]) {
+    const box = fitBox(avail, ratio);
+    assert.ok(box.w <= avail.w + 0.001, `ratio ${ratio}: too wide (${box.w} > ${avail.w})`);
+    assert.ok(box.h <= avail.h + 0.001, `ratio ${ratio}: too tall (${box.h} > ${avail.h})`);
+    close(box.w / box.h, ratio, `ratio ${ratio} preserved:`);
+    // It must also be the LARGEST such box — one edge touches the boundary.
+    const touches = Math.abs(box.w - avail.w) < 0.001 || Math.abs(box.h - avail.h) < 0.001;
+    assert.ok(touches, `ratio ${ratio}: not using the full space`);
+  }
+});
+
+test("an unmeasured or degenerate space yields no frame rather than a broken one", () => {
+  assert.deepEqual(fitBox({ w: 0, h: 0 }, 1), { w: 0, h: 0 });
+  assert.deepEqual(fitBox({ w: 400, h: 300 }, 0), { w: 0, h: 0 });
+  assert.deepEqual(fitBox({ w: 400, h: 0 }, 1.5), { w: 0, h: 0 });
 });
