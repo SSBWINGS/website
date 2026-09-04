@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import RecordManager, { type Field } from "@/components/admin/RecordManager";
+import { FRAMES } from "@/components/admin/useImageCropper";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +18,8 @@ export default async function TestimonialsAdmin() {
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Testimonials</h1>
       <p className="mt-1 text-sm text-slate-500">Success stories shown on the site. Style the text with the toolbar.</p>
-      <RecordManager table="testimonials" fields={FIELDS} initial={data ?? []} titleKey="name" subtitleKey="rank" />
+      <RecordManager table="testimonials" fields={FIELDS} initial={data ?? []} titleKey="name" subtitleKey="rank"
+        imageAspect={FRAMES.avatar} imageRound imageLabel="the testimonial photo" />
     </div>
   );
 }

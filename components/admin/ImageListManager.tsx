@@ -7,13 +7,15 @@ import { bustCmsCache } from "@/lib/revalidate-client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import { asArray } from "@/lib/shape";
+import { useImageCropper, FRAMES } from "./useImageCropper";
+
 
 /** Thumbnail shapes. The frame matches the artwork so nothing is cropped and
  *  the admin can actually read the names on wide banner images. */
 const SHAPES = {
-  square: { box: "aspect-square", grid: "grid-cols-2 sm:grid-cols-4 lg:grid-cols-5", size: "220px" },
-  tall: { box: "aspect-[2/3]", grid: "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6", size: "200px" },
-  wide: { box: "aspect-[3/1]", grid: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3", size: "560px" },
+  square: { box: "aspect-square", grid: "grid-cols-2 sm:grid-cols-4 lg:grid-cols-5", size: "220px", ratio: 1 },
+  tall: { box: "aspect-[2/3]", grid: "grid-cols-2 sm:grid-cols-4 lg:grid-cols-6", size: "200px", ratio: 2 / 3 },
+  wide: { box: "aspect-[3/1]", grid: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3", size: "560px", ratio: 3 },
 } as const;
 
 /** Reusable "a list of images" editor for simple gallery-style CMS docs. */
@@ -24,6 +26,8 @@ export default function ImageListManager({
   folder,
   note,
   shape = "square",
+  cropAspect,
+  cropLabel,
 }: {
   initial: string[];
   docKey: string;
@@ -31,8 +35,13 @@ export default function ImageListManager({
   folder: string;
   note?: string;
   shape?: keyof typeof SHAPES;
+  /** Frame ratio the admin crops to; defaults to the thumbnail's own shape. */
+  cropAspect?: number;
+  cropLabel?: string;
 }) {
   const thumb = SHAPES[shape];
+  const { crop, cropperUi } = useImageCropper();
+  const aspect = cropAspect ?? thumb.ratio;
   const supabase = createClient();
   const [images, setImages] = useState<string[]>(asArray<string>(initial));
   const [busy, setBusy] = useState(false);
@@ -46,7 +55,10 @@ export default function ImageListManager({
     try {
       const added: string[] = [];
       for (const raw of files) {
-        const f = await compressImage(raw);
+        // One crop dialog per file, in the frame's own shape.
+        const picked = await crop(raw, { aspect, label: cropLabel ?? label });
+        if (!picked) continue; // cancelled — skip this one
+        const f = await compressImage(picked);
         const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`;
         const { error } = await supabase.storage.from("media").upload(path, f, {
           cacheControl: MEDIA_CACHE_CONTROL,
@@ -89,6 +101,7 @@ export default function ImageListManager({
 
   return (
     <div className="mt-6 space-y-5">
+      {cropperUi}
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
           {busy ? "Working…" : "⬆ Upload images"}

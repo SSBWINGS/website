@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import RecordManager, { type Field } from "@/components/admin/RecordManager";
+import { FRAMES } from "@/components/admin/useImageCropper";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,8 @@ export default async function MentorsAdmin() {
     <div>
       <h1 className="text-2xl font-bold text-slate-900">Mentors</h1>
       <p className="mt-1 text-sm text-slate-500">The mentors shown across the site.</p>
-      <RecordManager table="mentors" fields={FIELDS} initial={data ?? []} titleKey="name" subtitleKey="role" />
+      <RecordManager table="mentors" fields={FIELDS} initial={data ?? []} titleKey="name" subtitleKey="role"
+        imageAspect={FRAMES.mentor} imageLabel="the mentor card" />
     </div>
   );
 }

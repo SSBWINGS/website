@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AIR1_IMAGES } from "@/lib/homepage-defaults";
 import { asArray } from "@/lib/shape";
 import ImageListManager from "@/components/admin/ImageListManager";
+import { FRAMES } from "@/components/admin/useImageCropper";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,8 @@ export default async function Air1Admin() {
         label="AIR-1 Marquee"
         folder="air1"
         shape="tall"
+        cropAspect={FRAMES.air1}
+        cropLabel="the AIR-1 marquee"
         note="These scroll continuously below the entries marquee."
       />
     </div>

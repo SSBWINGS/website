@@ -5,6 +5,8 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
+import CropFileInput from "./CropFileInput";
+import { FRAMES } from "./useImageCropper";
 
 export type Candidate = {
   id: string;
@@ -62,7 +64,6 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
       if (error) throw new Error(error.message);
       setRows((r) => sortCands([...r, data as Candidate]));
       setName(""); setExam(""); setFile(null); setDate(today());
-      (document.getElementById("cand-file") as HTMLInputElement | null)?.value && ((document.getElementById("cand-file") as HTMLInputElement).value = "");
       setMsg({ ok: true, text: "Candidate added." }); void bustCmsCache();
     } catch (err) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : "Failed to add." });
@@ -124,8 +125,13 @@ export default function CandidatesManager({ initial }: { initial: Candidate[] })
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-slate-700">Photo</label>
-            <input id="cand-file" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required
-              className="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-slate-700" />
+            <CropFileInput
+              file={file}
+              onPick={setFile}
+              aspect={FRAMES.candidate}
+              label="the recommendation wall"
+              buttonLabel="Choose photo"
+            />
           </div>
         </div>
         {msg && <p className={`mt-3 rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}

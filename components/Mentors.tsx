@@ -36,7 +36,7 @@ export default async function Mentors({ heading = true }: { heading?: boolean })
           {mentors.map((m, i) => (
             <Reveal key={m.name + i} delay={i * 110}>
               <article className="card-lift group skeu-panel h-full overflow-hidden p-0">
-                <div className="relative h-52 overflow-hidden bg-navy-950">
+                <div className="relative aspect-[4/3] overflow-hidden bg-navy-950">
                   <Image
                     src={mediaUrl(m.image_path)}
                     alt={m.name}

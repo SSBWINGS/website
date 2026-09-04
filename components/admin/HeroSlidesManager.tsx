@@ -8,10 +8,12 @@ import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import { asArray } from "@/lib/shape";
 import type { HeroSlide } from "@/lib/hero-slides";
+import { useImageCropper, FRAMES } from "./useImageCropper";
 
 export default function HeroSlidesManager({ initial }: { initial: HeroSlide[] }) {
   const supabase = createClient();
   const [items, setItems] = useState<HeroSlide[]>(asArray<HeroSlide>(initial));
+  const { crop, cropperUi } = useImageCropper();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -30,7 +32,9 @@ export default function HeroSlidesManager({ initial }: { initial: HeroSlide[] })
     try {
       const added: HeroSlide[] = [];
       for (const raw of files) {
-        const f = await compressImage(raw);
+        const picked = await crop(raw, { aspect: FRAMES.heroSlide, label: "the hero showcase frame" });
+        if (!picked) continue;
+        const f = await compressImage(picked);
         const path = `hero/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`;
         const { error } = await supabase.storage.from("media").upload(path, f, {
           cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type,
@@ -59,6 +63,7 @@ export default function HeroSlidesManager({ initial }: { initial: HeroSlide[] })
 
   return (
     <div className="mt-6 space-y-5">
+      {cropperUi}
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
           {busy ? "Working…" : "⬆ Upload officer photos"}

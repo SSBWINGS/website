@@ -8,6 +8,7 @@ import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import { asArray } from "@/lib/shape";
 import type { GoogleReview } from "@/lib/homepage-defaults";
+import { useImageCropper, FRAMES } from "./useImageCropper";
 
 export default function GoogleReviewsManager({
   initial,
@@ -20,6 +21,7 @@ export default function GoogleReviewsManager({
   const [items, setItems] = useState<GoogleReview[]>(asArray<GoogleReview>(initial));
   const [placeUrl, setPlaceUrl] = useState(initialPlaceUrl);
   const [link, setLink] = useState("");
+  const { crop, cropperUi } = useImageCropper();
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -68,9 +70,11 @@ export default function GoogleReviewsManager({
   }
 
   async function uploadAvatar(i: number, file: File) {
+    const picked = await crop(file, { aspect: FRAMES.avatar, round: true, label: "a reviewer photo" });
+    if (!picked) return;
     setBusy(true);
     try {
-      const f = await compressImage(file);
+      const f = await compressImage(picked);
       const path = `reviews/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.webp`;
       const { error } = await supabase.storage.from("media").upload(path, f, {
         cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type,
@@ -97,6 +101,7 @@ export default function GoogleReviewsManager({
 
   return (
     <div className="mt-6 space-y-5">
+      {cropperUi}
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <button onClick={importFromGoogle} disabled={busy}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60">

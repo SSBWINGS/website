@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
+import CropFileInput from "./CropFileInput";
+import { FRAMES } from "./useImageCropper";
 import RichText from "./RichText";
 
 export type Post = {
@@ -121,8 +123,7 @@ export default function BlogManager({ initial }: { initial: Post[] }) {
                 <Image src={mediaUrl(existingCover)} alt="" fill sizes="96px" className="object-cover" />
               </div>
             )}
-            <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-slate-700" />
+            <CropFileInput file={file} onPick={setFile} aspect={FRAMES.blogCover} label="the blog cover" buttonLabel="Choose cover image" />
             <span className="text-xs text-slate-400">Cover image</span>
           </div>
           <div>

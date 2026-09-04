@@ -7,6 +7,7 @@ import { bustCmsCache } from "@/lib/revalidate-client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
 import RichText from "./RichText";
+import CropFileInput from "./CropFileInput";
 
 export type Field = { key: string; label: string; type: "text" | "rich" | "image" };
 type Row = Record<string, unknown> & { id: string; sort_order: number; published: boolean; image_path?: string | null };
@@ -19,12 +20,19 @@ export default function RecordManager({
   initial,
   titleKey,
   subtitleKey,
+  imageAspect,
+  imageRound = false,
+  imageLabel,
 }: {
   table: string;
   fields: Field[];
   initial: Row[];
   titleKey: string;
   subtitleKey?: string;
+  /** Ratio of the frame this record's photo renders in, for the crop dialog. */
+  imageAspect?: number;
+  imageRound?: boolean;
+  imageLabel?: string;
 }) {
   const supabase = createClient();
   const [rows, setRows] = useState<Row[]>(initial);
@@ -141,8 +149,14 @@ export default function RecordManager({
                       <Image src={mediaUrl(String(rows.find((r) => r.id === editingId)?.image_path))} alt="" fill sizes="56px" className="object-cover" />
                     </div>
                   )}
-                  <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                    className="text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-slate-700" />
+                  <CropFileInput
+                    file={file}
+                    onPick={setFile}
+                    aspect={imageAspect}
+                    round={imageRound}
+                    label={imageLabel}
+                    buttonLabel="Choose photo"
+                  />
                   {editingId && <span className="text-xs text-slate-400">Leave empty to keep current image</span>}
                 </div>
               )}

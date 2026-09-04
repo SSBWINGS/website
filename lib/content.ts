@@ -51,6 +51,15 @@ export const telHref = (p: string) => `tel:${(p || "").replace(/[^\d+]/g, "")}`;
 export const mapHref = (s: { mapUrl?: string; address?: string }) =>
   s.mapUrl?.trim() || `https://maps.google.com/maps?q=${encodeURIComponent(s.address ?? "")}`;
 
+/** Embed URL for the inline map. Pulls the @lat,lng out of the Maps link so the
+ *  pin sits exactly where the admin dropped it; falls back to the address when
+ *  the link has no coordinates. */
+export function mapEmbedSrc(s: { mapUrl?: string; address?: string }): string {
+  const at = (s.mapUrl ?? "").match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  const q = at ? `${at[1]},${at[2]}` : s.address ?? "";
+  return `https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=17&output=embed`;
+}
+
 /**
  * Content layer with graceful fallback.
  *

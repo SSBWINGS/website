@@ -27,11 +27,11 @@ where key = 'settings';
 update public.site_content
 set
   draft = jsonb_build_object(
-    'mapUrl',   'https://maps.google.com/maps?q=SSBWINGS%2C%20C-56%2F43%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=16',
+    'mapUrl',   'https://www.google.com/maps/place/SSBWINGS/@28.6150754,77.3672718,17z/data=!3m1!4b1!4m6!3m5!1s0x390c67ca2975cd55:0x46410d700f3a28a!8m2!3d28.6150754!4d77.3672718!16s%2Fg%2F11rc47d6j3',
     'brochure', '/SSB-Wings-Brochure-2026.pdf'
   ) || draft,
   published = jsonb_build_object(
-    'mapUrl',   'https://maps.google.com/maps?q=SSBWINGS%2C%20C-56%2F43%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=16',
+    'mapUrl',   'https://www.google.com/maps/place/SSBWINGS/@28.6150754,77.3672718,17z/data=!3m1!4b1!4m6!3m5!1s0x390c67ca2975cd55:0x46410d700f3a28a!8m2!3d28.6150754!4d77.3672718!16s%2Fg%2F11rc47d6j3',
     'brochure', '/SSB-Wings-Brochure-2026.pdf'
   ) || published
 where key = 'settings';

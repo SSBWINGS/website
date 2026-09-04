@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/data";
-import { getSettings, telHref, mapHref } from "@/lib/content";
+import { getSettings, telHref, mapHref, mapEmbedSrc } from "@/lib/content";
 import { SocialIcon } from "./SocialIcons";
 import { mediaUrl } from "@/lib/supabase/media";
 
@@ -53,7 +53,7 @@ export default async function Footer() {
               className="mt-5 block overflow-hidden rounded-xl border border-navy-700/60">
               <iframe
                 title="SSBWINGS location — Sector 62, Noida"
-                src="https://maps.google.com/maps?q=SSBWINGS%2C%20C-56%2F43%2C%20Sector%2062%2C%20Noida&ll=28.6150754%2C77.3672718&z=15&output=embed"
+                src={mapEmbedSrc(SITE)}
                 className="pointer-events-none h-36 w-full"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

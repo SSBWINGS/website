@@ -5,12 +5,14 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
+import { useImageCropper } from "./useImageCropper";
 
 const FOLDERS = ["library", "candidates", "testimonials", "mentors", "students", "services", "campus"];
 
 export default function MediaLibrary() {
   const supabase = createClient();
   const [folder, setFolder] = useState("library");
+  const { crop, cropperUi } = useImageCropper();
   const [files, setFiles] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
@@ -24,9 +26,14 @@ export default function MediaLibrary() {
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.files?.[0];
+    e.target.value = "";
     if (!raw) return;
+    // No fixed destination here, so the dialog offers a shape picker
+    // (defaulting to Original) alongside rotate.
+    const picked = await crop(raw);
+    if (!picked) return;
     setBusy(true);
-    const f = await compressImage(raw);
+    const f = await compressImage(picked);
     const path = `library/${Date.now()}-${f.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
     const { error } = await supabase.storage.from("media").upload(path, f, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type });
     setBusy(false);
@@ -44,6 +51,7 @@ export default function MediaLibrary() {
 
   return (
     <div className="mt-6 space-y-5">
+      {cropperUi}
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4">
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
           {busy ? "Uploading…" : "⬆ Upload image"}

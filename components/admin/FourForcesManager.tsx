@@ -6,11 +6,13 @@ import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
+import { useImageCropper, FRAMES } from "./useImageCropper";
 import type { FourForcesDoc, ForceCard } from "@/lib/four-forces";
 import { asArray } from "@/lib/shape";
 
 export default function FourForcesManager({ initial }: { initial: FourForcesDoc }) {
   const supabase = createClient();
+  const { crop, cropperUi } = useImageCropper();
   const [doc, setDoc] = useState<FourForcesDoc>(initial);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -20,9 +22,11 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
     setDoc((d) => ({ ...d, cards: asArray<ForceCard>(d.cards).map((c, j) => (j === i ? { ...c, ...patch } : c)) }));
 
   async function uploadImage(i: number, file: File) {
+    const picked = await crop(file, { aspect: FRAMES.force, label: "a Four Forces card" });
+    if (!picked) return;
     setBusy(true); setMsg(null);
     try {
-      const f = await compressImage(file);
+      const f = await compressImage(picked);
       const path = `four-forces/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.webp`;
       const { error } = await supabase.storage.from("media").upload(path, f, { cacheControl: MEDIA_CACHE_CONTROL, upsert: true, contentType: f.type });
       if (error) throw new Error(error.message);
@@ -46,6 +50,7 @@ export default function FourForcesManager({ initial }: { initial: FourForcesDoc 
 
   return (
     <div className="mt-6 space-y-6">
+      {cropperUi}
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="mb-3 text-base font-semibold text-slate-900">Section heading</h2>
         <div className="grid gap-3">

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CAMPUS_IMAGES } from "@/lib/homepage-defaults";
 import { asArray } from "@/lib/shape";
 import ImageListManager from "@/components/admin/ImageListManager";
+import { FRAMES } from "@/components/admin/useImageCropper";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,8 @@ export default async function CampusAdmin() {
         docKey="campus_images"
         label="Campus Gallery"
         folder="campus-gallery"
+        cropAspect={FRAMES.campus}
+        cropLabel="the campus gallery"
         note="Shown in a grid under the Courses section."
       />
     </div>

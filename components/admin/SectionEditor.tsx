@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
 import { mediaUrl, MEDIA_CACHE_CONTROL } from "@/lib/supabase/media";
 import { compressImage } from "@/lib/image-client";
+import { useImageCropper, FRAMES } from "./useImageCropper";
 import type { SectionDef, SectionField } from "@/lib/sections";
 import RichText from "./RichText";
 
@@ -32,6 +33,7 @@ function setPreviewCookie(on: boolean) {
 /** Renders a single field (text/rich/image/tags/repeater). */
 function FieldInput({ field, value, onChange }: { field: SectionField; value: unknown; onChange: (v: unknown) => void }) {
   const [uploading, setUploading] = useState(false);
+  const { crop, cropperUi } = useImageCropper();
 
   if (field.type === "text") {
     return <input value={(value as string) ?? ""} onChange={(e) => onChange(e.target.value)}
@@ -57,6 +59,7 @@ function FieldInput({ field, value, onChange }: { field: SectionField; value: un
     const path = value as string;
     return (
       <div className="flex items-center gap-3">
+        {cropperUi}
         {path && (
           <div className="relative h-14 w-24 shrink-0 overflow-hidden rounded-md bg-slate-100">
             <Image src={mediaUrl(path)} alt="" fill sizes="96px" className="object-cover" />
@@ -64,10 +67,15 @@ function FieldInput({ field, value, onChange }: { field: SectionField; value: un
         )}
         <input type="file" accept="image/*" disabled={uploading}
           onChange={async (e) => {
-            const file = e.target.files?.[0]; if (!file) return;
+            const file = e.target.files?.[0];
+            e.target.value = "";
+            if (!file) return;
+            // Section images are wide banners behind text.
+            const picked = await crop(file, { aspect: FRAMES.pageHero, label: field.label });
+            if (!picked) return;
             setUploading(true);
-            try { onChange(await uploadImage(file)); } catch (err) { alert(err instanceof Error ? err.message : "Upload failed"); }
-            finally { setUploading(false); e.target.value = ""; }
+            try { onChange(await uploadImage(picked)); } catch (err) { alert(err instanceof Error ? err.message : "Upload failed"); }
+            finally { setUploading(false); }
           }}
           className="text-sm file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-slate-700" />
         {uploading && <span className="text-xs text-slate-400">Uploading…</span>}

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { OFFICER_BANNERS } from "@/lib/data";
 import { asArray } from "@/lib/shape";
 import ImageListManager from "@/components/admin/ImageListManager";
+import { FRAMES } from "@/components/admin/useImageCropper";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,8 @@ export default async function OfficerBannersAdmin() {
         label="Now Serving — Alumni Banners"
         folder="officers"
         shape="wide"
+        cropAspect={FRAMES.officerBanner}
+        cropLabel="the Now Serving marquee"
         note="Use ← → to reorder and ✕ to remove. The list is split in half: the first half scrolls left, the second half scrolls right."
       />
     </div>

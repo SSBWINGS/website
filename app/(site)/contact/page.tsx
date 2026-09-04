@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import CmsHero from "@/components/CmsHero";
-import { getSettings, mapHref } from "@/lib/content";
+import { getSettings, mapHref, mapEmbedSrc } from "@/lib/content";
 import ContactSection from "@/components/ContactSection";
 import Faq from "@/components/Faq";
 
@@ -22,7 +22,7 @@ export default async function ContactPage() {
             className="photo-frame block overflow-hidden" aria-label="Open SSBWINGS on Google Maps">
             <iframe
               title={`${SITE.name} location — ${SITE.address}`}
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(SITE.address)}&z=16&output=embed`}
+              src={mapEmbedSrc(SITE)}
               className="pointer-events-none h-[380px] w-full rounded-xl"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
