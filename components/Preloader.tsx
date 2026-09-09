@@ -1,16 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 const WORD = "SSBWINGS";
 const MIN_SHOW_MS = 2900;
+/** Marks that this visit has already seen the intro. Session-scoped, so it
+ *  plays once when the site is opened and not again while browsing. */
+const SEEN_KEY = "ssbw:preloader-seen";
+
+/** Runs before paint in the browser, so a repeat visit never flashes the
+ *  preloader; falls back to useEffect during server rendering. */
+const useBeforePaint = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export default function Preloader({ lottie = true }: { lottie?: boolean }) {
   const [done, setDone] = useState(false);
   const [removed, setRemoved] = useState(false);
+  const [skip, setSkip] = useState(false);
+
+  // A hard reload or a link that leaves the app would otherwise replay the
+  // whole intro. Anything after the first page of a visit skips straight past
+  // it — but still announces itself, since the enquiry popup waits on that.
+  useBeforePaint(() => {
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem(SEEN_KEY) === "1";
+      sessionStorage.setItem(SEEN_KEY, "1");
+    } catch {
+      // Private mode or storage disabled — fall through and just play it.
+    }
+    if (!seen) return;
+    setSkip(true);
+    setDone(true);
+    setRemoved(true);
+    document.body.style.overflow = "";
+    // Deferred by a tick: this is a layout effect, so ModalProvider has not
+    // attached its listener yet and would miss the event, leaving the enquiry
+    // popup to its 5s fallback instead of its configured delay.
+    setTimeout(() => window.dispatchEvent(new Event("ssbw:loaded")), 0);
+  }, []);
 
   useEffect(() => {
+    if (skip) return;
     document.body.style.overflow = "hidden";
     const shownAt = performance.now();
 
@@ -37,7 +68,7 @@ export default function Preloader({ lottie = true }: { lottie?: boolean }) {
     return () => {
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [skip]);
 
   if (removed) return null;
 

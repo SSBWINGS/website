@@ -39,13 +39,24 @@ export default async function Footer() {
                 </li>
               ))}
               <li className="col-span-2">
-                <a
-                  href={brochureHref(SITE)}
-                  {...(brochureOn(SITE) ? { download: true } : {})}
-                  className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1"
-                >
-                  {brochureOn(SITE) ? "⬇ Download 2026 Brochure" : "📩 Request the 2026 Brochure"}
-                </a>
+                {brochureOn(SITE) ? (
+                  <a
+                    href={brochureHref(SITE)}
+                    download
+                    className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1"
+                  >
+                    ⬇ Download 2026 Brochure
+                  </a>
+                ) : (
+                  /* Link, not <a>: an internal <a> is a full document load,
+                     which remounts the app and replays the preloader. */
+                  <Link
+                    href={brochureHref(SITE)}
+                    className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1"
+                  >
+                    📩 Request the 2026 Brochure
+                  </Link>
+                )}
               </li>
             </ul>
           </nav>

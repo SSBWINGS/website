@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { SITE, BATCH_INFO, BOOKS, STATS } from "@/lib/data";
 
 type Link = { label: string; href: string; download?: boolean };
@@ -265,13 +266,25 @@ export default function ChatBot({
                         const label = isBrochure && !brochureOn ? "Request the brochure →" : l.label;
                         const download = isBrochure ? brochureOn && l.download : l.download;
                         const external = href.startsWith("http");
+                        const cls =
+                          "rounded-lg bg-saffron-500 px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wide text-white transition hover:brightness-105";
+                        // Internal routes go through Link. As plain anchors they
+                        // were full document loads, so every chatbot suggestion
+                        // reloaded the app and replayed the preloader.
+                        if (!external && !download) {
+                          return (
+                            <Link key={l.label} href={href} onClick={() => setOpen(false)} className={cls}>
+                              {label}
+                            </Link>
+                          );
+                        }
                         return (
                           <a
                             key={l.label}
                             href={href}
                             {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                             {...(download ? { download: true } : {})}
-                            className="rounded-lg bg-saffron-500 px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wide text-white transition hover:brightness-105"
+                            className={cls}
                           >
                             {label}
                           </a>

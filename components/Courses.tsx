@@ -37,14 +37,20 @@ export default async function Courses({ heading = true }: { heading?: boolean })
         )}
 
         <div className="mt-8 flex justify-center">
-          <a href={brochureHref(SITE)} {...(brochureOn(SITE) ? { download: true } : {})} className="btn btn-outline btn-shine">
-            {brochureOn(SITE) && (
+          {brochureOn(SITE) ? (
+            <a href={brochureHref(SITE)} download className="btn btn-outline btn-shine">
               <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
                 <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            )}
-            {brochureOn(SITE) ? "Download 2026 Brochure (PDF)" : "Request the 2026 Brochure"}
-          </a>
+              Download 2026 Brochure (PDF)
+            </a>
+          ) : (
+            /* Link, not <a>: an internal <a> is a full document load, which
+               remounts the app and replays the preloader. */
+            <Link href={brochureHref(SITE)} className="btn btn-outline btn-shine">
+              Request the 2026 Brochure
+            </Link>
+          )}
         </div>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-3">
