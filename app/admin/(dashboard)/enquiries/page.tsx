@@ -7,7 +7,7 @@ export default async function EnquiriesPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("enquiries")
-    .select("id, name, email, phone, entry, message, source, status, notes, created_at")
+    .select("id, name, email, phone, entry, message, source, status, notes, meta, created_at")
     .order("created_at", { ascending: false })
     .limit(500);
 

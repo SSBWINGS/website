@@ -85,9 +85,9 @@ export default async function Courses({ heading = true }: { heading?: boolean })
                   ))}
                 </ul>
 
-                {c.enrollUrl ? (
+                {c.enrollUrl || c.ctaUrl ? (
                   <a
-                    href={c.enrollUrl}
+                    href={c.enrollUrl ?? c.ctaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`btn btn-shine mt-8 w-full ${c.highlight ? "btn-saffron" : "btn-ink"}`}

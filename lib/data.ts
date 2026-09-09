@@ -266,7 +266,10 @@ export type CourseItem = {
   desc: string;
   features: string[];
   cta: string;
+  /** Razorpay checkout — also shows the secure-payment note. */
   enrollUrl?: string;
+  /** External destination that is not a payment page (e.g. the Play Store). */
+  ctaUrl?: string;
   image?: { src: string; alt: string };
 };
 
@@ -326,6 +329,8 @@ export const COURSES: CourseItem[] = [
       "Curated study material & real SSB data",
     ],
     cta: "Get the App",
+    ctaUrl:
+      "https://play.google.com/store/apps/details?id=com.ssbwings.smartlearning&pcampaignid=web_share",
   },
 ];
 

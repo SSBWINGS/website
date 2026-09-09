@@ -14,7 +14,15 @@ export type Enquiry = {
   source: string;
   status: Status;
   notes: string | null;
+  /** Extra answers the form collected — preferred batch, current status. */
+  meta: Record<string, unknown> | null;
   created_at: string;
+};
+
+/** Read one extra answer off an enquiry's meta blob. */
+const extra = (r: Enquiry, key: string) => {
+  const v = r.meta?.[key];
+  return typeof v === "string" && v.trim() ? v : "";
 };
 
 const STATUSES: Status[] = ["new", "contacted", "enrolled", "dropped"];
@@ -69,12 +77,14 @@ export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
   }
 
   function exportCsv() {
-    const header = ["Date", "Name", "Email", "Phone", "Entry", "Source", "Status", "Message", "Notes"];
+    const header = ["Date", "Name", "Email", "Phone", "Entry", "Batch", "Current status", "Source", "Status", "Message", "Notes"];
     const lines = [header.join(",")].concat(
       visible.map((r) =>
         [
           new Date(r.created_at).toLocaleString(),
-          r.name, r.email, r.phone ?? "", r.entry ?? "", r.source, r.status, r.message ?? "", r.notes ?? "",
+          r.name, r.email, r.phone ?? "", r.entry ?? "",
+          extra(r, "batch"), extra(r, "status"),
+          r.source, r.status, r.message ?? "", r.notes ?? "",
         ].map((v) => csvCell(String(v))).join(","),
       ),
     );
@@ -124,7 +134,7 @@ export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
                   <td className="px-4 py-3">
                     <button onClick={() => setOpenId(openId === r.id ? null : r.id)} className="text-left">
                       <span className="font-semibold text-slate-900">{r.name}</span>
-                      <span className="block text-xs text-slate-500">{r.email}{r.phone ? ` · ${r.phone}` : ""}</span>
+                      <span className="block text-xs text-slate-500">{[r.email, r.phone].filter(Boolean).join(" · ") || "—"}</span>
                     </button>
                   </td>
                   <td className="px-4 py-3 text-slate-600">{r.entry || "—"}</td>
@@ -143,12 +153,38 @@ export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
                 {openId === r.id && (
                   <tr>
                     <td colSpan={6} className="bg-slate-50 px-4 py-4">
+                      {(extra(r, "batch") || extra(r, "status")) && (
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {extra(r, "batch") && (
+                            <span className="rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-slate-200">
+                              <b className="text-slate-500">Batch:</b> {extra(r, "batch")}
+                            </span>
+                          )}
+                          {extra(r, "status") && (
+                            <span className="rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-slate-200">
+                              <b className="text-slate-500">Current status:</b> {extra(r, "status")}
+                            </span>
+                          )}
+                        </div>
+                      )}
                       {r.message && <p className="mb-3 rounded-lg bg-white p-3 text-sm text-slate-700"><span className="font-semibold text-slate-500">Message: </span>{r.message}</p>}
                       <label className="mb-1 block text-xs font-medium text-slate-500">Internal notes</label>
                       <textarea defaultValue={r.notes ?? ""} onBlur={(e) => saveNotes(r.id, e.target.value)} rows={2}
                         placeholder="Add a note (saved on blur)…"
                         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500" />
-                      <a href={`mailto:${r.email}`} className="mt-2 inline-block text-xs font-medium text-blue-600 hover:underline">Reply by email →</a>
+                      <div className="mt-2 flex flex-wrap gap-4">
+                        {r.email && (
+                          <a href={`mailto:${r.email}`} className="text-xs font-medium text-blue-600 hover:underline">Reply by email →</a>
+                        )}
+                        {r.phone && (
+                          <>
+                            <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`} className="text-xs font-medium text-blue-600 hover:underline">Call →</a>
+                            <a href={`https://wa.me/${r.phone.replace(/\D/g, "").replace(/^0+/, "").replace(/^(?!91)/, "91")}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className="text-xs font-medium text-green-700 hover:underline">WhatsApp →</a>
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )}

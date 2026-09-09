@@ -47,7 +47,12 @@ export async function notifyAdmin(opts: {
   footer?: string;
 }): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
+  if (!apiKey) {
+    // Loud on purpose: without this the lead is saved but nobody is told, and
+    // the only symptom is an inbox that never fills up.
+    console.error("RESEND_API_KEY is not set — lead saved but no email sent:", opts.subject);
+    return false;
+  }
   try {
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
