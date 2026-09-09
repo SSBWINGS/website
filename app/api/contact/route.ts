@@ -4,7 +4,14 @@ import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { saveEnquiry } from "@/lib/enquiries";
 import { getPublished } from "@/lib/content";
 import { notifyAdmin, emailShell, escapeHtml } from "@/lib/mailer";
-import { CONTACT_FORM, resolveContactForm, type ContactFieldKey } from "@/lib/form-defaults";
+import {
+  CONTACT_FORM,
+  fullPhone,
+  isValidPhone,
+  phoneDigits,
+  resolveContactForm,
+  type ContactFieldKey,
+} from "@/lib/form-defaults";
 
 export const runtime = "nodejs";
 
@@ -43,7 +50,10 @@ export async function POST(req: Request) {
 
   const name = body.name?.trim() ?? "";
   const email = body.email?.trim() ?? "";
-  const phone = body.phone?.trim() ?? "";
+  // Normalise whatever arrives to the 10 national digits, so a number is
+  // validated and stored identically however it was typed or pasted.
+  const phoneNational = phoneDigits(body.phone ?? "");
+  const phone = fullPhone(phoneNational);
   const entry = body.entry?.trim() ?? "";
   const batch = body.batch?.trim().slice(0, 120) ?? "";
   const currentStatus = body.status?.trim().slice(0, 120) ?? "";
@@ -73,8 +83,11 @@ export async function POST(req: Request) {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email." }, { status: 400 });
   }
-  if (phone && !/^[0-9+\-\s]{10,15}$/.test(phone)) {
-    return NextResponse.json({ error: "Please enter a valid phone number." }, { status: 400 });
+  if (phoneNational && !isValidPhone(phoneNational)) {
+    return NextResponse.json(
+      { error: "Please enter a valid 10-digit mobile number." },
+      { status: 400 },
+    );
   }
   if (message.length > 2000) {
     return NextResponse.json({ error: "Message is too long." }, { status: 400 });

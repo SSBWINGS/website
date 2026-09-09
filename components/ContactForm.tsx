@@ -4,6 +4,10 @@ import { useState, type FormEvent } from "react";
 import { SITE } from "@/lib/data";
 import {
   CONTACT_FORM,
+  PHONE_DIAL_CODE,
+  fullPhone,
+  isValidPhone,
+  phoneDigits,
   type ContactField,
   type ContactFormDoc,
 } from "@/lib/form-defaults";
@@ -20,11 +24,16 @@ export default function ContactForm({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  /** Just the 10 national digits — the +91 is printed beside the box. */
+  const [phoneVal, setPhoneVal] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
+    // Send the full international number, not the digits shown in the box.
+    if ("phone" in data) data.phone = fullPhone(phoneVal);
     setStatus("sending");
     setErrorMsg("");
     try {
@@ -37,6 +46,8 @@ export default function ContactForm({
       if (!res.ok) throw new Error(json.error || "Something went wrong.");
       setStatus("success");
       form.reset();
+      setPhoneVal("");
+      setPhoneTouched(false);
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
@@ -100,8 +111,34 @@ export default function ContactForm({
         {phone && (
           <div>
             <Label f={phone} />
-            <input id="cf-phone" name="phone" type="tel" required={phone.required} pattern="[0-9+\-\s]{10,15}"
-              placeholder={phone.placeholder} className="field" />
+            {/* The dial code is fixed and shown, not typed — one less thing to
+                get wrong, and every stored number ends up in the same shape. */}
+            <div className="flex">
+              <span className="flex shrink-0 items-center rounded-l-[0.6rem] border border-r-0 border-[rgba(43,36,22,0.18)] bg-[rgba(43,36,22,0.06)] px-3 font-semibold text-ink-soft">
+                {PHONE_DIAL_CODE}
+              </span>
+              <input
+                id="cf-phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel-national"
+                maxLength={10}
+                required={phone.required}
+                value={phoneVal}
+                onChange={(e) => setPhoneVal(phoneDigits(e.target.value))}
+                onBlur={() => setPhoneTouched(true)}
+                pattern="[6-9][0-9]{9}"
+                title="Enter a 10-digit Indian mobile number starting with 6, 7, 8 or 9"
+                placeholder={phone.placeholder}
+                className="field rounded-l-none"
+              />
+            </div>
+            {phoneTouched && phoneVal && !isValidPhone(phoneVal) && (
+              <p className="mt-1 text-xs font-medium text-saffron-700">
+                Enter a 10-digit mobile number starting with 6, 7, 8 or 9.
+              </p>
+            )}
           </div>
         )}
         {email && (
@@ -127,7 +164,7 @@ export default function ContactForm({
       {/* Honeypot */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 opacity-0" />
 
-      <button type="submit" disabled={status === "sending"} className="btn btn-saffron btn-shine w-full text-base disabled:opacity-60">
+      <button type="submit" disabled={status === "sending" || (Boolean(phoneVal) && !isValidPhone(phoneVal))} className="btn btn-saffron btn-shine w-full text-base disabled:opacity-60">
         {status === "sending" ? (
           <>
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden />

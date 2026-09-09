@@ -70,7 +70,7 @@ export const STATUS_OPTIONS: string[] = ["Fresher (first attempt)", "Repeater (a
 export const CONTACT_FORM: ContactFormDoc = {
   fields: [
     { key: "name", label: "Full Name", placeholder: "e.g. Arjun Singh", required: true, enabled: true },
-    { key: "phone", label: "Phone", placeholder: "+91 XXXXX XXXXX", required: true, enabled: true },
+    { key: "phone", label: "Phone", placeholder: "98765 43210", required: true, enabled: true },
     { key: "email", label: "Email", placeholder: "you@example.com", required: true, enabled: true },
     { key: "entry", label: "Target Entry", placeholder: "Select your entry", required: true, enabled: true },
     { key: "batch", label: "Preferred Batch", placeholder: "Select a batch", required: true, enabled: true },
@@ -120,3 +120,32 @@ export function resolveContactForm(saved: unknown): ContactFormDoc {
     privacyNote: text(doc.privacyNote, CONTACT_FORM.privacyNote),
   };
 }
+
+/* ── Phone handling ───────────────────────────────────────────────────────
+   The academy serves Indian aspirants, so the dial code is fixed and shown
+   as a prefix rather than typed. Visitors enter the 10 national digits only;
+   everything stored, emailed and validated uses the full +91 form. */
+
+export const PHONE_DIAL_CODE = "+91";
+
+/**
+ * Reduce anything typed or pasted to at most 10 national digits.
+ * Tolerates the formats people actually paste — "+91 98765 43210",
+ * "091-98765-43210", "(+91) 9876543210" — so a paste is never rejected for
+ * repeating the country code the field already shows.
+ */
+export function phoneDigits(raw: string): string {
+  let d = (raw ?? "").replace(/\D/g, "");
+  d = d.replace(/^0+/, "");
+  // Only strip a leading 91 when digits remain beyond a full local number,
+  // so a genuine number starting "91…" is left alone.
+  if (d.startsWith("91") && d.length > 10) d = d.slice(2);
+  return d.slice(0, 10);
+}
+
+/** Indian mobile numbers are exactly 10 digits and begin 6, 7, 8 or 9. */
+export const isValidPhone = (digits: string): boolean => /^[6-9]\d{9}$/.test(digits);
+
+/** The form the number is stored and emailed in. */
+export const fullPhone = (digits: string): string =>
+  digits ? `${PHONE_DIAL_CODE}${digits}` : "";
