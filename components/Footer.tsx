@@ -1,9 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/data";
-import { getSettings, telHref, mapHref, mapEmbedSrc } from "@/lib/content";
+import { getSettings, telHref, mapHref, mapEmbedSrc, brochureHref, brochureOn } from "@/lib/content";
 import { SocialIcon } from "./SocialIcons";
-import { mediaUrl } from "@/lib/supabase/media";
 
 export default async function Footer() {
   const SITE = await getSettings();
@@ -40,8 +39,12 @@ export default async function Footer() {
                 </li>
               ))}
               <li className="col-span-2">
-                <a href={mediaUrl(SITE.brochure)} download className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1">
-                  ⬇ Download 2026 Brochure
+                <a
+                  href={brochureHref(SITE)}
+                  {...(brochureOn(SITE) ? { download: true } : {})}
+                  className="inline-block font-semibold text-gold-300 transition-all duration-200 hover:translate-x-1"
+                >
+                  {brochureOn(SITE) ? "⬇ Download 2026 Brochure" : "📩 Request the 2026 Brochure"}
                 </a>
               </li>
             </ul>

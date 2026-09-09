@@ -2,12 +2,12 @@ import PreloaderSection from "@/components/PreloaderSection";
 import Cursor from "@/components/Cursor";
 import ModalProvider from "@/components/ModalProvider";
 import { CONTACT_FORM, resolveContactForm } from "@/lib/form-defaults";
-import { getSettings } from "@/lib/content";
-import { mediaUrl } from "@/lib/supabase/media";
+import { getSettings, telHref, brochureHref, brochureOn } from "@/lib/content";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ChatBot from "@/components/ChatBot";
+import CallButton from "@/components/CallButton";
 import BackToTop from "@/components/BackToTop";
 import PageViewTracker from "@/components/PageViewTracker";
 import PreviewBar from "@/components/PreviewBar";
@@ -58,7 +58,8 @@ export default async function SiteLayout({ children }: Readonly<{ children: Reac
         {children}
         <Footer />
         <WhatsAppButton />
-        <ChatBot brochure={mediaUrl(settings.brochure)} />
+        <CallButton href={telHref(settings.phone1)} number={settings.phone1} />
+        <ChatBot brochure={brochureHref(settings)} brochureOn={brochureOn(settings)} />
         <BackToTop />
         <PreviewBar />
       </ModalProvider>

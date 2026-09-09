@@ -161,7 +161,10 @@ function answer(input: string): Msg {
   };
 }
 
-export default function ChatBot({ brochure = SITE.brochure }: { brochure?: string } = {}) {
+export default function ChatBot({
+  brochure = SITE.brochure,
+  brochureOn = true,
+}: { brochure?: string; brochureOn?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [input, setInput] = useState("");
@@ -255,17 +258,22 @@ export default function ChatBot({ brochure = SITE.brochure }: { brochure?: strin
                   {m.links && (
                     <div className="mt-2 flex flex-col gap-1.5">
                       {m.links.map((l) => {
-                        const href = l.href === BROCHURE_TOKEN ? brochure : l.href;
+                        // With downloads switched off the brochure link goes
+                        // to the contact form, so the label must not promise a PDF.
+                        const isBrochure = l.href === BROCHURE_TOKEN;
+                        const href = isBrochure ? brochure : l.href;
+                        const label = isBrochure && !brochureOn ? "Request the brochure →" : l.label;
+                        const download = isBrochure ? brochureOn && l.download : l.download;
                         const external = href.startsWith("http");
                         return (
                           <a
                             key={l.label}
                             href={href}
                             {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                            {...(l.download ? { download: true } : {})}
+                            {...(download ? { download: true } : {})}
                             className="rounded-lg bg-saffron-500 px-3 py-1.5 text-center text-xs font-bold uppercase tracking-wide text-white transition hover:brightness-105"
                           >
-                            {l.label}
+                            {label}
                           </a>
                         );
                       })}

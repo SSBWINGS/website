@@ -3,8 +3,7 @@ import Link from "next/link";
 import Reveal from "./Reveal";
 import CmsSectionHeading from "./CmsSectionHeading";
 import { COURSES } from "@/lib/data";
-import { mediaUrl } from "@/lib/supabase/media";
-import { getPublished, getSettings } from "@/lib/content";
+import { getPublished, getSettings, brochureHref, brochureOn } from "@/lib/content";
 import { COURSES_NOTE, COURSES_OPTIONS, type CoursesOptions } from "@/lib/homepage-defaults";
 
 // Fields an admin may safely edit; payment URL, button, styling & image stay in code.
@@ -38,11 +37,13 @@ export default async function Courses({ heading = true }: { heading?: boolean })
         )}
 
         <div className="mt-8 flex justify-center">
-          <a href={mediaUrl(SITE.brochure)} download className="btn btn-outline btn-shine">
-            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
-              <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Download 2026 Brochure (PDF)
+          <a href={brochureHref(SITE)} {...(brochureOn(SITE) ? { download: true } : {})} className="btn btn-outline btn-shine">
+            {brochureOn(SITE) && (
+              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+                <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+            {brochureOn(SITE) ? "Download 2026 Brochure (PDF)" : "Request the 2026 Brochure"}
           </a>
         </div>
 

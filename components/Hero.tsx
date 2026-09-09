@@ -115,7 +115,7 @@ export default function Hero({
                 <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </Link>
-            <Link href={content.secondaryCtaHref || HERO.secondaryCtaHref} className="btn btn-ink btn-shine hero-btn">
+            <Link href={content.secondaryCtaHref || HERO.secondaryCtaHref} className="btn btn-ink btn-shine btn-pulse hero-btn">
               {content.secondaryCta || HERO.secondaryCta}
             </Link>
           </div>

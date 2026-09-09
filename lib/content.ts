@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { SITE } from "@/lib/data";
+import { mediaUrl } from "@/lib/supabase/media";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { coerceShape } from "@/lib/shape";
 
@@ -45,6 +46,14 @@ export async function getSettings(): Promise<SiteSettings> {
 
 /** tel: href from a display phone number. */
 export const telHref = (p: string) => `tel:${(p || "").replace(/[^\d+]/g, "")}`;
+
+/** Is the brochure available to download? */
+export const brochureOn = (s: { brochureEnabled?: string }) => s.brochureEnabled !== "off";
+
+/** Where a "download the brochure" link should point. With downloads switched
+ *  off the academy would rather talk first, so it goes to the contact form. */
+export const brochureHref = (s: { brochureEnabled?: string; brochure?: string }) =>
+  brochureOn(s) ? mediaUrl(s.brochure ?? "") : "/contact";
 
 /** Google Maps link for the academy. Falls back to a search on the address
  *  itself so the link still works if the admin clears the map URL. */

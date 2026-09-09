@@ -80,6 +80,20 @@ export default function SettingsEditor({ initial }: { initial: Record<string, st
         <p className="mt-0.5 text-xs text-slate-500">
           Linked from the footer, the Courses page and the chatbot. Uploading a new file replaces it everywhere.
         </p>
+        <label className="mt-3 flex items-center gap-2 text-sm font-medium text-slate-700">
+          <input
+            type="checkbox"
+            checked={(form.brochureEnabled ?? "on") !== "off"}
+            onChange={(e) => setForm((s2) => ({ ...s2, brochureEnabled: e.target.checked ? "on" : "off" }))}
+            className="h-4 w-4"
+          />
+          Allow visitors to download the brochure
+        </label>
+        <p className="mb-3 mt-0.5 text-xs text-slate-500">
+          When this is off, every “Download brochure” link on the site sends the visitor to the
+          <b> contact form</b> instead, so you can send it to them yourself. The file below is kept either way.
+        </p>
+
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
             {busy ? "Working…" : "⬆ Upload new brochure"}

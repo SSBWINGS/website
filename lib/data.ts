@@ -22,6 +22,8 @@ export const SITE = {
   telegram: "https://t.me/ssbwings",
   url: "https://www.ssbwings.com",
   brochure: "/SSB-Wings-Brochure-2026.pdf",
+  /** "off" hides the download and sends those links to the contact page. */
+  brochureEnabled: "on",
   enrollOffline: "https://pages.razorpay.com/ssbwings",
   enrollOnline: "https://pages.razorpay.com/ssbwingsonlinebatch",
 };
