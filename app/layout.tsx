@@ -27,7 +27,6 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "SSBWINGS" }],
   creator: "SSBWINGS",
-  alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     locale: "en_IN",

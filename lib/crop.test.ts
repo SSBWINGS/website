@@ -26,7 +26,7 @@ test("cover fills the frame, contain fits inside it", () => {
 
 test("minimum zoom shows the whole image, and is 1 when shapes already match", () => {
   assert.ok(minZoom(wide) < 1, "a 4:3 photo in a 3:1 frame can be zoomed out");
-  close(minZoom({ imageW: 900, imageH: 300, viewW: 600, viewH: 200, zoom: 1, offsetX: 0, offsetY: 0 }), 1);
+  close(minZoom({ imageW: 900, imageH: 300, viewW: 600, viewH: 200 }), 1);
 });
 
 test("at zoom 1 the image covers the frame with nothing showing through", () => {

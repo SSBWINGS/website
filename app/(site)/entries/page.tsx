@@ -9,6 +9,8 @@ import { JOIN_ROUTES } from "@/lib/data";
 import { getPublished } from "@/lib/content";
 import { mediaUrl } from "@/lib/supabase/media";
 import { GATEWAYS as GATEWAYS_DEFAULT } from "@/lib/section-defaults";
+import Link from "next/link";
+import { ROUTE_SLUGS } from "@/lib/entry-pages";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("entries");
@@ -88,7 +90,17 @@ export default async function EntriesPage() {
                   <Reveal key={r.name} delay={(i % 2) * 90}>
                     <article className="skeu-panel card-lift flex h-full flex-col p-5">
                       <div className="flex items-start justify-between gap-3">
-                        <h3 className="font-display text-lg font-bold uppercase leading-tight text-ink">{r.name}</h3>
+                        <h3 className="font-display text-lg font-bold uppercase leading-tight text-ink">
+                          {/* Each card links to its entry's own page. Identical at
+                              rest; the hover colour just signals it is a link. */}
+                          {ROUTE_SLUGS[r.name] ? (
+                            <Link href={`/entries/${ROUTE_SLUGS[r.name]}`} className="transition-colors hover:text-saffron-700">
+                              {r.name}
+                            </Link>
+                          ) : (
+                            r.name
+                          )}
+                        </h3>
                         <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide shadow-[var(--shadow-raised)] ${STAGE_STYLE[r.stage]}`}>
                           {r.stage}
                         </span>

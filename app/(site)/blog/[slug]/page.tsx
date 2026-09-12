@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { mediaUrl } from "@/lib/supabase/media";
+import JsonLd from "@/components/JsonLd";
+import { ORG_ID, SITE_URL, breadcrumbLd, plainText } from "@/lib/jsonld";
 
 export const dynamic = "force-dynamic";
 
@@ -34,10 +36,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} — SSBWINGS`,
     description,
+    ...(post.tag ? { keywords: [post.tag, `${post.tag} SSB`, "SSB tips", "SSB preparation"] } : {}),
+    alternates: { canonical: `/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description,
       type: "article",
+      url: `/blog/${post.slug}`,
+      ...(post.published_at ? { publishedTime: post.published_at } : {}),
+      ...(post.author ? { authors: [post.author] } : {}),
       images: post.cover_path ? [mediaUrl(post.cover_path)] : undefined,
     },
   };
@@ -50,6 +57,30 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
   return (
     <main className="bg-[#faf6ec]">
+      <JsonLd
+        data={[
+          breadcrumbLd([
+            { name: "Blog", path: "/blog" },
+            { name: post.title, path: `/blog/${post.slug}` },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.excerpt || plainText(post.body).slice(0, 200),
+            url: `${SITE_URL}/blog/${post.slug}`,
+            mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+            inLanguage: "en-IN",
+            ...(post.published_at ? { datePublished: post.published_at } : {}),
+            ...(post.cover_path ? { image: mediaUrl(post.cover_path) } : {}),
+            ...(post.tag ? { articleSection: post.tag, keywords: post.tag } : {}),
+            author: post.author
+              ? { "@type": "Person", name: post.author }
+              : { "@type": "Organization", "@id": ORG_ID, name: "SSBWINGS" },
+            publisher: { "@type": "Organization", "@id": ORG_ID, name: "SSBWINGS", logo: `${SITE_URL}/logo.webp` },
+          },
+        ]}
+      />
       <article className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
         <nav className="mb-6 text-xs font-semibold uppercase tracking-wider text-slate-500">
           <Link href="/blog" className="hover:text-[#b8860b]">← Back to blog</Link>
