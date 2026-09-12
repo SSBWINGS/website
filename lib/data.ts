@@ -101,11 +101,13 @@ export const ENTRIES = [
   "SSC (Tech) – Men & Women",
   "NCC Special Entry",
   "JAG (Judge Advocate General)",
+  "RVC (Remount & Veterinary Corps)",
   // Navy — after graduation
   "CDS – INA (Navy)",
   "SSC Executive – GS(X) & Technical",
   "SSC Pilot / Observer",
-  "SSC Logistics / ATC / Education / Law",
+  "SSC Logistics / ATC / Education",
+  "JAG (Navy) – Law Cadre",
   // Air Force — after graduation
   "CDS – AFA (Air Force Academy)",
   "AFCAT – Flying Branch",
@@ -120,6 +122,9 @@ export const ENTRIES = [
   "ACC (Army Cadet College)",
   "SCO (Special Commissioned Officer)",
   "PC (SL) – Permanent Commission",
+  "AMC (NT) – Army Medical Corps (Non-Tech)",
+  "Navy (CW) – Commission Worthy",
+  "Navy (HET) – Higher Educational Test",
 ];
 
 // Short single-line labels for the compact footer list (24 → 2 columns × 12 rows).
@@ -141,12 +146,17 @@ export const ENTRIES_SHORT = [
   "AFCAT GD (N-Tech)",
   "Meteorology",
   "NCC Special",
-  "JAG",
+  "JAG (Army)",
+  "JAG (Navy)",
+  "RVC",
   "ICG AC – GD",
   "ICG AC – Pilot/Nav",
   "ICG AC – Tech",
   "ACC & SCO",
   "PC (SL)",
+  "AMC (NT)",
+  "Navy (CW)",
+  "Navy (HET)",
 ];
 
 // All India Rank 1 highlights for the homepage marquee (CMS-overridable via the
@@ -495,10 +505,12 @@ export const JOIN_ROUTES: {
       { name: "CDS – IMA", stage: "After Graduation", who: "Unmarried men, 19–24 yrs. Any graduate.", how: "UPSC CDS written → SSB → Medical", commission: "Permanent · IMA Dehradun" },
       { name: "CDS – OTA (SSC)", stage: "After Graduation", who: "Men & women, 19–25 yrs. Any graduate.", how: "UPSC CDS written → SSB → Medical", commission: "Short Service · OTA Chennai" },
       { name: "TGC (Technical Graduate Course)", stage: "After Graduation", who: "Unmarried men, 20–27 yrs. Engineering degree.", how: "Shortlist on merit → SSB → Medical", commission: "Permanent · IMA" },
-      { name: "SSC (Tech) – Men & Women", stage: "After Graduation", who: "Men & women, 20–27 yrs. Engineering degree.", how: "Shortlist on merit → SSB → Medical", commission: "Short Service · OTA" },
+      { name: "SSC (Tech) – Men & Women", stage: "After Graduation", who: "Unmarried men & women, 20–27 yrs. Engineering degree.", how: "Shortlist on merit → SSB → Medical", commission: "Short Service · OTA" },
       { name: "NCC Special Entry", stage: "After Graduation", who: "Men & women with NCC 'C' certificate (min B grade).", how: "NCC Directorate slot → SSB → Medical (no written)", commission: "Short Service · OTA" },
-      { name: "JAG (Judge Advocate General)", stage: "After Graduation", who: "Men & women, 21–27 yrs. LLB (min 55%).", how: "Shortlist → SSB → Medical", commission: "Short Service · OTA" },
+      { name: "JAG (Judge Advocate General)", stage: "After Graduation", who: "Unmarried men & women, 21–27 yrs. LLB (min 55%).", how: "Shortlist → SSB → Medical", commission: "Short Service · OTA" },
+      { name: "RVC (Remount & Veterinary Corps)", stage: "After Graduation", who: "Men & women, 21–32 yrs. BVSc / BVSc & AH with internship completed.", how: "Shortlist → SSB → Medical", commission: "Short Service · commissioned as Captain" },
       { name: "ACC & SCO", stage: "For Serving Personnel", who: "Serving soldiers of the Army meeting service & education criteria.", how: "Departmental written exam → SSB → Medical", commission: "Permanent · via ACC / direct" },
+      { name: "AMC (NT) – Army Medical Corps (Non-Tech)", stage: "For Serving Personnel", who: "Serving AMC / ADC soldiers, 28–42 yrs, 5+ yrs' service, 10+2 with Biology.", how: "Unit screening → SSB → Medical (written exam for PC)", commission: "Short Service or Permanent · AMC" },
     ],
   },
   {
@@ -511,12 +523,15 @@ export const JOIN_ROUTES: {
     intro: "Command warships, fly naval aircraft or run the technical backbone of the fleet — the Navy commissions officers across executive, technical and specialist branches.",
     routes: [
       { name: "NDA (Naval)", stage: "After 10+2", who: "Unmarried men & women, 16½–19½ yrs. 10+2 with PCM.", how: "UPSC written → SSB → Medical", commission: "Permanent · NDA then INA" },
-      { name: "10+2 (B.Tech) Cadet Entry", stage: "After 10+2", who: "Unmarried men, 10+2 PCM (min 70%) with valid JEE Mains.", how: "Shortlist on JEE Mains → SSB → Medical", commission: "Permanent · 4-yr B.Tech at INA" },
+      { name: "10+2 (B.Tech) Cadet Entry", stage: "After 10+2", who: "Unmarried men & women, 10+2 PCM (min 70%) with valid JEE Mains.", how: "Shortlist on JEE Mains → SSB → Medical", commission: "Permanent · 4-yr B.Tech at INA" },
       { name: "CDS (Navy)", stage: "After Graduation", who: "Unmarried men, 19–24 yrs. Engineering degree.", how: "UPSC CDS written → SSB → Medical", commission: "Permanent · INA" },
       { name: "SSC Executive (GS/X) & Technical", stage: "After Graduation", who: "Men & women. Graduates / engineering graduates.", how: "Shortlist on eligibility → SSB → Medical", commission: "Short Service" },
       { name: "SSC Pilot / Observer", stage: "After Graduation", who: "Men & women graduates meeting flying standards.", how: "SSB → PABT (Pilot Aptitude) → Medical", commission: "Short Service · Aviation" },
-      { name: "SSC Logistics / ATC / Education / Law", stage: "After Graduation", who: "Men & women with the relevant degree.", how: "Shortlist → SSB → Medical", commission: "Short Service · Specialist" },
+      { name: "SSC Logistics / ATC / Education", stage: "After Graduation", who: "Men & women with the relevant degree.", how: "Shortlist → SSB → Medical", commission: "Short Service · Specialist" },
+      { name: "JAG (Navy) – Law Cadre", stage: "After Graduation", who: "Unmarried men & women, 22–27 yrs. Law degree (min 55%) from a Bar Council-recognised college.", how: "Shortlist → SSB → Medical", commission: "Short Service · INA Ezhimala" },
       { name: "NCC Special Entry (Navy)", stage: "After Graduation", who: "Graduates with NCC (Naval Wing) 'C' certificate.", how: "NCC slot → SSB → Medical", commission: "Short Service" },
+      { name: "Navy (CW) – Commission Worthy", stage: "For Serving Personnel", who: "Serving sailors, 10+2 with Physics & Maths. Non-artificers under 22½, artificers under 24.", how: "Preliminary Screening Board → written exam → SSB → Medical", commission: "Commissioned as Sub Lieutenant" },
+      { name: "Navy (HET) – Higher Educational Test", stage: "For Serving Personnel", who: "Serving sailors who qualify in the Higher Educational Test.", how: "HET → commission scheme screening → SSB → Medical", commission: "Commission via sailor-to-officer scheme" },
     ],
   },
   {

@@ -9,6 +9,7 @@ const EDU: { v: Education; label: string }[] = [
   { v: "engineering", label: "Engineering" },
   { v: "law", label: "Law (LLB)" },
   { v: "postgraduate", label: "Post-graduate" },
+  { v: "veterinary", label: "Veterinary (BVSc)" },
 ];
 
 export default function EligibilityFinder() {

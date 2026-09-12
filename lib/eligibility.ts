@@ -12,7 +12,7 @@
 
 export type Gender = "male" | "female";
 export type Marital = "unmarried" | "married";
-export type Education = "10+2" | "graduate" | "engineering" | "law" | "postgraduate";
+export type Education = "10+2" | "graduate" | "engineering" | "law" | "postgraduate" | "veterinary";
 
 export type EligibilityInput = {
   age: number;
@@ -43,7 +43,8 @@ export type Entry = {
 };
 
 // engineering graduates also satisfy a plain "graduate" requirement
-const gradOk = (e: Education) => e === "graduate" || e === "engineering" || e === "postgraduate" || e === "law";
+const gradOk = (e: Education) =>
+  e === "graduate" || e === "engineering" || e === "postgraduate" || e === "law" || e === "veterinary";
 
 export const ENTRIES: Entry[] = [
   // ── After 10+2 ────────────────────────────────────────────────────────────
@@ -72,7 +73,18 @@ export const ENTRIES: Entry[] = [
   { id: "ncc-army", name: "NCC Special Entry", service: "Army", stage: "After Graduation", minAge: 19, maxAge: 25, genders: ["male", "female"], education: ["graduate", "engineering", "postgraduate"], requiresUnmarried: true, how: "Needs NCC 'C' certificate → SSB → Medical (no written)" },
   { id: "navy-ssc-exec", name: "SSC Executive – GS(X) & Technical (Navy)", service: "Navy", stage: "After Graduation", minAge: 19, maxAge: 25, genders: ["male", "female"], education: ["graduate", "engineering"], requiresUnmarried: true, how: "Shortlist on eligibility → SSB → Medical" },
   { id: "navy-ssc-pilot", name: "SSC Pilot / Observer (Navy)", service: "Navy", stage: "After Graduation", minAge: 19, maxAge: 24, genders: ["male", "female"], education: ["graduate", "engineering"], requiresUnmarried: true, requiresPcm: true, how: "SSB → PABT (Pilot Aptitude) → Medical" },
-  { id: "navy-ssc-logistics", name: "SSC Logistics / ATC / Education / Law (Navy)", service: "Navy", stage: "After Graduation", minAge: 19, maxAge: 25, genders: ["male", "female"], education: ["graduate", "engineering", "law"], requiresUnmarried: true, how: "Shortlist → SSB → Medical" },
+  // Law used to be folded in here with this entry's 19–25 window, contradicting
+  // the Law cadre's own 22–27. It now has its own entry (navy-jag) below.
+  { id: "navy-ssc-logistics", name: "SSC Logistics / ATC / Education (Navy)", service: "Navy", stage: "After Graduation", minAge: 19, maxAge: 25, genders: ["male", "female"], education: ["graduate", "engineering"], requiresUnmarried: true, how: "Shortlist → SSB → Medical" },
+  // Navy Law cadre. From the SSC notification for the Jun 2026 course: a law
+  // degree with 55%, from a Bar Council-recognised college; men and women;
+  // unmarried; born 02 Jul 1999 – 01 Jul 2004.
+  { id: "navy-jag", name: "JAG (Navy) – Law Cadre", service: "Navy", stage: "After Graduation", minAge: 22, maxAge: 27, genders: ["male", "female"], education: ["law"], requiresUnmarried: true, how: "LLB 55% (Bar Council recognised) → shortlist → SSB → Medical → INA Ezhimala" },
+  // Remount & Veterinary Corps. BVSc / BVSc & AH with internship complete and
+  // VCI registration; men and women; 21–32. Three separate write-ups of the
+  // notification give no marital restriction — Army notices that impose one
+  // state it prominently — so none is applied here.
+  { id: "rvc", name: "RVC (Remount & Veterinary Corps)", service: "Army", stage: "After Graduation", minAge: 21, maxAge: 32, genders: ["male", "female"], education: ["veterinary"], requiresUnmarried: false, how: "BVSc/BVSc & AH + internship → shortlist → SSB → Medical · SSC as Captain" },
   { id: "af-met", name: "Meteorology Entry (Air Force)", service: "Air Force", stage: "After Graduation", minAge: 20, maxAge: 26, genders: ["male", "female"], education: ["postgraduate"], requiresUnmarried: false, how: "AFCAT written → AFSB → Medical" },
 
   // ── Coast Guard ───────────────────────────────────────────────────────────
@@ -87,6 +99,20 @@ export const ENTRIES: Entry[] = [
   // candidates, which is what separates them from every civilian entry above.
   { id: "acc", name: "ACC (Army Cadet College)", service: "Army", stage: "Serving soldiers", minAge: 20, maxAge: 27, genders: ["male"], education: ["10+2", "graduate", "engineering", "postgraduate", "law"], requiresUnmarried: false, serving: true, how: "Min 2 years' service → ACC written → SSB → Medical" },
   { id: "sco", name: "SCO (Special Commissioned Officer)", service: "Army", stage: "Serving soldiers", minAge: 28, maxAge: 35, genders: ["male"], education: ["10+2", "graduate", "engineering", "postgraduate", "law"], requiresUnmarried: false, serving: true, how: "5–28 years' service → screening → SSB → Medical" },
+  // Army Medical Corps (Non-Technical): serving AMC / Army Dental Corps
+  // soldiers with at least 5 years' service; 28–42; 10+2 with Biology. The
+  // finder has no Biology input, so that condition is stated rather than
+  // enforced — enforcing it via the Physics & Maths box would be wrong.
+  { id: "amc-nt", name: "AMC (NT) – Army Medical Corps (Non-Tech)", service: "Army", stage: "Serving soldiers", minAge: 28, maxAge: 42, genders: ["male"], education: ["10+2", "graduate", "engineering", "postgraduate", "law", "veterinary"], requiresUnmarried: false, serving: true, how: "Serving AMC/ADC soldiers, 5+ yrs service, 10+2 with Biology → unit screening → SSB → Medical" },
+  // Navy Commission Worthy scheme (formerly Upper Yardmen): serving sailors.
+  // Non-artificers under 22½ and artificers under 24 on 1 Jan of the course
+  // year; 10+2 with Physics & Maths. Married sailors may apply.
+  { id: "navy-cw", name: "Navy (CW) – Commission Worthy", service: "Navy", stage: "Serving sailors", minAge: 18, maxAge: 24, genders: ["male"], education: ["10+2", "graduate", "engineering", "postgraduate"], requiresUnmarried: false, requiresPcm: true, serving: true, how: "Serving sailors · non-artificers under 22½, artificers under 24 → PSB → written exam → SSB → Medical" },
+  // Navy HET — the Higher Educational Test serving sailors sit on the way to a
+  // commission. No separate notification with its own limits could be found,
+  // so this mirrors the verified CW constraints it feeds into. Treat as
+  // indicative until confirmed against an official circular.
+  { id: "navy-het", name: "Navy (HET) – Higher Educational Test", service: "Navy", stage: "Serving sailors", minAge: 18, maxAge: 24, genders: ["male"], education: ["10+2", "graduate", "engineering", "postgraduate"], requiresUnmarried: false, requiresPcm: true, serving: true, how: "Serving sailors · Higher Educational Test → commission scheme → SSB → Medical" },
   { id: "pc-sl", name: "PC (SL) – Permanent Commission (Special List)", service: "Army", stage: "Serving JCOs / NCOs", minAge: 28, maxAge: 35, genders: ["male"], education: ["10+2", "graduate", "engineering", "postgraduate", "law"], requiresUnmarried: false, serving: true, how: "Serving JCO/NCO/OR → screening → SSB → Medical" },
 ];
 
