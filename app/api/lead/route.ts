@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { saveEnquiry } from "@/lib/enquiries";
 import { notifyAdmin } from "@/lib/mailer";
+import { emailRows } from "@/lib/enquiry-details";
 
 export const runtime = "nodejs";
 
@@ -48,30 +49,18 @@ export async function POST(req: Request) {
 
   await saveEnquiry({ name, email, phone, entry, message, source, meta });
 
-  // Flatten whatever the tool captured (quiz score, eligible entries, answers)
-  // so the academy sees the full picture in the notification.
-  const metaRows = Object.entries(meta)
-    .filter(([, v]) => v !== null && v !== undefined && v !== "")
-    .slice(0, 12)
-    .map(([k, v]) => [
-      k.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      Array.isArray(v) ? v.join(", ") : String(v),
-    ] as [string, string]);
-
   const label = source === "mock_test" ? "Mock Test" : "Eligibility Finder";
   await notifyAdmin({
     subject: `🎯 ${label} lead - ${name}`,
     subtitle: `New ${label.toLowerCase()} submission from the website`,
     replyTo: email,
-    rows: [
-      ["Name", name],
-      ["Email", email],
-      ["Phone", phone],
-      ["Source", label],
-      ["Entry / Interest", entry],
-      ["Message", message],
-      ...metaRows,
-    ],
+    // Every answer the tool captured, readably named — "Physics & Maths in
+    // Class 12: Yes" rather than "Pcm: true". Shared with the admin inbox.
+    rows: emailRows(
+      { name, email, phone, entry, message, meta },
+      { entry: "Entry / Interest" },
+      [{ label: "Source", value: label }],
+    ),
   });
 
   return NextResponse.json({ ok: true });

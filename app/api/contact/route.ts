@@ -4,6 +4,7 @@ import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { saveEnquiry } from "@/lib/enquiries";
 import { getPublished } from "@/lib/content";
 import { notifyAdmin, emailShell, escapeHtml, senderAddress } from "@/lib/mailer";
+import { emailRows } from "@/lib/enquiry-details";
 import {
   CONTACT_FORM,
   fullPhone,
@@ -135,16 +136,19 @@ export async function POST(req: Request) {
     subject: `🎖️ New Enquiry — ${name} (${entry || "Entry not specified"})`,
     subtitle: "New callback request from the website",
     ...(email ? { replyTo: email } : {}),
-    rows: [
-      ["Name", name],
-      ["Email", email],
-      ["Phone", phone],
-      ["Target Entry", entry],
-      ["Preferred Batch", batch],
-      ["Current Status", currentStatus],
-      ["Message", message],
-      ...custom.answers.map((a) => [a.label, a.value] as [string, string]),
-    ],
+    // The same rows the admin inbox shows: the admin's own field names, every
+    // answer including added questions, and nothing for fields not on the form.
+    rows: emailRows(
+      {
+        name,
+        phone,
+        email,
+        entry,
+        message,
+        meta: { batch, status: currentStatus, ...(custom.answers.length ? { custom: custom.answers } : {}) },
+      },
+      Object.fromEntries(form.fields.map((f) => [f.key, f.label])),
+    ),
     footer: email
       ? "Reply directly to this email to reach the aspirant."
       : "This aspirant left no email address — call or WhatsApp the number above.",

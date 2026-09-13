@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { enquiryDetails, humanise, readable, searchText } from "./enquiry-details.ts";
+import { emailRows, enquiryDetails, humanise, readable, searchText } from "./enquiry-details.ts";
 
 const contact = {
   name: "Aarti Boraste",
@@ -73,4 +73,45 @@ test("search covers every detail, not just name and email", () => {
 test("key names are humanised", () => {
   assert.equal(humanise("preferred_batch"), "Preferred batch");
   assert.equal(humanise("dateOfBirth"), "Date of birth");
+});
+
+// ── Notification emails ────────────────────────────────────────────────────
+
+test("the email lists every filled field, in the inbox's order", () => {
+  const rows = emailRows(contact);
+  assert.deepEqual(rows.map(([label]) => label), [
+    "Name", "Phone", "Email", "Target Entry", "Preferred Batch", "Current Status", "Your city", "Message",
+  ]);
+});
+
+test("a field that was not on the form is left out, not printed as a dash", () => {
+  const rows = emailRows({ ...contact, email: "" });
+  assert.ok(!rows.some(([label]) => label === "Email"));
+  assert.ok(!rows.some(([, value]) => value === "—" || value === ""));
+});
+
+test("the email uses the admin's field names, like the inbox", () => {
+  const labels = { name: "Full Name", status: "Attempt", batch: "Mode" };
+  const labelsUsed = emailRows(contact, labels).map(([l]) => l);
+  assert.ok(labelsUsed.includes("Full Name") && labelsUsed.includes("Attempt") && labelsUsed.includes("Mode"));
+});
+
+test("email and inbox agree on every answer", () => {
+  const fromEmail = emailRows(contact).slice(3);            // after name, phone, email
+  const fromInbox = enquiryDetails(contact).map((d) => [d.label, d.value]);
+  assert.deepEqual(fromEmail, fromInbox);
+});
+
+test("Eligibility Finder emails read as sentences, not 'Pcm: true'", () => {
+  const rows = Object.fromEntries(
+    emailRows({ name: "A", phone: "+919876543210", meta: { pcm: true, serving: false, gender: "male" } }),
+  );
+  assert.equal(rows["Physics & Maths in Class 12"], "Yes");
+  assert.equal(rows["Already serving"], "No");
+  assert.equal(rows["Pcm"], undefined);
+});
+
+test("extra rows (such as the source) slot in after the contact details", () => {
+  const rows = emailRows({ name: "A", phone: "+919876543210" }, {}, [{ label: "Source", value: "Eligibility Finder" }]);
+  assert.deepEqual(rows, [["Name", "A"], ["Phone", "+919876543210"], ["Source", "Eligibility Finder"]]);
 });

@@ -113,3 +113,27 @@ export const searchText = (r: EnquiryLike & { name?: string | null }) =>
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
+
+/**
+ * The rows of a notification email: contact details first, then exactly what
+ * the inbox shows. One source for both, so the email and the inbox always
+ * agree — same field names, same order, and a field that was not on the form
+ * is left out rather than printed as "—".
+ */
+export function emailRows(
+  r: EnquiryLike & { name?: string | null },
+  labels: Record<string, string> = {},
+  extra: Detail[] = [],
+): [string, string][] {
+  const rows: Detail[] = [];
+  const add = (label: string, v: unknown) => {
+    const text = readable(v);
+    if (text) rows.push({ label, value: text });
+  };
+  add(labels.name || "Name", r.name);
+  add(labels.phone || "Phone", r.phone);
+  add(labels.email || "Email", r.email);
+  rows.push(...extra.filter((d) => d.value));
+  rows.push(...enquiryDetails(r, labels));
+  return rows.map((d) => [d.label, d.value]);
+}
