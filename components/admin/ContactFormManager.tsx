@@ -16,28 +16,52 @@ import {
 } from "@/lib/form-defaults";
 
 /** What each built-in field is, for the admin. Their behaviour is fixed —
- *  the phone box always adds +91, the dropdowns use the lists below. */
+ *  the phone box always adds +91 — but their dropdown choices are editable. */
 const BUILT_IN_INFO: Record<ContactFieldKey, { kind: string; hint: string }> = {
   name: { kind: "Name", hint: "The aspirant's full name." },
   phone: { kind: "Phone", hint: "Indian mobile number — +91 is added automatically." },
   email: { kind: "Email", hint: "Used to reply, and for the automatic acknowledgement." },
-  entry: { kind: "Dropdown", hint: "Choices come from the Target Entry list below." },
-  batch: { kind: "Dropdown", hint: "Choices come from the Preferred Batch list below." },
-  status: { kind: "Dropdown", hint: "Choices come from the Current Status list below." },
+  entry: { kind: "Dropdown", hint: "What an aspirant picks as their target entry." },
+  batch: { kind: "Dropdown", hint: "Usually offline and online." },
+  status: { kind: "Dropdown", hint: "Usually fresher and repeater." },
   message: { kind: "Long answer", hint: "The free-text box." },
 };
 
 type ListKey = "entryOptions" | "batchOptions" | "statusOptions";
-const LISTS: { id: ListKey; field: ContactFieldKey; label: string; hint: string }[] = [
-  { id: "entryOptions", field: "entry", label: "Target Entry choices", hint: "Everything an aspirant can pick as their target entry." },
-  { id: "batchOptions", field: "batch", label: "Preferred Batch choices", hint: "Usually offline and online." },
-  { id: "statusOptions", field: "status", label: "Current Status choices", hint: "Usually fresher and repeater." },
-];
+/** Which choice list each built-in dropdown reads. */
+const LIST_FOR: Partial<Record<ContactFieldKey, ListKey>> = {
+  entry: "entryOptions",
+  batch: "batchOptions",
+  status: "statusOptions",
+};
 
 const toLines = (a?: string[]) => (a ?? []).join("\n");
 const fromLines = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
 
 const inputCls = "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm";
+
+/** The choices editor shown directly under a dropdown, so its options are
+ *  edited where the dropdown is — not in a separate list further down. */
+function choicesBox(id: string, value: string, onChange: (v: string) => void) {
+  const count = fromLines(value).length;
+  return (
+    <div className="mt-2 max-w-xl rounded-lg border border-blue-100 bg-blue-50/40 p-3">
+      <label htmlFor={id} className="block text-xs font-semibold text-slate-700">
+        Dropdown choices — one per line
+      </label>
+      <textarea
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        rows={Math.min(Math.max(count + 1, 3), 12)}
+        className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
+      />
+      <p className="mt-1 text-[11px] text-slate-500">
+        {count} choice{count === 1 ? "" : "s"}. Press Enter for a new line; delete a line to remove a choice.
+      </p>
+    </div>
+  );
+}
 const iconBtn =
   "rounded border border-slate-200 px-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-30";
 
@@ -126,6 +150,13 @@ export default function ContactFormManager({ initial }: { initial: ContactFormDo
     if (blank) return "Every question needs a label.";
     const emptyDropdown = fields.find((f) => f.type === "select" && !f.options?.length);
     if (emptyDropdown) return `"${emptyDropdown.label}" is a dropdown with no choices — add at least one.`;
+    // An emptied built-in list would quietly fall back to the defaults on the
+    // next load, which looks like the edit was ignored. Say so instead.
+    const emptyBuiltIn = fields.find((f) => {
+      const list = LIST_FOR[f.key as ContactFieldKey];
+      return list && !fromLines(listText[list]).length;
+    });
+    if (emptyBuiltIn) return `"${emptyBuiltIn.label}" has no choices — add at least one, or delete the field.`;
     return {
       ...doc,
       fields,
@@ -175,6 +206,7 @@ export default function ContactFormManager({ initial }: { initial: ContactFormDo
             <p className="mt-0.5 max-w-2xl text-xs text-slate-500">
               Add your own questions, delete ones you don&apos;t need, change the order with ↑ ↓, hide a field,
               or make it mandatory (a red <b className="text-red-600">*</b> appears and an empty answer is refused).
+              Every dropdown has its choices box right underneath it.
               {" "}{shownCount} of {doc.fields.length} shown.
             </p>
           </div>
@@ -264,17 +296,14 @@ export default function ContactFormManager({ initial }: { initial: ContactFormDo
 
                 <div className="ml-9 mt-2">
                   {info && <p className="text-[11px] text-slate-400">{info.hint}{isCore(f.key) ? " Can be hidden, not deleted." : ""}</p>}
-                  {!builtIn && f.type === "select" && (
-                    <label className="mt-1 block text-xs text-slate-500">
-                      Choices — one per line
-                      <textarea
-                        value={optionText[f.key] ?? toLines(f.options)}
-                        onChange={(e) => setOptionText((o) => ({ ...o, [f.key]: e.target.value }))}
-                        rows={3}
-                        className="mt-1 block w-full max-w-md rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs"
-                      />
-                    </label>
-                  )}
+                  {builtIn && LIST_FOR[f.key as ContactFieldKey] &&
+                    choicesBox(`choices-${f.key}`, listText[LIST_FOR[f.key as ContactFieldKey]!], (v) =>
+                      setListText((t) => ({ ...t, [LIST_FOR[f.key as ContactFieldKey]!]: v })),
+                    )}
+                  {!builtIn && f.type === "select" &&
+                    choicesBox(`choices-${f.key}`, optionText[f.key] ?? toLines(f.options), (v) =>
+                      setOptionText((o) => ({ ...o, [f.key]: v })),
+                    )}
                   {!f.enabled && <p className="mt-1 text-[11px] font-medium text-slate-500">Hidden — not on the form.</p>}
                 </div>
               </li>
@@ -297,27 +326,6 @@ export default function ContactFormManager({ initial }: { initial: ContactFormDo
             ))}
           </div>
         )}
-      </div>
-
-      {/* Choice lists — only for the built-in dropdowns still on the form. */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        {LISTS.filter((l) => doc.fields.some((f) => f.key === l.field)).map((l) => {
-          const count = fromLines(listText[l.id]).length;
-          return (
-            <div key={l.id} className="rounded-xl border border-slate-200 bg-white p-4">
-              <label htmlFor={`list-${l.id}`} className="block text-sm font-semibold text-slate-800">{l.label}</label>
-              <p className="mb-2 mt-0.5 text-xs text-slate-500">{l.hint}</p>
-              <textarea
-                id={`list-${l.id}`}
-                value={listText[l.id]}
-                onChange={(e) => setListText((t) => ({ ...t, [l.id]: e.target.value }))}
-                rows={Math.min(Math.max(count + 1, 4), 14)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
-              />
-              <p className="mt-1 text-xs text-slate-400">{count} choice(s) — one per line.</p>
-            </div>
-          );
-        })}
       </div>
 
       <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2">
