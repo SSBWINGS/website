@@ -2,6 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { enquiryDetails, searchText } from "@/lib/enquiry-details";
 
 type Status = "new" | "contacted" | "enrolled" | "dropped";
 export type Enquiry = {
@@ -14,26 +15,10 @@ export type Enquiry = {
   source: string;
   status: Status;
   notes: string | null;
-  /** Extra answers the form collected — preferred batch, current status. */
+  /** Extra answers the form collected — batch, status, the admin's own
+   *  questions, Eligibility Finder answers and so on. */
   meta: Record<string, unknown> | null;
   created_at: string;
-};
-
-/** Read one extra answer off an enquiry's meta blob. */
-const extra = (r: Enquiry, key: string) => {
-  const v = r.meta?.[key];
-  return typeof v === "string" && v.trim() ? v : "";
-};
-
-/** Answers to questions the admin added to the form, stored by label. */
-const customAnswers = (r: Enquiry): { label: string; value: string }[] => {
-  const v = r.meta?.custom;
-  return Array.isArray(v)
-    ? v.filter(
-        (a): a is { label: string; value: string } =>
-          !!a && typeof a === "object" && typeof (a as { label?: unknown }).label === "string" && typeof (a as { value?: unknown }).value === "string",
-      )
-    : [];
 };
 
 const STATUSES: Status[] = ["new", "contacted", "enrolled", "dropped"];
@@ -44,9 +29,28 @@ const STATUS_STYLE: Record<Status, string> = {
   dropped: "bg-slate-200 text-slate-600",
 };
 
+const SOURCE_LABEL: Record<string, string> = {
+  contact_form: "Contact form",
+  eligibility: "Eligibility Finder",
+  mock_test: "Mock test",
+};
+
 const csvCell = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
 
-export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
+const when = (iso: string) =>
+  new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+
+const waLink = (phone: string) =>
+  `https://wa.me/${phone.replace(/\D/g, "").replace(/^0+/, "").replace(/^(?!91)/, "91")}`;
+
+export default function EnquiryInbox({
+  initial,
+  labels = {},
+}: {
+  initial: Enquiry[];
+  /** The field names the admin gave the form, so the inbox uses the same words. */
+  labels?: Record<string, string>;
+}) {
   const supabase = createClient();
   const [rows, setRows] = useState<Enquiry[]>(initial);
   const [filter, setFilter] = useState<"all" | Status>("all");
@@ -59,13 +63,12 @@ export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
     return c;
   }, [rows]);
 
+  // Search every detail — batch, status, answers to added questions, message —
+  // not only the name and contact details.
   const visible = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return rows.filter(
-      (r) =>
-        (filter === "all" || r.status === filter) &&
-        (!needle ||
-          [r.name, r.email, r.phone, r.entry, r.message].some((f) => (f ?? "").toLowerCase().includes(needle))),
+      (r) => (filter === "all" || r.status === filter) && (!needle || searchText(r).includes(needle)),
     );
   }, [rows, filter, q]);
 
@@ -87,20 +90,26 @@ export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
     if (error) { setRows(prev); alert(error.message); }
   }
 
+  /** One column per detail, in the order they first appear — so every answer
+   *  gets its own spreadsheet column, including questions added later. */
   function exportCsv() {
-    const header = ["Date", "Name", "Email", "Phone", "Entry", "Batch", "Current status", "Other answers", "Source", "Status", "Message", "Notes"];
-    const lines = [header.join(",")].concat(
-      visible.map((r) =>
-        [
-          new Date(r.created_at).toLocaleString(),
-          r.name, r.email, r.phone ?? "", r.entry ?? "",
-          extra(r, "batch"), extra(r, "status"),
-          customAnswers(r).map((a) => `${a.label}: ${a.value}`).join("; "),
-          r.source, r.status, r.message ?? "", r.notes ?? "",
-        ].map((v) => csvCell(String(v))).join(","),
-      ),
+    const detailed = visible.map((r) => ({ r, d: enquiryDetails(r, labels) }));
+    const columns: string[] = [];
+    for (const { d } of detailed) for (const x of d) if (!columns.includes(x.label)) columns.push(x.label);
+
+    const header = ["Received", "Name", "Phone", "Email", ...columns, "Source", "Status", "Notes"];
+    const lines = [header.map(csvCell).join(",")].concat(
+      detailed.map(({ r, d }) => {
+        const byLabel = new Map(d.map((x) => [x.label, x.value]));
+        return [
+          when(r.created_at), r.name, r.phone ?? "", r.email,
+          ...columns.map((c) => byLabel.get(c) ?? ""),
+          SOURCE_LABEL[r.source] ?? r.source, r.status, r.notes ?? "",
+        ].map((v) => csvCell(String(v))).join(",");
+      }),
     );
-    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    // Byte-order mark so Excel reads the ₹, – and Hindi characters correctly.
+    const blob = new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -121,94 +130,120 @@ export default function EnquiryInbox({ initial }: { initial: Enquiry[] }) {
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…"
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search any detail…"
             className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-blue-500" />
           <button onClick={exportCsv} className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50">⬇ CSV</button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <table className="w-full min-w-[860px] text-sm">
           <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
             <tr>
               <th className="px-4 py-3 font-semibold">Aspirant</th>
-              <th className="px-4 py-3 font-semibold">Entry</th>
-              <th className="px-4 py-3 font-semibold">Source</th>
+              <th className="px-4 py-3 font-semibold">Everything they filled in</th>
               <th className="px-4 py-3 font-semibold">Status</th>
-              <th className="px-4 py-3 font-semibold">When</th>
+              <th className="px-4 py-3 font-semibold">Received</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {visible.map((r) => (
-              <Fragment key={r.id}>
-                <tr className="align-top">
-                  <td className="px-4 py-3">
-                    <button onClick={() => setOpenId(openId === r.id ? null : r.id)} className="text-left">
-                      <span className="font-semibold text-slate-900">{r.name}</span>
-                      <span className="block text-xs text-slate-500">{[r.email, r.phone].filter(Boolean).join(" · ") || "—"}</span>
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{r.entry || "—"}</td>
-                  <td className="px-4 py-3 text-xs text-slate-500">{r.source.replace("_", " ")}</td>
-                  <td className="px-4 py-3">
-                    <select value={r.status} onChange={(e) => setStatus(r.id, e.target.value as Status)}
-                      className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${STATUS_STYLE[r.status]}`}>
-                      {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500">{new Date(r.created_at).toLocaleDateString()}</td>
-                  <td className="px-4 py-3 text-right">
-                    <button onClick={() => remove(r.id)} className="rounded border border-red-200 px-1.5 text-xs text-red-600 hover:bg-red-50">✕</button>
-                  </td>
-                </tr>
-                {openId === r.id && (
-                  <tr>
-                    <td colSpan={6} className="bg-slate-50 px-4 py-4">
-                      {(extra(r, "batch") || extra(r, "status") || customAnswers(r).length > 0) && (
-                        <div className="mb-3 flex flex-wrap gap-2">
-                          {extra(r, "batch") && (
-                            <span className="rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-slate-200">
-                              <b className="text-slate-500">Batch:</b> {extra(r, "batch")}
-                            </span>
-                          )}
-                          {extra(r, "status") && (
-                            <span className="rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-slate-200">
-                              <b className="text-slate-500">Current status:</b> {extra(r, "status")}
-                            </span>
-                          )}
-                          {customAnswers(r).map((a, i) => (
-                            <span key={i} className="rounded-full bg-white px-3 py-1 text-xs text-slate-700 ring-1 ring-slate-200">
-                              <b className="text-slate-500">{a.label}:</b> {a.value}
-                            </span>
-                          ))}
-                        </div>
+            {visible.map((r) => {
+              const details = enquiryDetails(r, labels);
+              const message = details.find((d) => d.label === (labels.message || "Message"));
+              const rest = details.filter((d) => d !== message);
+              const open = openId === r.id;
+              return (
+                <Fragment key={r.id}>
+                  <tr className="align-top">
+                    <td className="w-56 px-4 py-3">
+                      <p className="font-semibold text-slate-900">{r.name || "—"}</p>
+                      {r.phone && (
+                        <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`} className="mt-0.5 block text-xs text-slate-600 hover:text-blue-700">
+                          📞 {r.phone}
+                        </a>
                       )}
-                      {r.message && <p className="mb-3 rounded-lg bg-white p-3 text-sm text-slate-700"><span className="font-semibold text-slate-500">Message: </span>{r.message}</p>}
-                      <label className="mb-1 block text-xs font-medium text-slate-500">Internal notes</label>
-                      <textarea defaultValue={r.notes ?? ""} onBlur={(e) => saveNotes(r.id, e.target.value)} rows={2}
-                        placeholder="Add a note (saved on blur)…"
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500" />
-                      <div className="mt-2 flex flex-wrap gap-4">
-                        {r.email && (
-                          <a href={`mailto:${r.email}`} className="text-xs font-medium text-blue-600 hover:underline">Reply by email →</a>
-                        )}
-                        {r.phone && (
-                          <>
-                            <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`} className="text-xs font-medium text-blue-600 hover:underline">Call →</a>
-                            <a href={`https://wa.me/${r.phone.replace(/\D/g, "").replace(/^0+/, "").replace(/^(?!91)/, "91")}`}
-                              target="_blank" rel="noopener noreferrer"
-                              className="text-xs font-medium text-green-700 hover:underline">WhatsApp →</a>
-                          </>
-                        )}
-                      </div>
+                      {r.email && (
+                        <a href={`mailto:${r.email}`} className="block break-all text-xs text-slate-600 hover:text-blue-700">
+                          ✉ {r.email}
+                        </a>
+                      )}
+                      <span className="mt-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">
+                        {SOURCE_LABEL[r.source] ?? r.source}
+                      </span>
+                    </td>
+
+                    {/* Every answer, right in the row — nothing to discover. */}
+                    <td className="px-4 py-3">
+                      {rest.length ? (
+                        <dl className="grid gap-x-4 gap-y-1 text-xs sm:grid-cols-[auto_1fr]">
+                          {rest.map((d, i) => (
+                            <Fragment key={i}>
+                              <dt className="font-semibold text-slate-500">{d.label}</dt>
+                              <dd className="text-slate-800">{d.value}</dd>
+                            </Fragment>
+                          ))}
+                        </dl>
+                      ) : (
+                        !message && <span className="text-xs text-slate-400">No other details</span>
+                      )}
+                      {message && (
+                        <p className={`mt-2 whitespace-pre-line rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-700 ${open ? "" : "line-clamp-3"}`}>
+                          <span className="font-semibold text-slate-500">{message.label}: </span>
+                          {message.value}
+                        </p>
+                      )}
+                      {r.notes && !open && (
+                        <p className="mt-2 text-xs text-amber-800">
+                          <span className="font-semibold">Note: </span>{r.notes}
+                        </p>
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <select value={r.status} onChange={(e) => setStatus(r.id, e.target.value as Status)}
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${STATUS_STYLE[r.status]}`}>
+                        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">{when(r.created_at)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right">
+                      <button
+                        onClick={() => setOpenId(open ? null : r.id)}
+                        className="mr-1 rounded border border-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        {open ? "Close" : "Notes & reply"}
+                      </button>
+                      <button onClick={() => remove(r.id)} className="rounded border border-red-200 px-1.5 text-xs text-red-600 hover:bg-red-50" aria-label="Delete enquiry">✕</button>
                     </td>
                   </tr>
-                )}
-              </Fragment>
-            ))}
+                  {open && (
+                    <tr>
+                      <td colSpan={5} className="bg-slate-50 px-4 py-4">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">Internal notes</label>
+                        <textarea defaultValue={r.notes ?? ""} onBlur={(e) => saveNotes(r.id, e.target.value)} rows={2}
+                          placeholder="Add a note (saved when you click away)…"
+                          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                        <div className="mt-2 flex flex-wrap gap-4">
+                          {r.email && (
+                            <a href={`mailto:${r.email}`} className="text-xs font-medium text-blue-600 hover:underline">Reply by email →</a>
+                          )}
+                          {r.phone && (
+                            <>
+                              <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`} className="text-xs font-medium text-blue-600 hover:underline">Call →</a>
+                              <a href={waLink(r.phone)} target="_blank" rel="noopener noreferrer"
+                                className="text-xs font-medium text-green-700 hover:underline">WhatsApp →</a>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
             {visible.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-slate-400">No enquiries{filter !== "all" ? ` with status "${filter}"` : " yet"}.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-slate-400">No enquiries{filter !== "all" ? ` with status "${filter}"` : q ? " match that search" : " yet"}.</td></tr>
             )}
           </tbody>
         </table>
