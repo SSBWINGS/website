@@ -64,6 +64,41 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  /**
+   * URLs from the two previous ssbwings.com sites (a WordPress blog, then a
+   * Next.js site) that Google still lists. Each is sent permanently to the
+   * page that now covers the same thing, so a stale search result lands
+   * somewhere useful and Google moves the old page's standing to the new one
+   * instead of just dropping it.
+   */
+  async redirects() {
+    const moved: [string, string][] = [
+      // Old course and exam pages
+      ["/offline-courses", "/courses"],
+      ["/online-courses", "/courses"],
+      ["/saca", "/courses"],
+      ["/smart-learning-app", "/courses"],
+      ["/cds-written", "/entries/cds-ima"],
+      ["/afcat-written", "/entries/afcat"],
+      ["/nda-written", "/entries/nda"],
+      // Old about / contact spellings
+      ["/aboutUs", "/about"],
+      ["/aboutus", "/about"],
+      ["/about-us", "/about"],
+      ["/contactUs", "/contact"],
+      ["/contact-us", "/contact"],
+      // Old WordPress articles
+      ["/understanding-the-ssb-interviewstructure-a-comprehensive-guide", "/ssb-process"],
+      ["/tips-for-ssb-interview-preparation", "/blog"],
+      // Old WordPress structure
+      ["/wp-content/uploads/:path*", "/resources"],
+      ["/feed", "/blog"],
+      ["/category/:path*", "/blog"],
+      ["/tag/:path*", "/blog"],
+      ["/author/:path*", "/blog"],
+    ];
+    return moved.map(([source, destination]) => ({ source, destination, permanent: true }));
+  },
 };
 
 export default nextConfig;

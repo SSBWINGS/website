@@ -43,7 +43,10 @@ export const metadata: Metadata = {
     images: ["/logo.webp"],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
-  icons: { icon: "/logo.webp", apple: "/logo.webp" },
+  // Search Console ownership, via a Vercel env var — no code change to verify.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
