@@ -1,9 +1,20 @@
 import "server-only";
 import { Resend } from "resend";
+import { explainMailError, isTestSender, parseRecipients } from "./mail-diagnosis";
 
-/** Where every lead notification is delivered. */
-export const ADMIN_EMAIL = process.env.CONTACT_ADMIN_EMAIL || "marketing@ssbwings.com";
-const FROM = process.env.CONTACT_FROM_EMAIL || "SSBWINGS Website <onboarding@resend.dev>";
+/** Where every lead notification goes. CONTACT_ADMIN_EMAIL may hold several
+ *  addresses, comma-separated — a backup inbox can be added without code. */
+export const adminRecipients = () => parseRecipients(process.env.CONTACT_ADMIN_EMAIL, "marketing@ssbwings.com");
+
+/** Who the mail is from. The default is on the academy's own domain: Resend's
+ *  test address (onboarding@resend.dev) only delivers to the Resend account
+ *  owner, which is why notifications to marketing@ssbwings.com never arrived. */
+export const senderAddress = () => process.env.CONTACT_FROM_EMAIL || "SSBWINGS <noreply@ssbwings.com>";
+
+/** The outcome of a send, with Resend's reason and a plain-language fix. */
+export type Delivery =
+  | { ok: true; id?: string; from: string; to: string[] }
+  | { ok: false; error: string; hint: string; from: string; to: string[] };
 
 export const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -32,12 +43,41 @@ export function emailShell(subtitle: string, inner: string): string {
     </div>`;
 }
 
+/** One send, with the failure reason kept rather than swallowed. */
+async function deliver(opts: { subject: string; html: string; replyTo?: string }): Promise<Delivery> {
+  const from = senderAddress();
+  const to = adminRecipients();
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    const error = "RESEND_API_KEY is not set";
+    return { ok: false, error, hint: explainMailError(error, from), from, to };
+  }
+  try {
+    const { data, error } = await new Resend(apiKey).emails.send({
+      from,
+      to,
+      ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
+      subject: opts.subject,
+      html: opts.html,
+    });
+    if (error) {
+      const message = error.message || String(error);
+      return { ok: false, error: message, hint: explainMailError(message, from), from, to };
+    }
+    return { ok: true, id: data?.id, from, to };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: message, hint: explainMailError(message, from), from, to };
+  }
+}
+
 /**
  * Send a lead notification to the academy inbox.
  *
  * Best-effort by design: the caller has already persisted the lead, so a
  * missing API key or a Resend outage must never fail the visitor's submission.
- * Returns whether the mail actually went out, for logging.
+ * Failures are logged with Resend's reason and the fix, so they show up in the
+ * Vercel logs instead of disappearing.
  */
 export async function notifyAdmin(opts: {
   subject: string;
@@ -46,35 +86,35 @@ export async function notifyAdmin(opts: {
   replyTo?: string;
   footer?: string;
 }): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    // Loud on purpose: without this the lead is saved but nobody is told, and
-    // the only symptom is an inbox that never fills up.
-    console.error("RESEND_API_KEY is not set — lead saved but no email sent:", opts.subject);
-    return false;
+  const result = await deliver({
+    subject: opts.subject,
+    replyTo: opts.replyTo,
+    html: emailShell(
+      opts.subtitle,
+      `<table style="width:100%;border-collapse:collapse;font-size:14px;">${detailRows(opts.rows)}</table>
+       <div style="padding:14px 24px;background:#faf8f1;font-size:12px;color:#666;">
+         ${escapeHtml(opts.footer ?? "Reply directly to this email to reach the aspirant.")}
+       </div>`,
+    ),
+  });
+  if (!result.ok) {
+    console.error(`Lead email NOT sent (${opts.subject}): ${result.error} — ${result.hint}`);
   }
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from: FROM,
-      to: ADMIN_EMAIL,
-      ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
-      subject: opts.subject,
-      html: emailShell(
-        opts.subtitle,
-        `<table style="width:100%;border-collapse:collapse;font-size:14px;">${detailRows(opts.rows)}</table>
-         <div style="padding:14px 24px;background:#faf8f1;font-size:12px;color:#666;">
-           ${escapeHtml(opts.footer ?? "Reply directly to this email to reach the aspirant.")}
-         </div>`,
-      ),
-    });
-    if (error) {
-      console.error("Resend error:", error);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error("Mailer error:", err);
-    return false;
-  }
+  return result.ok;
+}
+
+/** A labelled test message to the admin inbox, returning the full outcome so
+ *  the admin panel can show exactly what went wrong. */
+export async function sendTestEmail(): Promise<Delivery & { usingTestSender: boolean }> {
+  const result = await deliver({
+    subject: "SSBWINGS website — test email",
+    html: emailShell(
+      "Delivery test from the admin panel",
+      `<div style="padding:22px 24px;color:#333;font-size:14px;line-height:1.6;">
+         <p>If you are reading this, website enquiry emails are reaching this inbox.</p>
+         <p style="color:#666;">Sent from the Footer &amp; Contact page of the SSBWINGS admin panel.</p>
+       </div>`,
+    ),
+  });
+  return { ...result, usingTestSender: isTestSender(result.from) };
 }

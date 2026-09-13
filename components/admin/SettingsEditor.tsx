@@ -24,6 +24,26 @@ export default function SettingsEditor({ initial }: { initial: Record<string, st
   const [form, setForm] = useState<Record<string, string>>(initial);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  /** Outcome of the last "send test email", straight from the server. */
+  const [mailTest, setMailTest] = useState<
+    | { ok: boolean; from: string; to: string[]; error?: string; hint?: string; usingTestSender?: boolean }
+    | null
+  >(null);
+  const [testing, setTesting] = useState(false);
+
+  async function testEmail() {
+    setTesting(true);
+    setMailTest(null);
+    try {
+      const res = await fetch("/api/admin/test-email", { method: "POST" });
+      const json = await res.json();
+      setMailTest(res.ok ? json : { ok: false, from: "", to: [], error: json.error ?? "Request failed." });
+    } catch {
+      setMailTest({ ok: false, from: "", to: [], error: "Could not reach the server." });
+    } finally {
+      setTesting(false);
+    }
+  }
 
   /** Upload a replacement brochure PDF and point the site at it. */
   async function uploadBrochure(e: React.ChangeEvent<HTMLInputElement>) {
@@ -107,6 +127,43 @@ export default function SettingsEditor({ initial }: { initial: Record<string, st
           )}
         </div>
         <p className="mt-2 break-all text-[11px] text-slate-400">{form.brochure || "No brochure set"}</p>
+      </div>
+
+      <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p className="text-sm font-semibold text-slate-800">Enquiry emails</p>
+        <p className="mt-0.5 text-xs text-slate-500">
+          Every enquiry is saved under <b>Enquiries</b> whatever happens. This checks the email notification
+          on top of that — it sends a real test message and shows exactly what the mail service replied.
+        </p>
+        <button
+          type="button"
+          onClick={testEmail}
+          disabled={testing}
+          className="mt-3 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+        >
+          {testing ? "Sending…" : "✉ Send test email"}
+        </button>
+
+        {mailTest && (
+          <div className={`mt-3 rounded-lg px-3 py-2.5 text-sm ${mailTest.ok ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}>
+            {mailTest.ok ? (
+              <>
+                <p className="font-semibold">✓ Accepted for delivery to {mailTest.to.join(", ")}</p>
+                <p className="mt-1 text-xs">
+                  From <code>{mailTest.from}</code>. If it does not arrive within a few minutes, the problem is the
+                  receiving mailbox rather than the website — check spam, and that the address has a working inbox.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold">✗ Not sent{mailTest.to.length ? ` to ${mailTest.to.join(", ")}` : ""}</p>
+                {mailTest.error && <p className="mt-1 text-xs"><b>Mail service said:</b> {mailTest.error}</p>}
+                {mailTest.hint && <p className="mt-1 text-xs"><b>How to fix:</b> {mailTest.hint}</p>}
+                {mailTest.from && <p className="mt-1 text-xs text-red-700/80">Current sender: <code>{mailTest.from}</code></p>}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {msg && <p className={`mt-4 rounded-lg px-3 py-2 text-sm ${msg.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{msg.text}</p>}

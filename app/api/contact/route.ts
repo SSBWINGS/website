@@ -3,7 +3,7 @@ import { Resend } from "resend";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { saveEnquiry } from "@/lib/enquiries";
 import { getPublished } from "@/lib/content";
-import { notifyAdmin, emailShell, escapeHtml } from "@/lib/mailer";
+import { notifyAdmin, emailShell, escapeHtml, senderAddress } from "@/lib/mailer";
 import {
   CONTACT_FORM,
   fullPhone,
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
       await resend.emails.send({
-        from: process.env.CONTACT_FROM_EMAIL || "SSBWINGS Website <onboarding@resend.dev>",
+        from: senderAddress(),
         to: email,
         subject: "We've received your enquiry — SSBWINGS",
         html: emailShell(
