@@ -3,160 +3,335 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
-import { CONTACT_FORM, type ContactField, type ContactFormDoc } from "@/lib/form-defaults";
+import {
+  CONTACT_FORM,
+  CUSTOM_FIELD_TYPES,
+  isBuiltIn,
+  isCore,
+  newCustomField,
+  type ContactField,
+  type ContactFieldKey,
+  type ContactFormDoc,
+  type CustomFieldType,
+} from "@/lib/form-defaults";
 
-const HINTS: Record<ContactField["key"], string> = {
-  name: "The aspirant's full name.",
-  phone: "Callback number — validated as 10–15 digits.",
-  email: "Used to reply and to send the auto-acknowledgement.",
-  entry: "Dropdown — options are the Target Entry list below.",
-  batch: "Dropdown — online or offline (options below).",
-  status: "Dropdown — fresher or repeater (options below).",
-  message: "Free-text box shown under the grid.",
+/** What each built-in field is, for the admin. Their behaviour is fixed —
+ *  the phone box always adds +91, the dropdowns use the lists below. */
+const BUILT_IN_INFO: Record<ContactFieldKey, { kind: string; hint: string }> = {
+  name: { kind: "Name", hint: "The aspirant's full name." },
+  phone: { kind: "Phone", hint: "Indian mobile number — +91 is added automatically." },
+  email: { kind: "Email", hint: "Used to reply, and for the automatic acknowledgement." },
+  entry: { kind: "Dropdown", hint: "Choices come from the Target Entry list below." },
+  batch: { kind: "Dropdown", hint: "Choices come from the Preferred Batch list below." },
+  status: { kind: "Dropdown", hint: "Choices come from the Current Status list below." },
+  message: { kind: "Long answer", hint: "The free-text box." },
 };
+
+type ListKey = "entryOptions" | "batchOptions" | "statusOptions";
+const LISTS: { id: ListKey; field: ContactFieldKey; label: string; hint: string }[] = [
+  { id: "entryOptions", field: "entry", label: "Target Entry choices", hint: "Everything an aspirant can pick as their target entry." },
+  { id: "batchOptions", field: "batch", label: "Preferred Batch choices", hint: "Usually offline and online." },
+  { id: "statusOptions", field: "status", label: "Current Status choices", hint: "Usually fresher and repeater." },
+];
+
+const toLines = (a?: string[]) => (a ?? []).join("\n");
+const fromLines = (t: string) => t.split("\n").map((s) => s.trim()).filter(Boolean);
+
+const inputCls = "mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm";
+const iconBtn =
+  "rounded border border-slate-200 px-1.5 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-30";
 
 /** Editor for the contact page form AND the enquiry popup — both render the
  *  same document, so one save updates both. */
 export default function ContactFormManager({ initial }: { initial: ContactFormDoc }) {
   const supabase = createClient();
   const [doc, setDoc] = useState<ContactFormDoc>(initial);
+  // Choice lists are edited as raw text and parsed only on save. Parsing on
+  // every keystroke threw away the blank line Enter makes, so a new choice
+  // could never be typed on its own line.
+  const [listText, setListText] = useState<Record<ListKey, string>>({
+    entryOptions: toLines(initial.entryOptions),
+    batchOptions: toLines(initial.batchOptions),
+    statusOptions: toLines(initial.statusOptions),
+  });
+  const [optionText, setOptionText] = useState<Record<string, string>>(() =>
+    Object.fromEntries(initial.fields.filter((f) => f.type === "select").map((f) => [f.key, toLines(f.options)])),
+  );
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const setField = (key: ContactField["key"], patch: Partial<ContactField>) =>
+  const update = (key: string, patch: Partial<ContactField>) =>
     setDoc((d) => ({ ...d, fields: d.fields.map((f) => (f.key === key ? { ...f, ...patch } : f)) }));
 
-  const setList = (key: "entryOptions" | "batchOptions" | "statusOptions", text: string) =>
-    setDoc((d) => ({ ...d, [key]: text.split("\n").map((s) => s.trim()).filter(Boolean) }));
+  function move(index: number, dir: -1 | 1) {
+    setDoc((d) => {
+      const j = index + dir;
+      if (j < 0 || j >= d.fields.length) return d;
+      const fields = [...d.fields];
+      [fields[index], fields[j]] = [fields[j], fields[index]];
+      return { ...d, fields };
+    });
+  }
+
+  function addField(type: CustomFieldType) {
+    const f = newCustomField(type);
+    setDoc((d) => {
+      // Slot new questions in above the message box, so it stays last.
+      const at = d.fields.findIndex((x) => x.key === "message");
+      const fields = [...d.fields];
+      fields.splice(at === -1 ? fields.length : at, 0, f);
+      return { ...d, fields };
+    });
+    if (type === "select") setOptionText((o) => ({ ...o, [f.key]: toLines(f.options) }));
+    setMsg({ ok: true, text: "Question added — rename it, then Save & publish." });
+  }
+
+  function removeField(f: ContactField) {
+    if (isCore(f.key)) return;
+    // Built-ins can be restored, so only a question the admin wrote needs a check.
+    if (!isBuiltIn(f.key) && !window.confirm(`Delete "${f.label}"? Answers already received are kept.`)) return;
+    setDoc((d) => ({
+      ...d,
+      fields: d.fields.filter((x) => x.key !== f.key),
+      removed: isBuiltIn(f.key) ? Array.from(new Set([...d.removed, f.key])) : d.removed,
+    }));
+  }
+
+  function restore(key: ContactFieldKey) {
+    const def = CONTACT_FORM.fields.find((f) => f.key === key);
+    if (!def) return;
+    setDoc((d) => {
+      const at = d.fields.findIndex((x) => x.key === "message");
+      const fields = [...d.fields];
+      // The message box goes back to the end; anything else goes above it.
+      if (key === "message" || at === -1) fields.push(def);
+      else fields.splice(at, 0, def);
+      return { ...d, fields, removed: d.removed.filter((k) => k !== key) };
+    });
+  }
+
+  function changeType(f: ContactField, type: CustomFieldType) {
+    update(f.key, { type, options: type === "select" ? f.options ?? ["Option 1", "Option 2"] : undefined });
+    if (type === "select" && optionText[f.key] === undefined) {
+      setOptionText((o) => ({ ...o, [f.key]: toLines(f.options ?? ["Option 1", "Option 2"]) }));
+    }
+  }
+
+  /** The document as it will be stored, with the text boxes parsed. */
+  function finalDoc(): ContactFormDoc | string {
+    const fields = doc.fields.map((f) =>
+      f.type === "select" ? { ...f, options: fromLines(optionText[f.key] ?? toLines(f.options)) } : f,
+    );
+    const blank = fields.find((f) => !f.label.trim());
+    if (blank) return "Every question needs a label.";
+    const emptyDropdown = fields.find((f) => f.type === "select" && !f.options?.length);
+    if (emptyDropdown) return `"${emptyDropdown.label}" is a dropdown with no choices — add at least one.`;
+    return {
+      ...doc,
+      fields,
+      entryOptions: fromLines(listText.entryOptions),
+      batchOptions: fromLines(listText.batchOptions),
+      statusOptions: fromLines(listText.statusOptions),
+    };
+  }
 
   async function save() {
+    const next = finalDoc();
+    if (typeof next === "string") return setMsg({ ok: false, text: next });
     setBusy(true);
     setMsg(null);
     const { error } = await supabase.from("site_content").upsert(
-      { key: "contact_form", label: "Contact & Enquiry Form", draft: doc, published: doc },
+      { key: "contact_form", label: "Contact & Enquiry Form", draft: next, published: next },
       { onConflict: "key" },
     );
     setBusy(false);
     if (error) return setMsg({ ok: false, text: error.message });
+    setDoc(next);
     setMsg({ ok: true, text: "Saved & published — live on the contact page and the enquiry popup." });
     void bustCmsCache();
   }
 
   function resetDefaults() {
+    if (!window.confirm("Reset the form to its original fields? Any questions you added will be removed.")) return;
     setDoc(CONTACT_FORM);
-    setMsg({ ok: true, text: "Reset to the built-in defaults — press Save & publish to apply." });
+    setListText({
+      entryOptions: toLines(CONTACT_FORM.entryOptions),
+      batchOptions: toLines(CONTACT_FORM.batchOptions),
+      statusOptions: toLines(CONTACT_FORM.statusOptions),
+    });
+    setOptionText({});
+    setMsg({ ok: true, text: "Reset to the original fields — press Save & publish to apply." });
   }
 
-  const ListBox = ({
-    id,
-    label,
-    hint,
-    value,
-  }: {
-    id: "entryOptions" | "batchOptions" | "statusOptions";
-    label: string;
-    hint: string;
-    value: string[];
-  }) => (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <label className="block text-sm font-semibold text-slate-800">{label}</label>
-      <p className="mb-2 mt-0.5 text-xs text-slate-500">{hint}</p>
-      <textarea
-        value={value.join("\n")}
-        onChange={(e) => setList(id, e.target.value)}
-        rows={Math.min(Math.max(value.length + 1, 4), 14)}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
-      />
-      <p className="mt-1 text-xs text-slate-400">{value.length} option(s) — one per line.</p>
-    </div>
-  );
+  const shownCount = doc.fields.filter((f) => f.enabled).length;
+  const noContact = !doc.fields.some((f) => (f.key === "phone" || f.key === "email") && f.enabled);
 
   return (
     <div className="mt-6 space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-4 py-3">
-          <h2 className="text-sm font-bold text-slate-900">Fields</h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Rename a field, change its placeholder, mark it mandatory (a red <b className="text-red-600">*</b> appears
-            next to the label and an empty submit is blocked), or hide it entirely.
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900">Fields</h2>
+            <p className="mt-0.5 max-w-2xl text-xs text-slate-500">
+              Add your own questions, delete ones you don&apos;t need, change the order with ↑ ↓, hide a field,
+              or make it mandatory (a red <b className="text-red-600">*</b> appears and an empty answer is refused).
+              {" "}{shownCount} of {doc.fields.length} shown.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-slate-500">Add a question:</span>
+            {CUSTOM_FIELD_TYPES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => addField(t.value)}
+                className="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+              >
+                + {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="divide-y divide-slate-100">
-          {doc.fields.map((f) => (
-            <div key={f.key} className="grid gap-3 p-4 sm:grid-cols-[1fr_1.3fr_auto_auto]">
-              <div>
-                <label className="text-xs text-slate-500">Label</label>
-                <input
-                  value={f.label}
-                  onChange={(e) => setField(f.key, { label: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-                />
-                <p className="mt-1 text-[11px] text-slate-400">{HINTS[f.key]}</p>
-              </div>
-              <div>
-                <label className="text-xs text-slate-500">
-                  {f.key === "entry" || f.key === "batch" || f.key === "status" ? "Dropdown prompt" : "Placeholder"}
-                </label>
-                <input
-                  value={f.placeholder}
-                  onChange={(e) => setField(f.key, { placeholder: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-                />
-              </div>
-              <label className="flex items-end gap-2 pb-1.5 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={f.required}
-                  onChange={(e) => setField(f.key, { required: e.target.checked })}
-                  className="h-4 w-4"
-                />
-                Mandatory <span className="text-red-600">*</span>
-              </label>
-              <label className="flex items-end gap-2 pb-1.5 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={f.enabled}
-                  onChange={(e) => setField(f.key, { enabled: e.target.checked })}
-                  className="h-4 w-4"
-                />
-                Show
-              </label>
-            </div>
-          ))}
-        </div>
+        {noContact && (
+          <p className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs font-medium text-amber-800">
+            ⚠ Phone and Email are both hidden — you would have no way to reply to an enquiry.
+          </p>
+        )}
+
+        <ol className="divide-y divide-slate-100">
+          {doc.fields.map((f, i) => {
+            const builtIn = isBuiltIn(f.key);
+            const info = builtIn ? BUILT_IN_INFO[f.key as ContactFieldKey] : null;
+            const choice = f.key === "entry" || f.key === "batch" || f.key === "status" || f.type === "select";
+            return (
+              <li key={f.key} className={`p-4 ${f.enabled ? "" : "bg-slate-50/70"}`}>
+                <div className="flex flex-wrap items-start gap-3">
+                  <div className="flex flex-col gap-1 pt-5">
+                    <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className={iconBtn} aria-label="Move up">↑</button>
+                    <button type="button" onClick={() => move(i, 1)} disabled={i === doc.fields.length - 1} className={iconBtn} aria-label="Move down">↓</button>
+                  </div>
+
+                  <div className="grid min-w-[240px] flex-1 gap-3 sm:grid-cols-[1fr_1.2fr_auto]">
+                    <label className="text-xs text-slate-500">
+                      Label
+                      <input value={f.label} onChange={(e) => update(f.key, { label: e.target.value })} className={inputCls} />
+                    </label>
+                    <label className="text-xs text-slate-500">
+                      {choice ? "Prompt shown before a choice is made" : "Placeholder (hint inside the box)"}
+                      <input value={f.placeholder} onChange={(e) => update(f.key, { placeholder: e.target.value })} className={inputCls} />
+                    </label>
+                    <label className="text-xs text-slate-500">
+                      Type
+                      {builtIn ? (
+                        <span className="mt-1 flex h-[34px] items-center rounded-lg bg-slate-100 px-3 text-sm text-slate-600">
+                          {info?.kind}
+                        </span>
+                      ) : (
+                        <select
+                          value={f.type}
+                          onChange={(e) => changeType(f, e.target.value as CustomFieldType)}
+                          className={inputCls}
+                        >
+                          {CUSTOM_FIELD_TYPES.map((t) => (
+                            <option key={t.value} value={t.value}>{t.label}</option>
+                          ))}
+                        </select>
+                      )}
+                    </label>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 pt-5">
+                    <label className="flex items-center gap-2 text-sm text-slate-700">
+                      <input type="checkbox" checked={f.required} onChange={(e) => update(f.key, { required: e.target.checked })} className="h-4 w-4" />
+                      Mandatory <span className="text-red-600">*</span>
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-slate-700">
+                      <input type="checkbox" checked={f.enabled} onChange={(e) => update(f.key, { enabled: e.target.checked })} className="h-4 w-4" />
+                      Show
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => removeField(f)}
+                      disabled={isCore(f.key)}
+                      title={isCore(f.key) ? "Every enquiry needs a name and a way to reply — hide this field instead." : "Delete this field"}
+                      className="rounded-lg border border-red-200 px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                <div className="ml-9 mt-2">
+                  {info && <p className="text-[11px] text-slate-400">{info.hint}{isCore(f.key) ? " Can be hidden, not deleted." : ""}</p>}
+                  {!builtIn && f.type === "select" && (
+                    <label className="mt-1 block text-xs text-slate-500">
+                      Choices — one per line
+                      <textarea
+                        value={optionText[f.key] ?? toLines(f.options)}
+                        onChange={(e) => setOptionText((o) => ({ ...o, [f.key]: e.target.value }))}
+                        rows={3}
+                        className="mt-1 block w-full max-w-md rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs"
+                      />
+                    </label>
+                  )}
+                  {!f.enabled && <p className="mt-1 text-[11px] font-medium text-slate-500">Hidden — not on the form.</p>}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+
+        {doc.removed.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3">
+            <span className="text-xs font-medium text-slate-500">Deleted fields:</span>
+            {doc.removed.map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => restore(k)}
+                className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+              >
+                ↺ Restore {CONTACT_FORM.fields.find((f) => f.key === k)?.label ?? k}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Choice lists — only for the built-in dropdowns still on the form. */}
       <div className="grid gap-4 lg:grid-cols-3">
-        <ListBox id="entryOptions" label="Target Entry options" hint="Everything an aspirant can pick in the Target Entry dropdown." value={doc.entryOptions} />
-        <ListBox id="batchOptions" label="Preferred Batch options" hint="Usually offline and online." value={doc.batchOptions} />
-        <ListBox id="statusOptions" label="Current Status options" hint="Usually fresher and repeater." value={doc.statusOptions} />
+        {LISTS.filter((l) => doc.fields.some((f) => f.key === l.field)).map((l) => {
+          const count = fromLines(listText[l.id]).length;
+          return (
+            <div key={l.id} className="rounded-xl border border-slate-200 bg-white p-4">
+              <label htmlFor={`list-${l.id}`} className="block text-sm font-semibold text-slate-800">{l.label}</label>
+              <p className="mb-2 mt-0.5 text-xs text-slate-500">{l.hint}</p>
+              <textarea
+                id={`list-${l.id}`}
+                value={listText[l.id]}
+                onChange={(e) => setListText((t) => ({ ...t, [l.id]: e.target.value }))}
+                rows={Math.min(Math.max(count + 1, 4), 14)}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs outline-none focus:border-blue-500"
+              />
+              <p className="mt-1 text-xs text-slate-400">{count} choice(s) — one per line.</p>
+            </div>
+          );
+        })}
       </div>
 
       <div className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:grid-cols-2">
         <label className="text-xs text-slate-500">
           Submit button text
-          <input
-            value={doc.submitLabel}
-            onChange={(e) => setDoc((d) => ({ ...d, submitLabel: e.target.value }))}
-            className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-          />
+          <input value={doc.submitLabel} onChange={(e) => setDoc((d) => ({ ...d, submitLabel: e.target.value }))} className={inputCls} />
         </label>
         <label className="text-xs text-slate-500">
           Privacy note under the button
-          <input
-            value={doc.privacyNote}
-            onChange={(e) => setDoc((d) => ({ ...d, privacyNote: e.target.value }))}
-            className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-          />
+          <input value={doc.privacyNote} onChange={(e) => setDoc((d) => ({ ...d, privacyNote: e.target.value }))} className={inputCls} />
         </label>
         <label className="text-xs text-slate-500 sm:col-span-2">
           Thank-you message after a successful submit
-          <input
-            value={doc.successMessage}
-            onChange={(e) => setDoc((d) => ({ ...d, successMessage: e.target.value }))}
-            className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm"
-          />
+          <input value={doc.successMessage} onChange={(e) => setDoc((d) => ({ ...d, successMessage: e.target.value }))} className={inputCls} />
         </label>
       </div>
 
@@ -171,7 +346,7 @@ export default function ContactFormManager({ initial }: { initial: ContactFormDo
           {busy ? "Saving…" : "Save & publish"}
         </button>
         <button onClick={resetDefaults} disabled={busy} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60">
-          Reset to defaults
+          Reset to original fields
         </button>
       </div>
     </div>

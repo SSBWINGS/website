@@ -9,6 +9,7 @@ import {
   fullPhone,
   isValidPhone,
   phoneDigits,
+  readCustomAnswers,
   resolveContactForm,
   type ContactFieldKey,
 } from "@/lib/form-defaults";
@@ -48,26 +49,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   }
 
+  // The admin's field settings decide what this form collects. Read them
+  // first, so values for hidden or deleted fields are ignored rather than
+  // stored — they could only have come from a hand-crafted request.
+  const form = resolveContactForm(await getPublished<unknown>("contact_form", CONTACT_FORM));
+  const cfg = (key: ContactFieldKey) => form.fields.find((f) => f.key === key);
+  // A field that is missing from the form (deleted) is not "on".
+  const isOn = (key: ContactFieldKey) => cfg(key)?.enabled === true;
+  const isRequired = (key: ContactFieldKey) => isOn(key) && cfg(key)?.required === true;
+  const labelOf = (key: ContactFieldKey) => cfg(key)?.label || key;
+  const onlyIfOn = (key: ContactFieldKey, v: string | undefined) => (isOn(key) ? v?.trim() ?? "" : "");
+
   const name = body.name?.trim() ?? "";
   const email = body.email?.trim() ?? "";
   // Normalise whatever arrives to the 10 national digits, so a number is
   // validated and stored identically however it was typed or pasted.
   const phoneNational = phoneDigits(body.phone ?? "");
   const phone = fullPhone(phoneNational);
-  const entry = body.entry?.trim() ?? "";
-  const batch = body.batch?.trim().slice(0, 120) ?? "";
-  const currentStatus = body.status?.trim().slice(0, 120) ?? "";
-  const message = body.message?.trim() ?? "";
+  const entry = onlyIfOn("entry", body.entry).slice(0, 200);
+  const batch = onlyIfOn("batch", body.batch).slice(0, 120);
+  const currentStatus = onlyIfOn("status", body.status).slice(0, 120);
+  const message = onlyIfOn("message", body.message);
 
   // Validate against the admin's own field settings. The form is configurable
-  // — a field can be hidden or made optional — so hardcoding "email is
+  // — a field can be hidden, deleted or made optional — so hardcoding "email is
   // required" here rejected submissions from a form that never asked for one.
-  const form = resolveContactForm(await getPublished<unknown>("contact_form", CONTACT_FORM));
-  const cfg = (key: ContactFieldKey) => form.fields.find((f) => f.key === key);
-  const isOn = (key: ContactFieldKey) => cfg(key)?.enabled !== false;
-  const isRequired = (key: ContactFieldKey) => isOn(key) && cfg(key)?.required === true;
-  const labelOf = (key: ContactFieldKey) => cfg(key)?.label || key;
-
   const missing = (["name", "phone", "email", "entry", "batch", "status", "message"] as ContactFieldKey[])
     .filter((k) => isRequired(k))
     .find((k) => !({ name, phone, email, entry, batch, status: currentStatus, message }[k] ?? "").trim());
@@ -98,6 +104,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Please leave a phone number or an email so we can reach you." }, { status: 400 });
   }
 
+  // Answers to fields the admin added in the CMS.
+  const custom = readCustomAnswers(form, body as Record<string, unknown>);
+  if (custom.error) {
+    return NextResponse.json({ error: custom.error }, { status: 400 });
+  }
+
   // Capture the lead in the CRM first (best-effort, independent of email).
   await saveEnquiry({
     name,
@@ -107,7 +119,13 @@ export async function POST(req: Request) {
     entry,
     message,
     source: "contact_form",
-    meta: { batch, status: currentStatus },
+    meta: {
+      batch,
+      status: currentStatus,
+      // Stored by label, so the enquiry stays readable even after the question
+      // is renamed or deleted.
+      ...(custom.answers.length ? { custom: custom.answers } : {}),
+    },
   });
 
   // Notify the academy. Shared with the eligibility/mock-test route so both
@@ -125,6 +143,7 @@ export async function POST(req: Request) {
       ["Preferred Batch", batch],
       ["Current Status", currentStatus],
       ["Message", message],
+      ...custom.answers.map((a) => [a.label, a.value] as [string, string]),
     ],
     footer: email
       ? "Reply directly to this email to reach the aspirant."

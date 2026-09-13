@@ -4,6 +4,7 @@
  *  Plain data with no imports, so it is safe to use from both the server
  *  (admin editor, API validation) and the client (the form itself). */
 
+/** The built-in fields — each has its own storage and behaviour. */
 export type ContactFieldKey =
   | "name"
   | "phone"
@@ -13,19 +14,39 @@ export type ContactFieldKey =
   | "status"
   | "message";
 
+/** What an admin-added field collects. */
+export type CustomFieldType = "text" | "textarea" | "number" | "select" | "date";
+
+export const CUSTOM_FIELD_TYPES: { value: CustomFieldType; label: string }[] = [
+  { value: "text", label: "Short answer" },
+  { value: "textarea", label: "Long answer" },
+  { value: "number", label: "Number" },
+  { value: "select", label: "Dropdown" },
+  { value: "date", label: "Date" },
+];
+
 export type ContactField = {
-  key: ContactFieldKey;
+  /** A built-in key, or "c_…" for a field the admin added. */
+  key: string;
   label: string;
   placeholder: string;
-  /** "on" → shown with a red *, and the browser blocks an empty submit. */
+  /** Shown with a red *, and an empty submit is refused. */
   required: boolean;
-  /** "off" hides the field entirely without deleting its settings. */
+  /** Off hides the field without deleting its settings. */
   enabled: boolean;
+  /** Admin-added fields only — built-ins have fixed behaviour. */
+  type?: CustomFieldType;
+  /** Choices for an admin-added dropdown. */
+  options?: string[];
 };
 
 export type ContactFormDoc = {
+  /** Every field, in the order the form shows them. */
   fields: ContactField[];
-  /** Options for the three dropdowns. */
+  /** Built-in fields the admin deleted. Kept so they can be restored, and so a
+   *  deleted field is not quietly brought back. */
+  removed: ContactFieldKey[];
+  /** Options for the three built-in dropdowns. */
   entryOptions: string[];
   batchOptions: string[];
   statusOptions: string[];
@@ -33,6 +54,31 @@ export type ContactFormDoc = {
   successMessage: string;
   privacyNote: string;
 };
+
+export const BUILT_IN_KEYS: ContactFieldKey[] = ["name", "phone", "email", "entry", "batch", "status", "message"];
+
+/** Can be hidden but never deleted: an enquiry needs a name and a way to reply,
+ *  and the enquiries table requires both columns. */
+export const CORE_KEYS: ContactFieldKey[] = ["name", "phone", "email"];
+
+export const isBuiltIn = (key: string): key is ContactFieldKey => (BUILT_IN_KEYS as string[]).includes(key);
+export const isCore = (key: string) => (CORE_KEYS as string[]).includes(key);
+/** Keys for admin-added fields: "c_" plus 4–12 lowercase letters or digits. */
+export const isCustomKey = (key: string) => /^c_[a-z0-9]{4,12}$/.test(key);
+
+/** A fresh admin-added field. */
+export function newCustomField(type: CustomFieldType = "text"): ContactField {
+  const key = `c_${Math.random().toString(36).slice(2, 10).padEnd(6, "0")}`;
+  return {
+    key,
+    label: "New question",
+    placeholder: "",
+    required: false,
+    enabled: true,
+    type,
+    ...(type === "select" ? { options: ["Option 1", "Option 2"] } : {}),
+  };
+}
 
 /** Every officer entry an aspirant can target. */
 export const ENTRY_OPTIONS: string[] = [
@@ -82,6 +128,7 @@ export const CONTACT_FORM: ContactFormDoc = {
     { key: "status", label: "Current Status", placeholder: "Select your status", required: true, enabled: true },
     { key: "message", label: "Message", placeholder: "Attempt history, Board date, or any question…", required: false, enabled: true },
   ],
+  removed: [],
   entryOptions: ENTRY_OPTIONS,
   batchOptions: BATCH_OPTIONS,
   statusOptions: STATUS_OPTIONS,
@@ -90,33 +137,78 @@ export const CONTACT_FORM: ContactFormDoc = {
   privacyNote: "🔒 Your details stay with SSBWINGS. We never share them.",
 };
 
-/** Merge a stored document over the defaults so a partially-filled CMS doc (or
- *  one saved before a field existed) still renders a complete form. */
+const isText = (v: unknown): v is string => typeof v === "string";
+const cleanList = (v: unknown) =>
+  Array.isArray(v) ? v.filter((x): x is string => isText(x) && x.trim() !== "").map((x) => x.trim()) : [];
+
+/** A built-in field with the admin's edits applied over its defaults. */
+function mergeBuiltIn(def: ContactField, saved: Partial<ContactField>): ContactField {
+  return {
+    key: def.key,
+    label: isText(saved.label) && saved.label.trim() ? saved.label : def.label,
+    placeholder: isText(saved.placeholder) ? saved.placeholder : def.placeholder,
+    required: typeof saved.required === "boolean" ? saved.required : def.required,
+    enabled: typeof saved.enabled === "boolean" ? saved.enabled : def.enabled,
+  };
+}
+
+/** An admin-added field, checked property by property — the stored document is
+ *  editable data, so nothing about its shape is trusted. */
+function cleanCustom(saved: Partial<ContactField>): ContactField | null {
+  if (!isText(saved.key) || !isCustomKey(saved.key)) return null;
+  const type = CUSTOM_FIELD_TYPES.some((t) => t.value === saved.type) ? (saved.type as CustomFieldType) : "text";
+  const options = type === "select" ? cleanList(saved.options) : undefined;
+  // A dropdown with no choices could never be answered; show it as free text.
+  const safeType: CustomFieldType = type === "select" && !options?.length ? "text" : type;
+  return {
+    key: saved.key,
+    label: isText(saved.label) && saved.label.trim() ? saved.label.slice(0, 80) : "Question",
+    placeholder: isText(saved.placeholder) ? saved.placeholder.slice(0, 120) : "",
+    required: saved.required === true,
+    enabled: saved.enabled !== false,
+    type: safeType,
+    ...(safeType === "select" ? { options } : {}),
+  };
+}
+
+/**
+ * The form as it should render: the admin's fields in the admin's order,
+ * built-ins merged over their defaults, deleted built-ins left out.
+ *
+ * Built-ins the stored document never mentions are appended, so a field added
+ * to the code later still appears on sites saved before it existed.
+ */
 export function resolveContactForm(saved: unknown): ContactFormDoc {
   const doc = (saved ?? {}) as Partial<ContactFormDoc>;
-  const savedFields = Array.isArray(doc.fields) ? doc.fields : [];
+  // Core fields can never be deleted, whatever the stored document says.
+  const removed = cleanList(doc.removed).filter(
+    (k): k is ContactFieldKey => isBuiltIn(k) && !isCore(k),
+  );
+  const gone = new Set<string>(removed);
+  const seen = new Set<string>();
+  const fields: ContactField[] = [];
 
-  const fields = CONTACT_FORM.fields.map((def) => {
-    const hit = savedFields.find((f) => f && f.key === def.key);
-    if (!hit) return def;
-    return {
-      key: def.key,
-      label: typeof hit.label === "string" && hit.label.trim() ? hit.label : def.label,
-      placeholder: typeof hit.placeholder === "string" ? hit.placeholder : def.placeholder,
-      required: typeof hit.required === "boolean" ? hit.required : def.required,
-      enabled: typeof hit.enabled === "boolean" ? hit.enabled : def.enabled,
-    };
-  });
+  for (const raw of Array.isArray(doc.fields) ? doc.fields : []) {
+    if (!raw || !isText(raw.key) || seen.has(raw.key)) continue;
+    const def = CONTACT_FORM.fields.find((f) => f.key === raw.key);
+    const field = def ? (gone.has(def.key) ? null : mergeBuiltIn(def, raw)) : cleanCustom(raw);
+    if (!field) continue;
+    fields.push(field);
+    seen.add(field.key);
+  }
+  for (const def of CONTACT_FORM.fields) {
+    if (!seen.has(def.key) && !gone.has(def.key)) fields.push(def);
+  }
 
   const list = (v: unknown, fallback: string[]) => {
-    const arr = Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && x.trim() !== "") : [];
+    const arr = cleanList(v);
     return arr.length ? arr : fallback;
   };
-  const text = (v: unknown, fallback: string) =>
-    typeof v === "string" && v.trim() ? v : fallback;
+  const text = (v: unknown, fallback: string) => (isText(v) && v.trim() ? v : fallback);
 
   return {
     fields,
+    removed: Array.from(new Set(removed)),
     entryOptions: list(doc.entryOptions, CONTACT_FORM.entryOptions),
     batchOptions: list(doc.batchOptions, CONTACT_FORM.batchOptions),
     statusOptions: list(doc.statusOptions, CONTACT_FORM.statusOptions),
@@ -124,6 +216,47 @@ export function resolveContactForm(saved: unknown): ContactFormDoc {
     successMessage: text(doc.successMessage, CONTACT_FORM.successMessage),
     privacyNote: text(doc.privacyNote, CONTACT_FORM.privacyNote),
   };
+}
+
+/** Longest answer kept for each kind of admin-added field. */
+const CUSTOM_MAX: Record<CustomFieldType, number> = { text: 300, textarea: 2000, number: 30, select: 200, date: 10 };
+
+/**
+ * Read and check the answers to admin-added fields from a submission.
+ *
+ * Returns them in form order as label/value pairs — labels rather than keys,
+ * so an enquiry stays readable even after the admin renames or deletes the
+ * question. Hidden fields are ignored; anything submitted for a field that is
+ * not on the form is dropped.
+ */
+export function readCustomAnswers(
+  form: ContactFormDoc,
+  body: Record<string, unknown>,
+): { answers: { label: string; value: string }[]; error?: string } {
+  const answers: { label: string; value: string }[] = [];
+  for (const f of form.fields) {
+    if (!f.enabled || isBuiltIn(f.key) || !f.type) continue;
+    const raw = body[f.key];
+    const value = isText(raw) ? raw.trim().slice(0, CUSTOM_MAX[f.type]) : "";
+
+    if (!value) {
+      if (f.required) return { answers, error: `Please fill in ${f.label}.` };
+      continue;
+    }
+    if (f.type === "number" && !/^-?\d+(\.\d+)?$/.test(value)) {
+      return { answers, error: `${f.label} must be a number.` };
+    }
+    if (f.type === "date" && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return { answers, error: `${f.label} must be a date.` };
+    }
+    // A dropdown answer must be one of its choices — anything else was typed
+    // in by hand rather than picked from the form.
+    if (f.type === "select" && !(f.options ?? []).includes(value)) {
+      return { answers, error: `Please choose a valid option for ${f.label}.` };
+    }
+    answers.push({ label: f.label, value });
+  }
+  return { answers };
 }
 
 /* ── Phone handling ───────────────────────────────────────────────────────
