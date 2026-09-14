@@ -1,5 +1,5 @@
-/** The hero heading's size controls, and the text helpers the admin's hero
- *  wireframe uses. Shared by the public hero and the admin editor.
+/** The hero heading's size controls. Shared by the public hero and the
+ *  admin editor.
  *
  *  Pure and dependency-free, so it can be unit-tested. */
 
@@ -23,26 +23,3 @@ export function headingPercent(v: unknown): number {
 
 /** One step bigger or smaller, stopping at the ends of the range. */
 export const stepHeading = (v: unknown, dir: 1 | -1) => headingPercent(headingPercent(v) + dir * HEADING_SIZE.step);
-
-// ── Wireframe text helpers ─────────────────────────────────────────────────
-
-const ENTITIES: Record<string, string> = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", apos: "'" };
-
-/** Rich-text HTML as plain text, one entry per visual line block: every <br>,
- *  and the end of every <div>, <p>, <li> or heading, starts a new block. */
-export function richTextBlocks(html: string): string[] {
-  return (html || "")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(div|p|li|h[1-6])\s*>/gi, "\n")
-    .replace(/<[^>]*>/g, "")
-    .replace(/&(nbsp|amp|lt|gt|quot|#39|apos);/g, (_, e: string) => ENTITIES[e])
-    .split("\n")
-    .map((s) => s.replace(/\s+/g, " ").trim())
-    .filter(Boolean);
-}
-
-/** How the rich text is aligned, from the alignment the editor applied. */
-export function richTextAlign(html: string): "left" | "center" | "right" {
-  const m = (html || "").match(/text-align:\s*(left|center|right)/i);
-  return m ? (m[1].toLowerCase() as "left" | "center" | "right") : "left";
-}

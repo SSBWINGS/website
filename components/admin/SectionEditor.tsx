@@ -9,13 +9,15 @@ import { compressImage } from "@/lib/image-client";
 import { useImageCropper, FRAMES } from "./useImageCropper";
 import type { SectionDef, SectionField } from "@/lib/sections";
 import RichText from "./RichText";
-import HeroWireframe from "./HeroWireframe";
+import HeroPreview from "./HeroPreview";
 
-/** Sections with a live layout preview above their fields. The preview gets
- *  the draft as it is typed, and may own settings of its own (the hero's
- *  heading sizes live next to the frames they change). */
-const PREVIEWS: Record<string, (p: { form: Record<string, unknown>; setField: (k: string, v: unknown) => void }) => ReactNode> = {
-  hero: HeroWireframe,
+/** Sections with a live preview above their fields. The preview gets the
+ *  draft as it is typed, plus any read-only data the page loaded for it, and
+ *  may own settings of its own (the hero's heading sizes live next to the
+ *  frames they change). */
+type PreviewProps = { form: Record<string, unknown>; setField: (k: string, v: unknown) => void; data?: unknown };
+const PREVIEWS: Record<string, (p: PreviewProps) => ReactNode> = {
+  hero: HeroPreview,
 };
 
 const supabase = createClient();
@@ -129,7 +131,7 @@ function FieldInput({ field, value, onChange }: { field: SectionField; value: un
   return null;
 }
 
-export default function SectionEditor({ section, initial, canRollback }: { section: SectionDef; initial: Record<string, unknown>; canRollback: boolean }) {
+export default function SectionEditor({ section, initial, canRollback, previewData }: { section: SectionDef; initial: Record<string, unknown>; canRollback: boolean; previewData?: unknown }) {
   const [form, setForm] = useState<Record<string, unknown>>(initial);
   const [busy, setBusy] = useState<"" | "save" | "publish" | "rollback">("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -191,7 +193,7 @@ export default function SectionEditor({ section, initial, canRollback }: { secti
 
   return (
     <div className="mt-6 space-y-6">
-      {Preview && <Preview form={form} setField={setField} />}
+      {Preview && <Preview form={form} setField={setField} data={previewData} />}
       <div className="max-w-3xl rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-4">
           {section.fields.map((f) => (

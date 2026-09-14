@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Counter from "./Counter";
@@ -8,6 +8,7 @@ import HeroShowcase from "./HeroShowcase";
 import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
 import { asArray } from "@/lib/shape";
 import { headingPercent } from "@/lib/hero-heading";
+import { useTypewriter } from "./useTypewriter";
 
 import { HERO } from "@/lib/section-defaults";
 
@@ -31,23 +32,6 @@ export type HeroContent = {
 };
 
 export const HERO_DEFAULT: HeroContent = HERO;
-
-function useTypewriter(words: string[]) {
-  const [text, setText] = useState("");
-  const [i, setI] = useState(0);
-  const [del, setDel] = useState(false);
-  useEffect(() => {
-    const w = words[i % words.length];
-    const delay = del ? 45 : text === w ? 1700 : 95;
-    const t = setTimeout(() => {
-      if (!del && text === w) setDel(true);
-      else if (del && text === "") { setDel(false); setI((n) => (n + 1) % words.length); }
-      else setText(w.slice(0, text.length + (del ? -1 : 1)));
-    }, delay);
-    return () => clearTimeout(t);
-  }, [text, del, i, words]);
-  return text;
-}
 
 const DEFAULT_STATS = [
   { value: 677, label: "Recommendations" },
