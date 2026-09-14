@@ -96,8 +96,8 @@ export const SECTIONS: SectionDef[] = [
     previewPath: "/",
     fields: [
       { key: "badge", label: "Badge (small pill text)", type: "text" },
-      { key: "headingLine1", label: "Heading — line 1", type: "text" },
-      { key: "headingLine2", label: "Heading — line 2", type: "text" },
+      { key: "headingLine1", label: "Heading — line 1 (always one line; lines 1 & 2 shrink together to fit)", type: "text" },
+      { key: "headingLine2", label: "Heading — line 2 (always one line, same size as line 1)", type: "text" },
       { key: "typedPrefix", label: "Animated line — fixed start (e.g. \"Become \")", type: "text" },
       { key: "typedWords", label: "Animated line — rotating words (comma-separated)", type: "tags" },
       { key: "paragraph", label: "Intro paragraph (fonts/colours/word-art)", type: "rich" },
