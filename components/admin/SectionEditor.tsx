@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { bustCmsCache } from "@/lib/revalidate-client";
@@ -9,6 +9,14 @@ import { compressImage } from "@/lib/image-client";
 import { useImageCropper, FRAMES } from "./useImageCropper";
 import type { SectionDef, SectionField } from "@/lib/sections";
 import RichText from "./RichText";
+import HeroWireframe from "./HeroWireframe";
+
+/** Sections with a live layout preview above their fields. The preview gets
+ *  the draft as it is typed, and may own settings of its own (the hero's
+ *  heading sizes live next to the frames they change). */
+const PREVIEWS: Record<string, (p: { form: Record<string, unknown>; setField: (k: string, v: unknown) => void }) => ReactNode> = {
+  hero: HeroWireframe,
+};
 
 const supabase = createClient();
 
@@ -179,9 +187,12 @@ export default function SectionEditor({ section, initial, canRollback }: { secti
     setMsg({ ok: true, text: "Rolled back to the previous version." }); void bustCmsCache();
   }
 
+  const Preview = PREVIEWS[section.key];
+
   return (
-    <div className="mt-6 max-w-3xl">
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
+    <div className="mt-6 space-y-6">
+      {Preview && <Preview form={form} setField={setField} />}
+      <div className="max-w-3xl rounded-xl border border-slate-200 bg-white p-5">
         <div className="space-y-4">
           {section.fields.map((f) => (
             <div key={f.key}>

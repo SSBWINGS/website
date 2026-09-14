@@ -17,6 +17,9 @@ export const HERO = {
   primaryCtaHref: "/contact",
   secondaryCta: "Courses",
   secondaryCtaHref: "/courses",
+  /** Heading size, % of the design size (see lib/hero-heading.ts). */
+  headingSizeMobile: 100,
+  headingSizeDesktop: 100,
 };
 
 export const STORY = {

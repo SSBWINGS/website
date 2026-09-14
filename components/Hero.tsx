@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Counter from "./Counter";
 import HeroShowcase from "./HeroShowcase";
 import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
 import { asArray } from "@/lib/shape";
+import { headingPercent } from "@/lib/hero-heading";
 
 import { HERO } from "@/lib/section-defaults";
 
@@ -24,6 +25,9 @@ export type HeroContent = {
   primaryCtaHref?: string;
   secondaryCta?: string;
   secondaryCtaHref?: string;
+  /** Heading size as a % of the design size — phones, and tablets/desktops. */
+  headingSizeMobile?: number | string;
+  headingSizeDesktop?: number | string;
 };
 
 export const HERO_DEFAULT: HeroContent = HERO;
@@ -96,9 +100,16 @@ export default function Hero({
             <span className="chakra text-[14px]" aria-hidden /> {content.badge}
           </div>
 
-          {/* Full design size, left-aligned. Each heading starts on its own line;
-              a long one wraps rather than shrinking. */}
-          <h1 className="section-title text-left text-4xl leading-[0.98] sm:text-5xl lg:text-6xl">
+          {/* Left-aligned; each heading starts on its own line and a long one
+              wraps. Size is the design size scaled by the admin's setting for
+              phones and for larger screens (see .hero-headline). */}
+          <h1
+            className="hero-headline section-title text-left leading-[0.98]"
+            style={{
+              "--hs-m": headingPercent(content.headingSizeMobile) / 100,
+              "--hs-d": headingPercent(content.headingSizeDesktop) / 100,
+            } as CSSProperties}
+          >
             <span className="block">{content.headingLine1}</span>
             <span className="block">{content.headingLine2}</span>
             <span className="block">

@@ -456,6 +456,14 @@ body {
   font-size: 1.0625rem;
   line-height: 1;
 }
+/* Hero heading: the design size (the text-4xl, 5xl and 6xl sizes above)
+   scaled by the admin's "Heading size" setting, one for phones and one for
+   tablets and desktops. Keep the rems in step with HEADING_REM in
+   lib/hero-heading.ts. */
+.hero-headline { font-size: calc(2.5rem * var(--hs-m, 1)); }
+@media (min-width: 640px) { .hero-headline { font-size: calc(3.25rem * var(--hs-d, 1)); } }
+@media (min-width: 1024px) { .hero-headline { font-size: calc(4rem * var(--hs-d, 1)); } }
+
 /* Phones: bigger, easier to tap. The row is centred in Hero.tsx. */
 @media (max-width: 639.98px) {
   .hero-btn {
