@@ -456,18 +456,6 @@ body {
   font-size: 1.0625rem;
   line-height: 1;
 }
-/* Hero headline: every line on one line (see useFittedHeadline in Hero.tsx).
-   --hero-max is the design size per screen; the fitted size only ever takes
-   it down, when a line is too long for the column. The animated line matches
-   the headings unless its own longest word needs it smaller still. */
-.hero-headline {
-  --hero-max: 2.25rem;
-  font-size: min(var(--hero-max), var(--hero-fit, var(--hero-max)));
-}
-@media (min-width: 640px) { .hero-headline { --hero-max: 3rem; } }
-@media (min-width: 1024px) { .hero-headline { --hero-max: 3.75rem; } }
-.hero-typed { font-size: min(1em, var(--hero-typed-fit, 1em)); }
-
 /* Phones: bigger, easier to tap. The row is centred in Hero.tsx. */
 @media (max-width: 639.98px) {
   .hero-btn {

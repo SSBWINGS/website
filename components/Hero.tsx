@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Counter from "./Counter";
 import HeroShowcase from "./HeroShowcase";
 import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
 import { asArray } from "@/lib/shape";
-import { estimateFitCqw, fitFontPx } from "@/lib/fit-text";
 
 import { HERO } from "@/lib/section-defaults";
 
@@ -46,57 +45,6 @@ function useTypewriter(words: string[]) {
   return text;
 }
 
-/**
- * Keeps each headline line on one line. Heading lines 1 and 2 share the
- * largest size at which both fit; the animated line matches them, shrinking
- * on its own only if its longest word would not fit at that size. Never
- * larger than the design size (set in CSS), so short headings look as before.
- *
- * The server can't measure text, so the first paint uses an estimate from the
- * characters (in cqw, which follows the column's width); the browser then
- * measures the real text before painting and whenever the column resizes.
- */
-function useFittedHeadline(headings: string[], animated: string[]) {
-  const ref = useRef<HTMLHeadingElement>(null);
-  const [measured, setMeasured] = useState<{ head: number; typed: number } | null>(null);
-  const headKey = headings.join("\n");
-  const typedKey = animated.join("\n");
-
-  useLayoutEffect(() => {
-    const h = ref.current;
-    if (!h) return;
-    let live = true;
-    const measure = () => {
-      if (!live) return;
-      // Measured at the headline's current size so it inherits the exact
-      // font, weight and tracking; width scales with size from there.
-      const atPx = parseFloat(getComputedStyle(h).fontSize);
-      const probe = document.createElement("span");
-      probe.style.cssText = "position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;pointer-events:none";
-      h.appendChild(probe);
-      const widthOf = (t: string) => ((probe.textContent = t), probe.getBoundingClientRect().width);
-      const head = fitFontPx(h.clientWidth, headKey.split("\n").map(widthOf), atPx);
-      const typed = fitFontPx(h.clientWidth, typedKey.split("\n").map(widthOf), atPx);
-      probe.remove();
-      if (head && typed) setMeasured((m) => (m && m.head === head && m.typed === typed ? m : { head, typed }));
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(h);
-    // The display font may arrive after first paint and is a different width.
-    document.fonts?.ready.then(measure);
-    return () => { live = false; ro.disconnect(); };
-  }, [headKey, typedKey]);
-
-  const estHead = estimateFitCqw(headings);
-  const estTyped = estimateFitCqw(animated);
-  const style = {
-    "--hero-fit": measured ? `${measured.head}px` : estHead ? `${estHead}cqw` : undefined,
-    "--hero-typed-fit": measured ? `${measured.typed}px` : estTyped ? `${estTyped}cqw` : undefined,
-  } as CSSProperties;
-  return { ref, style };
-}
-
 const DEFAULT_STATS = [
   { value: 677, label: "Recommendations" },
   { value: 3450, label: "Alumni Family" },
@@ -118,11 +66,6 @@ export default function Hero({
   const roles = words.length ? words : (HERO.typedWords as string[]);
   const typed = useTypewriter(roles);
   const prefix = content.typedPrefix ?? HERO.typedPrefix;
-  // The animated line is sized for its longest word, cursor included.
-  const headline = useFittedHeadline(
-    [content.headingLine1, content.headingLine2],
-    roles.map((w) => `${prefix}${w}|`),
-  );
 
   return (
     <section className="relative overflow-hidden">
@@ -153,17 +96,16 @@ export default function Hero({
             <span className="chakra text-[14px]" aria-hidden /> {content.badge}
           </div>
 
-          {/* The wrapper is the size container the first-paint estimate uses. */}
-          <div className="@container">
-            <h1 ref={headline.ref} style={headline.style} className="hero-headline section-title leading-[0.98]">
-              <span className="block whitespace-nowrap">{content.headingLine1}</span>
-              <span className="block whitespace-nowrap">{content.headingLine2}</span>
-              <span className="hero-typed block whitespace-nowrap">
-                <span className="tricolour-text">{prefix}{typed}</span>
-                <span className="animate-pulse text-saffron-600">|</span>
-              </span>
-            </h1>
-          </div>
+          {/* Full design size, left-aligned. Each heading starts on its own line;
+              a long one wraps rather than shrinking. */}
+          <h1 className="section-title text-left text-4xl leading-[0.98] sm:text-5xl lg:text-6xl">
+            <span className="block">{content.headingLine1}</span>
+            <span className="block">{content.headingLine2}</span>
+            <span className="block">
+              <span className="tricolour-text">{prefix}{typed}</span>
+              <span className="animate-pulse text-saffron-600">|</span>
+            </span>
+          </h1>
 
           {/* A div, not a p: the paragraph is rich text that may hold its own
               block tags, and a p cannot contain them — the browser would split
