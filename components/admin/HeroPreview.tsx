@@ -27,10 +27,21 @@ export type HeroPreviewData = {
 };
 type Props = { form: Form; setField: (key: string, value: unknown) => void; data?: unknown };
 
-/** Design width and root font size of each device (globals.css bumps the
- *  root to 104% from 1280px wide). */
-const PHONE = { width: 360, root: 16, screen: 740 } as const;
-const DESKTOP = { width: 1280, root: 16.64 } as const;
+/** Each device's screen in CSS px — desktop 16:9, phone 9:16 — and its root
+ *  font size (globals.css bumps the root to 104% from 1280px wide). */
+const PHONE = { width: 360, height: 640, root: 16 } as const;
+const DESKTOP = { width: 1280, height: 720, root: 16.64 } as const;
+
+/** What surrounds the two screens, for fitting them into the window. Across:
+ *  the gap between them, the phone's bezel, the browser frame's border, and
+ *  the size controls' column when they sit beside the screens. Down: each
+ *  screen's caption and frame chrome, the size controls when they sit below,
+ *  and a little breathing room above the window's edge. */
+const FIT = {
+  gapX: 24, phoneBezelX: 20, desktopBorderX: 2, controlsW: 240,
+  chromeY: 60, controlsY: 112, marginY: 16, minScreen: 200,
+} as const;
+const SCREEN_RATIO = 16 / 9 + 9 / 16; // total width of both screens per px of height
 
 const DISPLAY = 'var(--font-barlow), "Arial Narrow", sans-serif';
 const SANS = "var(--font-inter), ui-sans-serif, system-ui, sans-serif";
@@ -75,10 +86,39 @@ function Scaled({ width, scale, children }: { width: number; scale: number; chil
   );
 }
 
-/** Width of an element, kept up to date. A callback ref, so it starts
- *  measuring whenever the element appears, not only on first mount. */
-function useWidth<T extends HTMLElement>() {
-  const [el, ref] = useState<T | null>(null);
+/** The screens' height, and where the size controls go: as tall as fits
+ *  both screens side by side in the preview's width, and everything in the
+ *  window below the preview's top, so the whole preview is visible without
+ *  scrolling the page. Controls go beside the screens on short, wide windows
+ *  and below them on tall ones — whichever leaves the screens bigger. */
+function useScreenFit() {
+  const [row, ref] = useState<HTMLDivElement | null>(null);
+  const [fit, setFit] = useState({ height: 0, beside: false });
+  useEffect(() => {
+    if (!row) return;
+    const measure = () => {
+      const across = row.clientWidth - FIT.gapX - FIT.phoneBezelX - FIT.desktopBorderX;
+      const down = window.innerHeight - (row.getBoundingClientRect().top + window.scrollY) - FIT.chromeY - FIT.marginY;
+      const below = Math.min(across / SCREEN_RATIO, down - FIT.controlsY);
+      const beside = Math.min((across - FIT.gapX - FIT.controlsW) / SCREEN_RATIO, down);
+      const next = beside > below
+        ? { height: Math.max(FIT.minScreen, Math.floor(beside)), beside: true }
+        : { height: Math.max(FIT.minScreen, Math.floor(below)), beside: false };
+      setFit((f) => (f.height === next.height && f.beside === next.beside ? f : next));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(row);
+    window.addEventListener("resize", measure);
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
+  }, [row]);
+  return { ref, ...fit };
+}
+
+/** Width inside an element's scrollbar, kept up to date: the scale for the
+ *  page drawn in it. */
+function useInnerWidth() {
+  const [el, ref] = useState<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
     if (!el) return;
@@ -248,7 +288,7 @@ function SizeControl({ label, value, onChange, basePx }: { label: string; value:
   const pct = headingPercent(value);
   const btn = "inline-flex h-8 shrink-0 items-center justify-center gap-px rounded-lg border border-slate-300 bg-white px-2 font-semibold leading-none text-slate-700 hover:bg-slate-50 disabled:opacity-40";
   return (
-    <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
       <div className="flex flex-wrap items-baseline justify-between gap-x-2">
         <span className="text-xs font-semibold text-slate-700">{label}</span>
         <span className="text-xs tabular-nums text-slate-500">
@@ -258,7 +298,7 @@ function SizeControl({ label, value, onChange, basePx }: { label: string; value:
           )}
         </span>
       </div>
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-1.5 flex items-center gap-2">
         <button type="button" className={btn} onClick={() => onChange(stepHeading(pct, -1))} disabled={pct <= HEADING_SIZE.min} aria-label={`${label}: smaller`}>
           <span className="text-xs">A</span>−
         </button>
@@ -276,9 +316,12 @@ function SizeControl({ label, value, onChange, basePx }: { label: string; value:
 }
 
 export default function HeroPreview({ form, setField, data }: Props) {
-  const desktop = useWidth<HTMLDivElement>();
-  const phoneShown = 240; // px on screen
-  const phoneScale = phoneShown / PHONE.width;
+  const screens = useScreenFit();
+  const desktop = useInnerWidth();
+  const phone = useInnerWidth();
+  const h = screens.height;
+  const scroller = "overflow-y-auto overflow-x-hidden";
+  const thin = { scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 transparent" } as const;
 
   // The page is admin-only and rendered after mount (the HTML cleaner needs
   // the browser), so the server and first client render agree.
@@ -304,57 +347,65 @@ export default function HeroPreview({ form, setField, data }: Props) {
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 className="text-sm font-semibold text-slate-900">Preview</h2>
         <p className="text-xs text-slate-500">
-          Your hero text exactly as the live site shows it, with the same fonts, sizes and line breaks. Photos are left out. Updates as you type.
+          Live text on real screen shapes · scroll inside a screen for the rest · photos left out · updates as you type
         </p>
       </div>
 
       {mounted && (
-        <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-start">
-          {/* Desktop */}
-          <figure className="min-w-0 flex-1">
-            <figcaption className="mb-2 text-xs font-medium text-slate-500">Desktop · 1280px wide</figcaption>
-            <div className="overflow-hidden rounded-lg border border-slate-300 shadow-sm">
-              <div className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-100 px-3 py-2" aria-hidden>
-                {[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-slate-300" />)}
-                <span className="ml-3 h-4 flex-1 rounded bg-white" />
+        <div ref={screens.ref} className={`mt-3 flex justify-center gap-6 ${screens.beside ? "flex-row items-start" : "flex-col items-center"}`}>
+          <div className="flex min-w-0 items-start justify-center gap-6">
+            {/* Desktop — a 16:9 screen */}
+            <figure className="min-w-0" style={{ width: h ? (h * 16) / 9 + FIT.desktopBorderX : undefined }}>
+              <figcaption className="mb-2 truncate text-xs font-medium text-slate-500">Desktop · 16:9 screen (1280 × 720)</figcaption>
+              <div className="overflow-hidden rounded-lg border border-slate-300 shadow-sm">
+                <div className="flex items-center gap-1.5 border-b border-slate-200 bg-slate-100 px-3 py-2" aria-hidden>
+                  {[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-slate-300" />)}
+                  <span className="ml-3 h-4 flex-1 rounded bg-white" />
+                </div>
+                <div ref={desktop.ref} className={scroller} style={{ height: h, ...thin }}>
+                  {h > 0 && desktop.width > 0 && (
+                    <Scaled width={DESKTOP.width} scale={desktop.width / DESKTOP.width}>
+                      <HeroLayout form={form} phone={false} v={resolved} />
+                    </Scaled>
+                  )}
+                </div>
               </div>
-              <div ref={desktop.ref}>
-                {desktop.width > 0 && (
-                  <Scaled width={DESKTOP.width} scale={desktop.width / DESKTOP.width}>
-                    <HeroLayout form={form} phone={false} v={resolved} />
-                  </Scaled>
-                )}
+            </figure>
+
+            {/* Phone — a 9:16 screen */}
+            <figure className="shrink-0" style={{ width: h ? (h * 9) / 16 + FIT.phoneBezelX : undefined }}>
+              <figcaption className="mb-2 truncate text-xs font-medium text-slate-500">Phone · 9:16 (360 × 640)</figcaption>
+              <div className="rounded-[1.6rem] border-[10px] border-slate-800 bg-slate-800 shadow-md">
+                <div className="mx-auto mb-1.5 h-1.5 w-12 rounded-full bg-slate-600" aria-hidden />
+                <div ref={phone.ref} className={`${scroller} rounded-[0.9rem] bg-white`} style={{ height: h, ...thin }}>
+                  {h > 0 && phone.width > 0 && (
+                    <Scaled width={PHONE.width} scale={phone.width / PHONE.width}>
+                      <HeroLayout form={form} phone v={resolved} />
+                    </Scaled>
+                  )}
+                </div>
               </div>
-            </div>
+            </figure>
+          </div>
+
+          {/* Heading sizes — beside the screens or below them, whichever fits */}
+          <div
+            className={screens.beside ? "shrink-0 space-y-3 pt-6" : "grid w-full gap-3 sm:grid-cols-2"}
+            style={screens.beside ? { width: FIT.controlsW } : { maxWidth: (h * 16) / 9 + (h * 9) / 16 + FIT.gapX + FIT.phoneBezelX + FIT.desktopBorderX }}
+          >
             <SizeControl
               label="Heading size — tablets & desktops"
               value={form.headingSizeDesktop}
               onChange={(v) => setField("headingSizeDesktop", v)}
               basePx={HEADING_REM.desktop * 16}
             />
-          </figure>
-
-          {/* Phone */}
-          <figure className="mx-auto w-[16.5rem] shrink-0">
-            <figcaption className="mb-2 text-xs font-medium text-slate-500">Phone · 360px wide (scroll inside)</figcaption>
-            <div className="rounded-[2rem] border-[10px] border-slate-800 bg-slate-800 shadow-md">
-              <div className="mx-auto mb-1.5 h-1.5 w-14 rounded-full bg-slate-600" aria-hidden />
-              <div
-                className="overflow-y-auto overflow-x-hidden rounded-[1.2rem] bg-white"
-                style={{ width: phoneShown, height: PHONE.screen * phoneScale, scrollbarWidth: "thin", scrollbarColor: "#cbd5e1 transparent" }}
-              >
-                <Scaled width={PHONE.width} scale={phoneScale}>
-                  <HeroLayout form={form} phone v={resolved} />
-                </Scaled>
-              </div>
-            </div>
             <SizeControl
               label="Heading size — phones"
               value={form.headingSizeMobile}
               onChange={(v) => setField("headingSizeMobile", v)}
               basePx={HEADING_REM.phone * 16}
             />
-          </figure>
+          </div>
         </div>
       )}
     </section>
