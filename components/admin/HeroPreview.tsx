@@ -133,6 +133,8 @@ function useInnerWidth() {
 type Resolved = {
   str: (k: string) => string;
   typed: string;
+  /** Whether there are rotating words to type (else no cursor). */
+  animated: boolean;
   paragraph: string;
   rating: string;
   data: HeroPreviewData;
@@ -190,10 +192,12 @@ function HeroLayout({ form, phone, v }: { form: Form; phone: boolean; v: Resolve
       >
         <span style={{ display: "block" }}>{str("headingLine1")}</span>
         <span style={{ display: "block" }}>{str("headingLine2")}</span>
-        <span style={{ display: "block" }}>
-          <span className="tricolour-text">{str("typedPrefix")}{v.typed}</span>
-          <span className="animate-pulse" style={{ color: "var(--color-saffron-600)" }}>|</span>
-        </span>
+        {(v.animated || str("typedPrefix").trim()) && (
+          <span style={{ display: "block" }}>
+            <span className="tricolour-text">{str("typedPrefix")}{v.typed}</span>
+            {v.animated && <span className="animate-pulse" style={{ color: "var(--color-saffron-600)" }}>|</span>}
+          </span>
+        )}
       </div>
 
       <div
@@ -330,15 +334,15 @@ export default function HeroPreview({ form, setField, data }: Props) {
 
   const str = (k: string) => (typeof form[k] === "string" ? (form[k] as string) : "");
   const typedWordsKey = asArray<string>(form.typedWords).filter(Boolean).join("\n");
-  // Same fallback as the live hero: its default words if none are set.
-  const words = useMemo(() => (typedWordsKey ? typedWordsKey.split("\n") : (HERO.typedWords as string[])), [typedWordsKey]);
+  // As on the live hero: no words, no animation.
+  const words = useMemo(() => (typedWordsKey ? typedWordsKey.split("\n") : []), [typedWordsKey]);
   const typed = useTypewriter(words);
   const paragraph = useMemo(() => (mounted ? cleanHtml(str("paragraph")) : ""), [mounted, form.paragraph]); // eslint-disable-line react-hooks/exhaustive-deps
   const rating = useMemo(() => (mounted ? cleanHtml(str("rating")) : ""), [mounted, form.rating]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const d = (data ?? {}) as Partial<HeroPreviewData>;
   const resolved: Resolved = {
-    str, typed, paragraph, rating,
+    str, typed, paragraph, rating, animated: words.length > 0,
     data: { stats: Array.isArray(d.stats) ? d.stats : [], slide: d.slide ?? null },
   };
 

@@ -50,10 +50,12 @@ export default function Hero({
   slides?: HeroSlide[];
 }) {
   // Everything in the headline is CMS-editable, including the animated words.
+  // No words means no animation: the line shows just its fixed start, with no
+  // cursor, and disappears if that is empty too.
   const words = asArray<string>(content.typedWords).filter(Boolean);
-  const roles = words.length ? words : (HERO.typedWords as string[]);
-  const typed = useTypewriter(roles);
+  const typed = useTypewriter(words);
   const prefix = content.typedPrefix ?? HERO.typedPrefix;
+  const animated = words.length > 0;
 
   return (
     <section className="relative overflow-hidden">
@@ -96,10 +98,12 @@ export default function Hero({
           >
             <span className="block">{content.headingLine1}</span>
             <span className="block">{content.headingLine2}</span>
-            <span className="block">
-              <span className="tricolour-text">{prefix}{typed}</span>
-              <span className="animate-pulse text-saffron-600">|</span>
-            </span>
+            {(animated || prefix.trim()) && (
+              <span className="block">
+                <span className="tricolour-text">{prefix}{typed}</span>
+                {animated && <span className="animate-pulse text-saffron-600">|</span>}
+              </span>
+            )}
           </h1>
 
           {/* A div, not a p: the paragraph is rich text that may hold its own

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 
 /** Types each word out, holds it, deletes it, moves to the next — the hero's
- *  animated line. Shared by the hero and its admin preview. */
+ *  animated line. Shared by the hero and its admin preview. With no words it
+ *  types nothing, and clears straight away if the words are removed. */
 export function useTypewriter(words: string[]) {
   const [text, setText] = useState("");
   const [i, setI] = useState(0);
@@ -19,5 +20,5 @@ export function useTypewriter(words: string[]) {
     }, delay);
     return () => clearTimeout(t);
   }, [text, del, i, words]);
-  return text;
+  return words.length ? text : "";
 }

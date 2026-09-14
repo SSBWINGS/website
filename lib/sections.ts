@@ -99,7 +99,7 @@ export const SECTIONS: SectionDef[] = [
       { key: "headingLine1", label: "Heading — line 1", type: "text" },
       { key: "headingLine2", label: "Heading — line 2", type: "text" },
       { key: "typedPrefix", label: "Animated line — fixed start (e.g. \"Become \")", type: "text" },
-      { key: "typedWords", label: "Animated line — rotating words (comma-separated)", type: "tags" },
+      { key: "typedWords", label: "Animated line — rotating words (comma-separated; leave empty for no animation)", type: "tags" },
       { key: "paragraph", label: "Intro paragraph (fonts/colours/word-art)", type: "rich" },
       { key: "rating", label: "Rating line (HTML allowed)", type: "text" },
       { key: "primaryCta", label: "Primary button — label", type: "text" },
