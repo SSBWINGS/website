@@ -7,7 +7,7 @@ import Counter from "./Counter";
 import HeroShowcase from "./HeroShowcase";
 import { HERO_SLIDES, type HeroSlide } from "@/lib/hero-slides";
 import { asArray } from "@/lib/shape";
-import { headingPercent } from "@/lib/hero-heading";
+import { headingAlign, headingPercent } from "@/lib/hero-heading";
 import { useTypewriter } from "./useTypewriter";
 
 import { HERO } from "@/lib/section-defaults";
@@ -29,6 +29,8 @@ export type HeroContent = {
   /** Heading size as a % of the design size — phones, and tablets/desktops. */
   headingSizeMobile?: number | string;
   headingSizeDesktop?: number | string;
+  /** "left" | "center" | "right" — the heading lines within the text column. */
+  headingAlign?: string;
 };
 
 export const HERO_DEFAULT: HeroContent = HERO;
@@ -86,14 +88,16 @@ export default function Hero({
             <span className="chakra text-[14px]" aria-hidden /> {content.badge}
           </div>
 
-          {/* Left-aligned; each heading starts on its own line and a long one
-              wraps. Size is the design size scaled by the admin's setting for
-              phones and for larger screens (see .hero-headline). */}
+          {/* Each heading starts on its own line and a long one wraps. Size is
+              the design size scaled by the admin's setting for phones and for
+              larger screens (see .hero-headline); alignment is the admin's too. */}
           <h1
-            className="hero-headline section-title text-left leading-[0.98]"
+            className="hero-headline section-title leading-[0.98]"
             style={{
               "--hs-m": headingPercent(content.headingSizeMobile) / 100,
               "--hs-d": headingPercent(content.headingSizeDesktop) / 100,
+              // Aligned within the text column only; the photo does not move.
+              textAlign: headingAlign(content.headingAlign),
             } as CSSProperties}
           >
             <span className="block">{content.headingLine1}</span>

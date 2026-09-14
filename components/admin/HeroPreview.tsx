@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { asArray } from "@/lib/shape";
-import { HEADING_REM, HEADING_SIZE, headingPercent, stepHeading } from "@/lib/hero-heading";
+import {
+  HEADING_ALIGNS, HEADING_REM, HEADING_SIZE, headingAlign, headingPercent, stepHeading, type HeadingAlign,
+} from "@/lib/hero-heading";
 import { useTypewriter } from "@/components/useTypewriter";
 import { HERO } from "@/lib/section-defaults";
 
@@ -39,7 +41,7 @@ const DESKTOP = { width: 1280, height: 720, root: 16.64 } as const;
  *  and a little breathing room above the window's edge. */
 const FIT = {
   gapX: 24, phoneBezelX: 20, desktopBorderX: 2, controlsW: 240,
-  chromeY: 60, controlsY: 112, marginY: 16, minScreen: 200,
+  chromeY: 60, controlsY: 132, marginY: 16, minScreen: 200,
 } as const;
 const SCREEN_RATIO = 16 / 9 + 9 / 16; // total width of both screens per px of height
 
@@ -187,7 +189,7 @@ function HeroLayout({ form, phone, v }: { form: Form; phone: boolean; v: Resolve
       <div
         style={{
           fontFamily: DISPLAY, fontWeight: 800, textTransform: "uppercase", letterSpacing: "-0.01em",
-          lineHeight: 0.98, fontSize: headingPx, textAlign: "left", color: INK,
+          lineHeight: 0.98, fontSize: headingPx, textAlign: headingAlign(form.headingAlign), color: INK,
         }}
       >
         <span style={{ display: "block" }}>{str("headingLine1")}</span>
@@ -284,6 +286,41 @@ function HeroLayout({ form, phone, v }: { form: Form; phone: boolean; v: Resolve
         ))}
       </div>
     </section>
+  );
+}
+
+const ALIGN_LABEL: Record<HeadingAlign, string> = { left: "Left", center: "Centre", right: "Right" };
+
+/** Four lines set the way the option aligns text. */
+function AlignIcon({ align }: { align: HeadingAlign }) {
+  const lines = [12, 8, 12, 8];
+  const x = (w: number) => (align === "left" ? 2 : align === "right" ? 14 - w : 8 - w / 2);
+  return (
+    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden>
+      {lines.map((w, i) => <path key={i} d={`M${x(w)} ${3 + i * 3.3}h${w}`} stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />)}
+    </svg>
+  );
+}
+
+/** Left / Centre / Right for the heading lines. */
+function AlignControl({ value, onChange }: { value: unknown; onChange: (v: HeadingAlign) => void }) {
+  const current = headingAlign(value);
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+      <span className="text-xs font-semibold text-slate-700">Heading alignment</span>
+      <div role="radiogroup" aria-label="Heading alignment" className="mt-1.5 flex gap-1">
+        {HEADING_ALIGNS.map((a) => (
+          <button
+            key={a} type="button" role="radio" aria-checked={current === a} onClick={() => onChange(a)}
+            className={`inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium ${
+              current === a ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            <AlignIcon align={a} /> {ALIGN_LABEL[a]}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -392,9 +429,9 @@ export default function HeroPreview({ form, setField, data }: Props) {
             </figure>
           </div>
 
-          {/* Heading sizes — beside the screens or below them, whichever fits */}
+          {/* Heading sizes and alignment — beside the screens or below them, whichever fits */}
           <div
-            className={screens.beside ? "shrink-0 space-y-3 pt-6" : "grid w-full gap-3 sm:grid-cols-2"}
+            className={screens.beside ? "shrink-0 space-y-3 pt-6" : "grid w-full gap-3 sm:grid-cols-[1fr_1fr_auto]"}
             style={screens.beside ? { width: FIT.controlsW } : { maxWidth: (h * 16) / 9 + (h * 9) / 16 + FIT.gapX + FIT.phoneBezelX + FIT.desktopBorderX }}
           >
             <SizeControl
@@ -409,6 +446,7 @@ export default function HeroPreview({ form, setField, data }: Props) {
               onChange={(v) => setField("headingSizeMobile", v)}
               basePx={HEADING_REM.phone * 16}
             />
+            <AlignControl value={form.headingAlign} onChange={(v) => setField("headingAlign", v)} />
           </div>
         </div>
       )}

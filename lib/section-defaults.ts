@@ -20,6 +20,8 @@ export const HERO = {
   /** Heading size, % of the design size (see lib/hero-heading.ts). */
   headingSizeMobile: 100,
   headingSizeDesktop: 100,
+  /** Heading lines within the text column: "left" | "center" | "right". */
+  headingAlign: "left",
 };
 
 export const STORY = {

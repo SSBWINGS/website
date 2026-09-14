@@ -23,3 +23,12 @@ export function headingPercent(v: unknown): number {
 
 /** One step bigger or smaller, stopping at the ends of the range. */
 export const stepHeading = (v: unknown, dir: 1 | -1) => headingPercent(headingPercent(v) + dir * HEADING_SIZE.step);
+
+/** How the heading lines sit in the hero's text column. Only the text moves;
+ *  on a desktop the photo beside it stays where it is. */
+export const HEADING_ALIGNS = ["left", "center", "right"] as const;
+export type HeadingAlign = (typeof HEADING_ALIGNS)[number];
+
+/** Any stored value as a valid alignment; anything else means left. */
+export const headingAlign = (v: unknown): HeadingAlign =>
+  (HEADING_ALIGNS as readonly unknown[]).includes(v) ? (v as HeadingAlign) : "left";
