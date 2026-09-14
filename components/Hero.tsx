@@ -108,7 +108,7 @@ export default function Hero({
             dangerouslySetInnerHTML={{ __html: content.paragraph }}
           />
 
-          <div className="mt-6 flex flex-wrap items-center gap-4">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:justify-start">
             <Link href={content.primaryCtaHref || HERO.primaryCtaHref} className="btn btn-saffron btn-shine hero-btn">
               {content.primaryCta || HERO.primaryCta}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>

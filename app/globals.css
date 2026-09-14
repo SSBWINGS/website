@@ -456,6 +456,16 @@ body {
   font-size: 1.0625rem;
   line-height: 1;
 }
+/* Phones: bigger, easier to tap. The row is centred in Hero.tsx. */
+@media (max-width: 639.98px) {
+  .hero-btn {
+    min-height: 3.75rem;
+    padding-inline: 1.75rem;
+    /* 21px on most phones; eases down on the narrowest so it never wraps. */
+    font-size: min(1.3125rem, 6.1vw);
+    max-width: 100%;
+  }
+}
 
 /* Subtle attention pulse for the hero's Courses button: a saffron halo that
    breathes, plus a whisper of scale. Transform-only, so nothing reflows. */
