@@ -102,10 +102,6 @@
     0% { transform: scale(0.85); opacity: 0.8; }
     100% { transform: scale(1.7); opacity: 0; }
   }
-  @keyframes dev-glow {
-    0%, 100% { text-shadow: 0 0 6px rgba(242,213,25,0.55), 0 0 14px rgba(255,153,51,0.4); }
-    50% { text-shadow: 0 0 12px rgba(242,213,25,0.95), 0 0 26px rgba(255,153,51,0.75), 0 0 40px rgba(19,136,8,0.4); }
-  }
 }
 
 /* Glowing "+" nav badge → All Recommended Candidates */
@@ -748,12 +744,24 @@ input, select, textarea {
   mask: radial-gradient(circle, transparent 40%, #000 42%);
 }
 
-/* Glowing developer credit */
-.dev-glow {
-  color: #ffe870;
-  animation: dev-glow 2.4s ease-in-out infinite;
-  transition: color 0.25s ease, filter 0.25s ease;
+/* Glowing developer credit - the Crayora wordmark in the footer. Violet is the
+   sparkle in the wordmark; the white lifts it off the navy footer. */
+@keyframes dev-logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(78,67,253,0.5)) drop-shadow(0 0 8px rgba(255,255,255,0.18)); }
+  50% { filter: drop-shadow(0 0 7px rgba(78,67,253,0.95)) drop-shadow(0 0 16px rgba(255,255,255,0.4)); }
 }
-.dev-glow:hover { color: #ff9933; filter: brightness(1.15); }
+.dev-logo-glow {
+  animation: dev-logo-glow 2.4s ease-in-out infinite;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+/* Hover has its own feedback - let it take over from the animation. */
+.dev-logo-glow:hover {
+  animation: none;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 0 10px rgba(78,67,253,1)) drop-shadow(0 0 22px rgba(255,255,255,0.5));
+}
+@media (prefers-reduced-motion: reduce) {
+  .dev-logo-glow { animation: none; }
+}
 
 } /* end @layer components */

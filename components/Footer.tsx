@@ -117,15 +117,18 @@ export default async function Footer() {
         <div className="mx-auto flex max-w-[1840px] flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-navy-200/70 sm:flex-row sm:px-8">
           <p>© {new Date().getFullYear()} SSBWINGS. All rights reserved.</p>
         </div>
-        <p className="mx-auto max-w-[1840px] px-4 pb-5 text-center text-xs text-navy-200/70 sm:px-8">
-          Developed with <span className="text-red-500" aria-hidden>❤</span> by{" "}
+        <p className="mx-auto flex max-w-[1840px] flex-col items-center justify-center gap-2 px-4 pb-24 text-center text-xs text-navy-200/70 sm:flex-row sm:gap-x-2.5 sm:px-8 sm:pb-5">
+          Designed and developed by
+          {/* The wordmark is the credit, so it carries the name; unoptimized
+              keeps it off Vercel's image quota - it is already tiny. */}
           <a
-            href="https://jyotiranjansahoo.vercel.app/"
+            href="https://www.crayoratech.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="dev-glow font-display font-bold uppercase tracking-wider"
+            title="Crayora"
+            className="dev-logo-glow inline-flex"
           >
-            Jyotiranjan
+            <Image src="/crayora.webp" alt="Crayora" width={269} height={72} unoptimized className="h-6 w-auto" />
           </a>
         </p>
       </div>
