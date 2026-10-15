@@ -28,7 +28,7 @@ export const STORY = {
   kicker: "The Hard Truth",
   title: '1.4 Billion Indians.<br><span class="tricolour-text">Still Short of Officers.</span>',
   paragraph:
-    "Every year lakhs clear the written exam, reach the SSB gates — and come back with a <strong>Conference Out</strong>. Not because they lack potential, but because nobody showed them the battlefield map. In mentoring 3,450+ aspirants, almost every failure traces back to three gaps:",
+    "Every year lakhs clear the written exam, reach the SSB gates — and come back with a <strong>Conference Out</strong>. Not because they lack potential, but because nobody showed them the battlefield map. In mentoring 3,500+ aspirants, almost every failure traces back to three gaps:",
 };
 
 export const WHYUS = {
@@ -61,10 +61,10 @@ import { TRACKER } from "@/lib/selection-defaults";
 
 export const WHYUS_ITEMS = [
   { icon: "🎖️", title: "Mentored by Ex-SSB Assessors", body: "Learn from officers who sat on the other side of the table — retired Interviewing Officers, GTOs and psychology experts who assessed thousands at real Boards." },
-  { icon: "🪖", title: "Real GTO Ground on Campus", body: "Full-scale PGT structures, command task areas and obstacle courses. You rehearse Day 3 & 4 physically — not on a whiteboard." },
+  { icon: "🪖", title: "Real GTO Ground on Campus", body: "Full-scale progressive group task (PGT) structures, command task areas and individual obstacles. You rehearse Day 3 & 4 physically — not on a whiteboard." },
   { icon: "🧭", title: "Guidance Till Recommendation", body: "One enrollment, our commitment till you hear your chest number called. Repeaters get focused conference-out analysis and a rebuilt strategy." },
   { icon: "🔍", title: "Personal Attention, Small Batches", body: "Every dossier read, every mock interview debriefed one-on-one. You are a name and a personality here — never a roll number." },
-  { icon: "🤝", title: "3,450+ Strong Alumni Network", body: "Serving officers across the Army, Navy and Air Force mentor the next generation. Free monthly practice sessions for alumni, always." },
+  { icon: "🤝", title: "3,500+ Strong Alumni Network", body: "Serving officers across the Army, Navy and Air Force mentor the next generation. Free monthly practice sessions for alumni, always." },
   { icon: "⚖️", title: "Merit-First, No False Promises", body: "No academy can 'guarantee' a recommendation. We build the officer; the Board does the rest — honestly, transparently." },
 ];
 
@@ -96,7 +96,7 @@ export const ABOUT_MISSION = {
   kicker: "The Mission",
   title: 'From Aspirant to <span class="tricolour-text">Officer</span>',
   body:
-    "<p>India has more than 1.4 billion people, yet the Armed Forces remain short of officers. The gap isn't talent — it's <strong>preparation that understands the Board</strong>.</p><p>SSBWINGS was founded to close that gap. Our director <strong>Vishal Kaushik</strong>, alongside a bench of retired Interviewing Officers, GTOs and DIPR-trained psychologists, built an academy that mirrors the real SSB — a full GTO ground, honest psychology feedback and one-on-one mock interviews.</p><p>The result: <strong>677+ recommendations</strong>, cadets marching into IMA, INA, AFA and OTA — many after repeated setbacks that we helped them turn around.</p>",
+    "<p>India has more than 1.4 billion people, yet the Armed Forces remain short of officers. The gap isn't talent — it's <strong>preparation that understands the Board</strong>.</p><p>SSBWINGS was founded to close that gap. Our director <strong>Vishal Kaushik</strong>, alongside a bench of retired Interviewing Officers, GTOs and DIPR-trained psychologists, built an academy that mirrors the real SSB — a full GTO ground, honest psychology feedback and one-on-one mock interviews.</p><p>The result: <strong>760+ recommendations</strong>, cadets marching into IMA, INA, AFA and OTA — many after repeated setbacks that we helped them turn around.</p>",
   image: "/images/campus/imagestwo-20.jpg",
 };
 

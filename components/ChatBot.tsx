@@ -54,7 +54,7 @@ const KB: Entry[] = [
   {
     id: "courses",
     keys: ["course", "program", "programme", "training", "which class", "enroll", "enroll", "buy", "purchase", "join batch"],
-    a: "We offer three ways to train: 🎖 15-Day Offline Immersion (Noida campus), 💻 20-Day Online Masterclass (live 8–10 PM), and 📱 the SSB Smart Learning App. You can enroll online securely below.",
+    a: "We offer three ways to train: 🎖 2-Week Offline Immersion (Noida campus), 💻 30-Day Online Batch (live 9–11 PM, with recordings), and 📱 the SSB Smart Learning App. You can enroll online securely below.",
     links: [
       { label: "Enroll — Offline Batch", href: SITE.enrollOffline },
       { label: "Enroll — Online Batch", href: SITE.enrollOnline },
@@ -63,20 +63,20 @@ const KB: Entry[] = [
   },
   {
     id: "offline",
-    keys: ["offline", "noida", "campus", "residential", "15 day", "15-day"],
-    a: `Offline: a 15-day residential immersion at our Noida Sector 62 campus — psychology dossiers, a real GTO ground, mock boards & one-on-one interviews. ${BATCH_INFO.offline}`,
+    keys: ["offline", "noida", "campus", "residential", "2 week", "two week", "15 day", "15-day", "hostel"],
+    a: `Offline: a 2-week residential immersion at our Noida Sector 62 campus — psychology dossiers, a real GTO ground, mock boards & one-on-one interviews. ${BATCH_INFO.offline}`,
     links: [{ label: "Enroll in Offline Batch", href: SITE.enrollOffline }],
   },
   {
     id: "online",
-    keys: ["online", "remote", "live class", "evening", "20 day", "20-day", "work"],
-    a: `Online: a 20-day live masterclass, 8:00–10:00 PM IST, with recordings provided. ${BATCH_INFO.online}`,
+    keys: ["online", "remote", "live class", "evening", "30 day", "30-day", "one month", "1 month", "20 day", "20-day", "work", "recording"],
+    a: `Online: a 30-day live batch, 9:00–11:00 PM IST, with recordings provided — built for college students and working professionals. ${BATCH_INFO.online}`,
     links: [{ label: "Enroll in Online Batch", href: SITE.enrollOnline }],
   },
   {
     id: "why",
     keys: ["why", "stand out", "choose", "different", "best coaching", "unique", "edge", "trust"],
-    a: "Why SSBWINGS stands out: ✔ Mentored by EX-SSB assessors (real IOs & GTOs), not just teachers ✔ A real GTO ground on campus ✔ 677+ recommendations & a 3,450+ alumni-officer family ✔ Personal attention & guidance till your recommendation ✔ Merit-first, no false promises. We give shape to your dreams.",
+    a: "Why SSBWINGS stands out: ✔ Mentored by EX-SSB assessors (real IOs & GTOs), not just teachers ✔ A real GTO ground on campus ✔ {recommendations} recommendations & a {alumni} alumni-officer family ✔ Personal attention & guidance till your recommendation ✔ Merit-first, no false promises. We give shape to your dreams.",
     links: [{ label: "Why aspirants trust us →", href: "/about" }],
   },
   {
@@ -165,7 +165,19 @@ function answer(input: string): Msg {
 export default function ChatBot({
   brochure = SITE.brochure,
   brochureOn = true,
-}: { brochure?: string; brochureOn?: boolean } = {}) {
+  counts = { recommendations: "760+", alumni: "3,500+" },
+}: {
+  brochure?: string;
+  brochureOn?: boolean;
+  /** Headline figures from the admin's stat cards, already formatted. */
+  counts?: { recommendations: string; alumni: string };
+} = {}) {
+  // Replies are written once, above; the figures in them come from the stat
+  // cards so the chatbot always says what the rest of the site says.
+  const fill = (m: Msg): Msg => ({
+    ...m,
+    text: m.text.replace(/\{recommendations\}/g, counts.recommendations).replace(/\{alumni\}/g, counts.alumni),
+  });
   const [open, setOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [input, setInput] = useState("");
@@ -187,7 +199,7 @@ export default function ChatBot({
 
   const push = (label: string, reply: Msg) => {
     setMsgs((m) => [...m, { from: "user", text: label }]);
-    setTimeout(() => setMsgs((m) => [...m, reply]), 350);
+    setTimeout(() => setMsgs((m) => [...m, fill(reply)]), 350);
   };
 
   const sendText = (text: string) => {

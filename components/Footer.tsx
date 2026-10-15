@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/data";
-import { getSettings, telHref, mapHref, mapEmbedSrc, brochureHref, brochureOn } from "@/lib/content";
+import { getSettings, getTrackRecord, telHref, mapHref, mapEmbedSrc, brochureHref, brochureOn } from "@/lib/content";
+import { countText } from "@/lib/track-record";
 import { SocialIcon } from "./SocialIcons";
 
 export default async function Footer() {
-  const SITE = await getSettings();
+  const [SITE, record] = await Promise.all([getSettings(), getTrackRecord()]);
   return (
     <footer className="relative bg-navy-950 text-paper">
       <div className="tricolour-bar h-1.5 w-full" aria-hidden />
@@ -23,7 +24,7 @@ export default async function Footer() {
             </Link>
             <p className="mt-5 text-sm leading-relaxed text-navy-100/80">
               India&apos;s trusted SSB interview academy — mentored by ex-SSB assessors,
-              powered by 677+ recommendations and a 3,450+ strong alumni family of officers.
+              powered by {countText(record.recommendations)} recommendations and a {countText(record.alumni)} strong alumni family of officers.
             </p>
             <p className="mt-4 flex items-center gap-2 text-sm text-gold-300">★★★★★ <span className="text-navy-100/80">5.0 Google Rating</span></p>
           </div>

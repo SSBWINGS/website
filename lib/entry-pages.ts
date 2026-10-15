@@ -28,9 +28,21 @@ export type EntryPage = {
   extraKeywords?: string[];
   /** Entry-specific questions, on top of the generated eligibility ones. */
   faqs?: { q: string; a: string }[];
+  /** One sentence added to the "how does SSBWINGS prepare you" answer, in the
+   *  words aspirants of this entry search with. */
+  prepNote?: string;
   /** Set where the limits could not be confirmed against an official notice. */
   indicative?: boolean;
 };
+
+/** Shared by the entries for serving personnel. */
+const SERVICE_ENTRY_NOTE =
+  "Service entry SSB interview preparation builds on your years in uniform — your service record runs through your PIQ form and the interview.";
+
+/** The same advice the site's FAQ gives for "how early should I start",
+ *  worded for one entry's written exam. */
+const afterWrittenExam = (course: string) =>
+  `Start 30–45 days before your SSB date — personality projection is conditioned, not crammed. Revise your PIQ form, practise the screening (OIR and PPDT), the psychology tests (TAT, WAT, SRT, SDT) and the GTO tasks, and take mock interviews. Our 2-week offline and 30-day online ${course} cover all of it, followed by self-practice on the SSB Smart Learning App.`;
 
 export const ENTRY_PAGES: EntryPage[] = [
   // ── After 10+2 ────────────────────────────────────────────────────────────
@@ -41,8 +53,10 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "National Defence Academy, Khadakwasla — then IMA, INA or AFA",
     commission: "Permanent Commission",
     intro: "The NDA is the most sought-after officer entry straight after Class 12. Clear the UPSC written exam and the 5-day SSB, train three years at Khadakwasla, and commission as a permanent officer in the Army, Navy or Air Force.",
-    extraKeywords: ["NDA coaching after 12th", "NDA SSB interview tips", "NDA 1 NDA 2 SSB", "join NDA after 12th", "NDA for girls"],
+    extraKeywords: ["NDA coaching after 12th", "NDA SSB interview course", "NDA SSB interview questions", "NDA SSB interview tips", "NDA SSB preparation after written exam", "NDA interview coaching", "SSB interview questions for NDA", "NDA 1 NDA 2 SSB", "join NDA after 12th", "NDA for girls"],
+    prepNote: "Most aspirants begin their NDA SSB preparation after the written exam result; our NDA SSB interview course and NDA interview coaching follow that timeline, with practice on the NDA SSB interview questions and NDA SSB interview tips for candidates fresh out of school.",
     faqs: [
+      { q: "How do I prepare for the SSB interview after clearing the NDA written exam?", a: afterWrittenExam("NDA SSB coaching courses") },
       { q: "Can girls apply for NDA?", a: "Yes. Women have been eligible for the NDA since 2021 and train alongside men at Khadakwasla, in the Army, Navy and Air Force wings." },
       { q: "Do I need PCM for NDA?", a: "Only for the Navy and Air Force wings, which need Physics and Maths in Class 12. The Army wing is open to Class 12 in any stream." },
     ],
@@ -54,7 +68,7 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Officers Training Academy, Gaya, then technical training",
     commission: "Permanent Commission, with a four-year engineering degree",
     intro: "10+2 TES takes Class 12 PCM students straight to the SSB on the strength of their JEE Mains score — no UPSC written paper — and commissions them as Army engineers with a funded B.Tech.",
-    extraKeywords: ["TES entry coaching", "TES SSB interview", "Army technical entry after 12th", "TES JEE Mains cutoff"],
+    extraKeywords: ["TES SSB coaching", "TES SSB interview preparation", "TES entry coaching", "TES SSB interview", "Army technical entry after 12th", "TES JEE Mains cutoff"],
     faqs: [
       { q: "Is there a written exam for 10+2 TES?", a: "No. Candidates are shortlisted on their JEE Mains score and go straight to the SSB interview, followed by the medical." },
     ],
@@ -66,7 +80,7 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Indian Naval Academy, Ezhimala",
     commission: "Permanent Commission, with a four-year B.Tech",
     intro: "The Navy's 10+2 B.Tech Cadet Entry takes PCM students with a JEE Mains rank directly to the SSB. Selected cadets study a fully funded four-year B.Tech at INA Ezhimala and commission as naval officers.",
-    extraKeywords: ["Navy B.Tech entry SSB", "10+2 B.Tech entry scheme", "INA Ezhimala entry", "Navy entry after 12th"],
+    extraKeywords: ["10+2 Navy BTech SSB preparation", "Navy B.Tech entry SSB", "10+2 B.Tech entry scheme", "INA Ezhimala entry", "Navy entry after 12th"],
     faqs: [
       { q: "Can women apply for the Navy 10+2 B.Tech entry?", a: "Yes. The entry is open to unmarried men and women, and INA Ezhimala has trained women B.Tech cadets since 2021." },
     ],
@@ -80,7 +94,11 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Indian Military Academy, Dehradun",
     commission: "Permanent Commission",
     intro: "CDS IMA is the graduate route to a permanent commission in the Army. Clear the UPSC CDS exam and the SSB, and train at the Indian Military Academy in Dehradun.",
-    extraKeywords: ["CDS SSB coaching", "CDS IMA SSB interview", "IMA Dehradun entry", "join Army after graduation"],
+    extraKeywords: ["CDS SSB coaching", "CDS SSB interview preparation", "CDS SSB interview course", "CDS SSB interview questions", "CDS IMA SSB preparation", "SSB interview questions for CDS", "CDS IMA SSB interview", "IMA Dehradun entry", "join Army after graduation"],
+    prepNote: "CDS IMA SSB preparation follows our CDS SSB interview course, with practice on the CDS SSB interview questions graduates face about their degree, work and choice of service.",
+    faqs: [
+      { q: "How do I prepare for CDS SSB after the written exam?", a: afterWrittenExam("CDS SSB coaching courses") },
+    ],
   },
   {
     slug: "cds-ota", name: "CDS — Officers Training Academy (OTA)", short: "CDS OTA", service: "Army",
@@ -89,9 +107,11 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Officers Training Academy, Chennai",
     commission: "Short Service Commission",
     intro: "CDS OTA is the Short Service route into the Army for graduates, and one of the few CDS entries open to women. Clear UPSC CDS and the SSB, and train at OTA Chennai.",
-    extraKeywords: ["CDS OTA SSB interview", "OTA Chennai entry", "CDS for women", "short service commission Army"],
+    extraKeywords: ["CDS OTA SSB preparation", "CDS SSB coaching", "CDS SSB interview questions", "CDS OTA SSB interview", "OTA Chennai entry", "CDS for women", "short service commission Army"],
+    prepNote: "CDS OTA SSB preparation follows the same CDS SSB interview course as every CDS entry, with practice on the CDS SSB interview questions about your degree, work and choice of service.",
     faqs: [
       { q: "Can women apply through CDS?", a: "Yes, through CDS OTA — the Short Service entry trained at OTA Chennai is open to women as well as men." },
+      { q: "How do I prepare for CDS SSB after the written exam?", a: afterWrittenExam("CDS SSB coaching courses") },
     ],
   },
   {
@@ -119,7 +139,7 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Indian Military Academy, Dehradun",
     commission: "Permanent Commission",
     intro: "The Technical Graduate Course takes engineering graduates straight to the SSB on merit, with no written exam, and commissions them permanently into the Army's technical arms after training at IMA.",
-    extraKeywords: ["TGC entry coaching", "TGC SSB interview", "Army entry for engineers"],
+    extraKeywords: ["TGC SSB interview preparation", "TGC entry coaching", "TGC SSB interview", "SSB technical interview questions", "Army entry for engineers"],
   },
   {
     slug: "ssc-tech", name: "SSC (Tech) — Short Service Commission Technical", short: "SSC Tech", service: "Army",
@@ -128,7 +148,11 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Officers Training Academy, Chennai",
     commission: "Short Service Commission",
     intro: "SSC (Tech) is the Army's Short Service entry for engineering graduates — men and women — shortlisted on merit for the SSB, with training at OTA Chennai.",
-    extraKeywords: ["SSC Tech SSB interview", "SSCW Tech coaching", "Army SSC for engineers", "SSC Tech for women"],
+    extraKeywords: ["SSC Tech SSB interview preparation", "SSC Tech SSB coaching", "SSC Tech interview questions", "SSB technical interview questions", "SSC Tech SSB interview", "SSCW Tech coaching", "Army SSC for engineers", "SSC Tech for women"],
+    prepNote: "SSC Tech SSB coaching also prepares you for SSB technical interview questions from your engineering branch.",
+    faqs: [
+      { q: "How should an engineering graduate prepare for SSC Tech SSB?", a: "Prepare for all five days of the SSB like any other entry — screening, psychology, GTO and the interview — and also revise the core subjects of your engineering branch and your final-year project, since SSC Tech interview questions can include technical ones. Our 2-week offline and 30-day online courses cover all five days, with one-on-one feedback." },
+    ],
   },
   {
     slug: "afcat", name: "AFCAT — Air Force Common Admission Test", short: "AFCAT", service: "Air Force",
@@ -137,9 +161,10 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Air Force Academy, Dundigal",
     commission: "Short Service or Permanent Commission, depending on branch",
     intro: "AFCAT is the Air Force's own entrance exam for graduates, covering the Flying, Ground Duty (Technical) and Ground Duty (Non-Technical) branches. Clear AFCAT, then the 5-day AFSB.",
-    extraKeywords: ["AFSB coaching", "AFCAT interview preparation", "AFCAT flying branch", "AFCAT ground duty", "Air Force SSB"],
+    extraKeywords: ["AFCAT AFSB coaching", "AFCAT SSB interview preparation", "AFCAT interview preparation", "AFCAT AFSB interview questions", "AFCAT SSB interview tips", "AFCAT psychology test preparation", "SSB interview questions for AFCAT", "AFSB coaching", "AFCAT flying branch", "AFCAT ground duty", "Air Force SSB"],
+    prepNote: "For AFCAT interview preparation, our AFCAT AFSB coaching adds practice on the AFCAT AFSB interview questions for your branch — Flying or Ground Duty — alongside the same psychology test preparation every SSB demands.",
     faqs: [
-      { q: "Is the AFCAT interview the same as an SSB?", a: "It is conducted by an Air Force Selection Board (AFSB) and follows the same 5-day pattern — screening, psychology, GTO and interview — with an extra pilot aptitude test (CPSS) for the flying branch." },
+      { q: "What is the difference between SSB and AFSB?", a: "An AFSB is the Air Force Selection Board that conducts the AFCAT interview. It follows the same 5-day pattern as an SSB — screening, psychology, GTO and interview — with an extra pilot aptitude test (CPSS) for the flying branch." },
     ],
   },
   {
@@ -149,7 +174,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Officers Training Academy, Chennai",
     commission: "Short Service Commission",
     intro: "The Army's JAG entry commissions law graduates as the Army's legal officers. Shortlisted candidates go straight to the SSB and train at OTA Chennai.",
-    extraKeywords: ["JAG entry SSB coaching", "Army JAG eligibility", "join Army as a lawyer", "JAG SSB interview"],
+    extraKeywords: ["JAG entry SSB interview preparation", "JAG SSB interview questions", "JAG entry SSB coaching", "Army JAG eligibility", "join Army as a lawyer", "JAG SSB interview"],
+    prepNote: "JAG entry SSB interview preparation includes practice on the JAG SSB interview questions about your law degree and why you want to serve as a legal officer.",
   },
   {
     slug: "jag-navy", name: "JAG (Navy) — Law Cadre", short: "Navy JAG", service: "Navy",
@@ -170,7 +196,11 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Officers Training Academy, Chennai",
     commission: "Short Service Commission",
     intro: "NCC Special Entry rewards NCC cadets who hold the 'C' certificate with a direct route to the SSB — no written exam — and a Short Service Commission after training at OTA Chennai.",
-    extraKeywords: ["NCC special entry SSB", "NCC C certificate entry", "NCC entry Army"],
+    extraKeywords: ["NCC Special Entry SSB preparation", "NCC SSB interview coaching", "NCC Special Entry interview questions", "NCC special entry SSB", "NCC C certificate entry", "NCC entry Army"],
+    prepNote: "NCC Special Entry SSB preparation also covers the NCC Special Entry interview questions on your NCC training, camps and 'C' certificate.",
+    faqs: [
+      { q: "How can I prepare for the NCC Special Entry SSB interview?", a: "Prepare for all five days of the SSB like any entry, and be ready to talk about your NCC years — camps, ranks and the 'C' certificate — since your PIQ form and interview draw on them. Our NCC SSB interview coaching covers screening, psychology, GTO and mock interviews, with one-on-one feedback." },
+    ],
   },
   {
     slug: "navy-ssc", name: "Navy SSC Officer Entry", short: "Navy SSC", service: "Navy",
@@ -179,7 +209,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Indian Naval Academy, Ezhimala",
     commission: "Short Service Commission",
     intro: "The Navy's Short Service Commission entries take graduates into the Executive, Technical, Pilot, Observer, Logistics, ATC and Education branches, through the SSB and training at INA Ezhimala.",
-    extraKeywords: ["Navy SSC officer SSB", "Navy pilot entry", "Navy observer entry", "Navy logistics entry", "INET coaching"],
+    extraKeywords: ["Indian Navy SSC SSB interview preparation", "Navy SSB interview preparation", "Navy SSC officer SSB", "Navy pilot entry", "Navy observer entry", "Navy logistics entry", "INET coaching"],
+    prepNote: "Navy SSB interview preparation is the same for every Indian Navy SSC branch, with interview practice on why you chose the Navy and your branch.",
   },
   {
     slug: "meteorology", name: "Air Force Meteorology Branch", short: "IAF Meteorology", service: "Air Force",
@@ -197,7 +228,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Indian Naval Academy, Ezhimala",
     commission: "Assistant Commandant (Group 'A' Gazetted Officer)",
     intro: "Assistant Commandant is the officer entry into the Indian Coast Guard, across General Duty, Pilot, Navigator and Technical branches — through CGCAT and a selection board.",
-    extraKeywords: ["Coast Guard SSB coaching", "ICG assistant commandant eligibility", "CGCAT preparation", "Coast Guard FSB interview"],
+    extraKeywords: ["Coast Guard Assistant Commandant SSB preparation", "Coast Guard SSB coaching", "ICG assistant commandant eligibility", "CGCAT preparation", "Coast Guard FSB interview"],
+    prepNote: "Coast Guard Assistant Commandant SSB preparation follows the same five days, with mock interviews focused on the Coast Guard's role.",
     faqs: [
       { q: "Can women join the Coast Guard as officers?", a: "Yes. Women can enter General Duty through the Short Service Appointment, and the Pilot and Navigator branches are also open to women." },
     ],
@@ -208,7 +240,7 @@ export const ENTRY_PAGES: EntryPage[] = [
     exam: "Shortlisting on the veterinary degree — then the SSB",
     commission: "Short Service Commission, commissioned as Captain",
     intro: "The Remount & Veterinary Corps commissions veterinary graduates to care for the Army's horses, mules and dogs. It needs a BVSc or BVSc & AH with the internship complete, and runs through the SSB.",
-    extraKeywords: ["RVC entry Army", "Army veterinary officer", "Remount Veterinary Corps eligibility", "BVSc Army job"],
+    extraKeywords: ["RVC entry SSB interview preparation", "RVC entry Army", "Army veterinary officer", "Remount Veterinary Corps eligibility", "BVSc Army job"],
     faqs: [
       { q: "What rank do RVC officers join at?", a: "Veterinary officers are granted a Short Service Commission in the rank of Captain." },
     ],
@@ -222,7 +254,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "AMC Centre & College, Lucknow",
     commission: "Short Service or Permanent Commission",
     intro: "AMC (NT) lets serving soldiers of the Army Medical Corps and Army Dental Corps become officers in the non-technical side of the medical corps. It needs at least five years' service and Class 12 with Biology.",
-    extraKeywords: ["AMC NT entry", "Army Medical Corps non technical", "soldier to officer AMC"],
+    extraKeywords: ["AMC NT SSB interview preparation", "service entry SSB interview preparation", "AMC NT entry", "Army Medical Corps non technical", "soldier to officer AMC"],
+    prepNote: SERVICE_ENTRY_NOTE,
   },
   {
     slug: "acc", name: "ACC — Army Cadet College", short: "ACC", service: "Army",
@@ -231,7 +264,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     academy: "Army Cadet College wing, IMA Dehradun",
     commission: "Permanent Commission",
     intro: "The Army Cadet College is the classic 'sipahi to officer' route: serving soldiers with at least two years' service clear a written exam and the SSB, earn a degree at the ACC wing and commission from IMA.",
-    extraKeywords: ["ACC entry SSB coaching", "soldier to officer", "Army Cadet College eligibility", "ACC exam preparation"],
+    extraKeywords: ["ACC entry SSB interview preparation", "service entry SSB interview preparation", "ACC entry SSB coaching", "soldier to officer", "Army Cadet College eligibility", "ACC exam preparation"],
+    prepNote: SERVICE_ENTRY_NOTE,
   },
   {
     slug: "sco", name: "SCO — Special Commissioned Officer", short: "SCO", service: "Army",
@@ -239,7 +273,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     exam: "Screening, then the SSB",
     commission: "Special Commissioned Officer",
     intro: "The Special Commissioned Officer scheme lets experienced serving soldiers — typically 28 to 35 with long service — earn a commission after screening and the SSB.",
-    extraKeywords: ["SCO entry Army", "special commissioned officer eligibility"],
+    extraKeywords: ["SCO entry SSB interview preparation", "service entry SSB interview preparation", "SCO entry Army", "special commissioned officer eligibility"],
+    prepNote: SERVICE_ENTRY_NOTE,
   },
   {
     slug: "pc-sl", name: "PC (SL) — Permanent Commission (Special List)", short: "PC (SL)", service: "Army",
@@ -247,7 +282,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     exam: "Screening, then the SSB",
     commission: "Permanent Commission (Special List)",
     intro: "PC (SL) offers serving JCOs, NCOs and other ranks a permanent commission on the Special List, after screening and the SSB.",
-    extraKeywords: ["PC SL entry", "permanent commission special list"],
+    extraKeywords: ["PC SL SSB interview preparation", "service entry SSB interview preparation", "PC SL entry", "permanent commission special list"],
+    prepNote: SERVICE_ENTRY_NOTE,
   },
   {
     slug: "navy-cw", name: "Navy (CW) — Commission Worthy Scheme", short: "Navy CW", service: "Navy",
@@ -255,7 +291,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     exam: "Preliminary Screening Board and a written exam, then the SSB",
     commission: "Commissioned as Sub Lieutenant",
     intro: "The Commission Worthy scheme — formerly the Upper Yardmen scheme — is the Navy's route for serving sailors to become officers, through a screening board, a written exam and the SSB.",
-    extraKeywords: ["Navy CW entry", "commission worthy scheme", "sailor to officer", "Upper Yardmen scheme"],
+    extraKeywords: ["Navy CW entry", "service entry SSB interview preparation", "commission worthy scheme", "sailor to officer", "Upper Yardmen scheme"],
+    prepNote: SERVICE_ENTRY_NOTE,
     faqs: [
       { q: "Can married sailors apply for CW?", a: "Yes. Married sailors may apply, though they are not given married accommodation during training; unmarried sailors may not marry until they are commissioned as Sub Lieutenants." },
     ],
@@ -266,7 +303,8 @@ export const ENTRY_PAGES: EntryPage[] = [
     exam: "Higher Educational Test, then a commission scheme and the SSB",
     commission: "Commission through a sailor-to-officer scheme",
     intro: "The Higher Educational Test is taken by serving sailors on the way to a commission. Qualifying in it opens the Navy's sailor-to-officer schemes and the SSB that follows.",
-    extraKeywords: ["Navy HET", "Higher Educational Test Navy", "sailor to officer Navy"],
+    extraKeywords: ["Navy HET", "service entry SSB interview preparation", "Higher Educational Test Navy", "sailor to officer Navy"],
+    prepNote: SERVICE_ENTRY_NOTE,
     indicative: true,
   },
 ];
@@ -354,7 +392,7 @@ export function titleFor(page: EntryPage): string {
 }
 
 export const descriptionFor = (page: EntryPage) =>
-  `${page.short} eligibility, age limit and selection process — and how SSBWINGS, mentored by ex-SSB officers in Noida, prepares you for the ${page.short} SSB interview.`;
+  `${page.short} eligibility, age limit and selection process — and how SSBWINGS, mentored by ex-SSB officers in Noida, helps with your ${page.short} SSB interview preparation.`;
 
 /** Questions and answers for the page — generated from the rules, then the
  *  page's own. Written as complete answers so each stands alone when quoted. */
@@ -378,8 +416,10 @@ export function faqsFor(page: EntryPage): { question: string; answer: string }[]
     ...(page.faqs ?? []).map((f) => ({ question: f.q, answer: f.a })),
     {
       question: `How does SSBWINGS prepare you for the ${page.short} SSB interview?`,
-      answer:
-        "SSBWINGS is mentored by ex-SSB assessors. The 15-day offline course at our Noida campus and the 20-day online course cover all five days of the SSB — screening (OIR and PPDT), psychology (TAT, WAT, SRT, SD), GTO tasks on a full ground, the personal interview and the conference — with one-on-one feedback.",
+      answer: [
+        `SSBWINGS is mentored by ex-SSB assessors. Our ${page.short} SSB coaching — the 2-week offline course at our Noida campus or the 30-day online course — covers all five days of the SSB: screening (OIR and PPDT), psychology (TAT, WAT, SRT, SDT), GTO tasks on a full ground, the personal interview and the conference, with one-on-one feedback and mock interviews built on your PIQ form.`,
+        page.prepNote,
+      ].filter(Boolean).join(" "),
     },
   ];
 }

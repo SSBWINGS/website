@@ -30,8 +30,8 @@ export const SITE = {
 
 /** Batch cadence — exact upcoming dates are confirmed on enrollment / WhatsApp. */
 export const BATCH_INFO = {
-  offline: "Two fresh 15-day offline batches begin every month at our Noida Sector 62 campus (typically around the 1st and 15th). Exact dates for the next batch are confirmed at enrollment.",
-  online: "20-day online batches run live from 8:00–10:00 PM IST and start every month. The next start date is shared on enrollment or over WhatsApp.",
+  offline: "Two fresh 2-week offline batches begin every month at our Noida Sector 62 campus (typically around the 1st and 15th). Exact dates for the next batch are confirmed at enrollment.",
+  online: "30-day online batches run live from 9:00–11:00 PM IST, with recordings, and start every month. The next start date is shared on enrollment or over WhatsApp.",
 };
 
 /** Book by Director & GTO mentor Vishal Kaushik (Flipkart). */
@@ -79,8 +79,8 @@ export const BOOKS: BookItem[] = [
  *  but an admin can blank it out or use "%", "★" and so on. */
 export type Stat = { value: number; label: string; suffix?: string };
 export const STATS: Stat[] = [
-  { value: 677, label: "Recommendations", suffix: "+" },
-  { value: 3450, label: "Alumni Officers Family", suffix: "+" },
+  { value: 760, label: "Recommendations", suffix: "+" },
+  { value: 3500, label: "Alumni Officers Family", suffix: "+" },
   { value: 175, label: "NDA Entries", suffix: "+" },
   { value: 168, label: "OTA Entries", suffix: "+" },
   { value: 125, label: "AFCAT Entries", suffix: "+" },
@@ -190,31 +190,31 @@ export const DAYS = [
     title: "The First Cut is the Deepest",
     subtitle: "OIR Test + PPDT — over 60% go home tonight",
     brief:
-      "Within hours of reporting, you face the Officer Intelligence Rating test and the Picture Perception & Discussion Test. A blurred picture, 30 seconds to observe, 4 minutes to write — then defend your story in a group of strangers fighting to be heard.",
+      "Within hours of reporting, you face the SSB screening test: the Officer Intelligence Rating (OIR) test and the Picture Perception & Discussion Test (PPDT). A blurred picture, 30 seconds to observe, 4 minutes to write — then defend your story in a group of strangers fighting to be heard.",
     tests: [
       { name: "OIR", detail: "Verbal & non-verbal reasoning — speed and accuracy under the clock" },
-      { name: "PPDT", detail: "Perceive, write and narrate a story from a hazy picture" },
+      { name: "PPDT", detail: "Perceive, write and narrate a PPDT story from a hazy picture" },
       { name: "Group Discussion", detail: "Assert your story without drowning the group" },
     ],
     drill:
-      "At SSBWINGS: weekly mock screenings with real-time narration practice, camera-recorded GD reviews and OIR speed drills until Stage-1 feels like home turf.",
+      "At SSBWINGS: weekly mock screenings with real-time PPDT narration practice, camera-recorded group discussion reviews and OIR practice questions until SSB Stage 1 feels like home turf.",
   },
   {
     day: "Day 2",
     code: "Psychology",
     service: "navy" as Service,
     title: "The Pen Reveals What the Mouth Hides",
-    subtitle: "TAT · WAT · SRT · Self Description — 3 hours, zero masks",
+    subtitle: "TAT · WAT · SRT · SDT (Self Description) — 3 hours, zero masks",
     brief:
-      "Twelve pictures, sixty words, sixty situations and one brutally honest self-portrait — written so fast that only your subconscious can answer. The psychologist reads between every line for the 15 Officer Like Qualities.",
+      "Twelve pictures, sixty words, sixty situations and one brutally honest self-portrait — written so fast that only your subconscious can answer. The psychologist's assessment reads between every line for the 15 Officer Like Qualities (OLQs).",
     tests: [
       { name: "TAT", detail: "12 stories in 48 minutes — your instincts on paper" },
       { name: "WAT", detail: "60 words, 15 seconds each — first thought wins" },
       { name: "SRT", detail: "60 real-life situations — decisions under time famine" },
-      { name: "SD", detail: "What your parents, friends & you truly think of you" },
+      { name: "SDT", detail: "Self Description Test — what your parents, friends & you truly think of you" },
     ],
     drill:
-      "At SSBWINGS: 13 days of psychology immersion, 10 full-length dossier practice sets, each one personally evaluated with written feedback by our psych mentors.",
+      "At SSBWINGS: a dedicated psychology lab — a full week offline, three weeks online — with TAT, WAT, SRT and SDT practice and 10 full-length psychology practice test sets, each one personally evaluated with written feedback by our psych mentors.",
   },
   {
     day: "Day 3",
@@ -225,13 +225,13 @@ export const DAYS = [
     brief:
       "The Group Testing Officer hands your group planks, ropes and impossible obstacles. No one is in charge — that's the point. Leaders emerge; followers comply; the GTO notes everything.",
     tests: [
-      { name: "GD & GPE", detail: "Two discussions and a military planning exercise on a map" },
+      { name: "GD & GPE", detail: "Two group discussions and the Group Planning Exercise — a military plan on a map" },
       { name: "PGT", detail: "Progressive Group Task — structures, loads and ground rules" },
       { name: "GOR", detail: "Snake Race — group grit at full sprint" },
       { name: "Lecturette", detail: "3 minutes, one topic, all eyes on you" },
     ],
     drill:
-      "At SSBWINGS: a real GTO ground on campus with full-scale obstacles — you don't imagine PGT, you sweat through it under an ex-GTO's whistle.",
+      "At SSBWINGS: GTO ground training on a real campus ground with full-scale obstacles — you don't imagine PGT, you sweat through it under an ex-GTO's whistle.",
   },
   {
     day: "Day 4",
@@ -248,7 +248,7 @@ export const DAYS = [
       { name: "Personal Interview", detail: "Rapid-fire life questions — coherence is character" },
     ],
     drill:
-      "At SSBWINGS: one-on-one mock interviews with a retired Interviewing Officer, PIQ-based grilling and recorded playback so you hear yourself as the Board hears you.",
+      "At SSBWINGS: one-on-one mock interviews with feedback from a retired Interviewing Officer, grilling on your PIQ form and recorded playback so you hear yourself as the Board hears you.",
   },
   {
     day: "Day 5",
@@ -289,16 +289,16 @@ export const COURSES: CourseItem[] = [
   {
     tag: "Flagship · Most Popular",
     highlight: true,
-    title: "15-Day Offline Immersion",
-    where: "Noida Sector 62 Campus",
+    title: "2-Week Offline Immersion",
+    where: "Noida: 08:30am to 6:00pm",
     price: "₹24,999",
     service: "army" as Service,
-    desc: "Live like a cadet for 15 days. Psychology dossiers, real GTO ground, mock boards and one-on-one interviews — the complete rebuild.",
+    desc: "Live like a cadet for 2 weeks. Psychology dossiers, real GTO ground, mock boards and one-on-one interviews — the complete rebuild.",
     features: [
       "Week-long psychology lab — TAT, WAT, SRT, SD with written feedback",
-      "Full-scale GTO ground: PGT, HGT, Command Task on real obstacles",
-      "Mock personal interviews by retired Interviewing Officers",
-      "Mock PPDT screenings & group discussions every week",
+      "Full-scale GTO ground: Progressive Group Task (PGT), Half Group Task (HGT) and Command Task on real obstacles",
+      "Mock personal interviews with feedback from retired Interviewing Officers",
+      "Mock PPDT screenings & group discussions",
       "2 fresh batches every month at the Noida campus",
     ],
     cta: "Enroll in Offline Batch",
@@ -307,17 +307,17 @@ export const COURSES: CourseItem[] = [
   {
     tag: "For Working Aspirants",
     highlight: false,
-    title: "1-Month Online Batch",
-    where: "Live · 8:00–10:00 PM IST",
+    title: "30-Day Online Batch",
+    where: "Live · 9:00–11:00 PM IST",
     price: "₹6,999",
     service: "airforce" as Service,
     desc: "The same mentors, the same method — beamed to your desk every evening. Built for college students, working professionals and remote aspirants.",
     features: [
-      "13 days of deep psychology training with dossier reviews",
-      "7 days of GTO concepts, GPE solutions & lecturette practice",
-      "Personal interview preparation with PIQ analysis",
+      "3 weeks of deep psychology training with dossier reviews",
+      "1 week of GTO concepts, GPE solutions & lecturette practice",
+      "SSB personal interview preparation with PIQ form analysis",
       "Live doubt-clearing with mentors after every session",
-      "Recordings available — never miss a class",
+      "Recordings available* — never miss a class & 2 days free practice session at Noida campus.",
     ],
     cta: "Enroll in Online Batch",
     enrollUrl: "https://pages.razorpay.com/ssbwingsonlinebatch",
@@ -448,15 +448,15 @@ export const YT_VIDEOS = ["2m14ob1OUHo", "XlmVnxhg2IY", "JeuWNbPZC4U", "waAzH9vH
 
 export const FAQS = [
   {
-    q: "What exactly is the SSB and why is it 5 days long?",
-    a: "The Services Selection Board is the Armed Forces' personality and intelligence assessment for officer entry. Over 5 days, three independent assessors — a Psychologist, a Group Testing Officer and an Interviewing Officer — evaluate you for 15 Officer Like Qualities through Screening (Day 1), Psychology tests (Day 2), GTO tasks (Days 3–4), Personal Interview and the final Conference (Day 5). Three opinions, one verdict.",
+    q: "What is the SSB, and what happens in the five-day SSB interview process?",
+    a: "The Services Selection Board is the Armed Forces' personality and intelligence assessment for officer entry. Over 5 days, three independent assessors — a Psychologist, a Group Testing Officer and an Interviewing Officer — evaluate you for 15 Officer Like Qualities (OLQs) through Screening (Day 1: OIR test and PPDT), Psychology tests (Day 2: TAT, WAT, SRT and SDT), GTO tasks (Days 3–4), Personal Interview and the final Conference (Day 5). Three opinions, one verdict.",
   },
   {
-    q: "I've cleared the written exam. How early should I start SSB preparation?",
-    a: "Ideally 30–45 days before your Board date. Personality projection isn't crammed — it's conditioned. Our 15-day offline immersion or 20-day online masterclass, followed by self-practice on the Smart Learning App, is the rhythm most of our recommended candidates followed.",
+    q: "I've cleared the written exam. How early should I start my SSB interview preparation?",
+    a: "Ideally 30–45 days before your Board date. Personality projection isn't crammed — it's conditioned. Our 2-week offline immersion or 30-day online batch, followed by self-practice on the SSB Smart Learning App, is the rhythm most of our recommended candidates followed.",
   },
   {
-    q: "I'm a repeater with conference-outs. Can you actually help?",
+    q: "I'm a repeater after a conference-out. What should I do — and can you actually help?",
     a: "Repeaters are our specialty. We begin with a forensic analysis of your previous attempts, identify the exact OLQs you failed to project, and rebuild your dossier, interview narrative and GTO approach around them. Khushvant (3 conference-outs) and Chandan (5 attempts) wear stars today.",
   },
   {
@@ -465,11 +465,11 @@ export const FAQS = [
   },
   {
     q: "What are the batch options and hostel arrangements?",
-    a: "Offline: two 15-day batches begin every month at our Noida Sector 62 campus, with optional AC hostel at ₹500/day (3–4 sharing) including three meals. Online: 20-day batches run live from 8–10 PM IST with recordings provided. Seats in both are limited to protect personal attention.",
+    a: "Offline: 2-week batches begin every month at our Noida Sector 62 campus, with optional AC hostel at ₹500/day (2-3 sharing) including three meals. Online: 30-day batches run live from 9–11 PM IST with recordings provided — built for college students and working professionals. Seats in both are limited to protect personal attention.",
   },
   {
     q: "Which entries do you prepare aspirants for?",
-    a: "All of them — NDA, CDS, AFCAT, TES, TGC, 10+2 Navy B.Tech, SSC Tech (Men & Women), NCC Special Entry, Indian Coast Guard, and service entries like ACC, PC(SL) and SCO. The SSB process is common; we tailor the interview and PIQ strategy to your specific entry.",
+    a: "All of them — NDA, CDS, AFCAT, TES, TGC, 10+2 Navy B.Tech, SSC Tech (Men & Women), NCC Special Entry, JAG, RVC, Indian Coast Guard Assistant Commandant, and service entries like ACC, PC(SL), SCO, AMC (NT) and Navy (CW, HET). The SSB process is common; we tailor the interview and PIQ strategy to your specific entry.",
   },
 ];
 

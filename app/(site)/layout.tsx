@@ -2,7 +2,8 @@ import PreloaderSection from "@/components/PreloaderSection";
 import Cursor from "@/components/Cursor";
 import ModalProvider from "@/components/ModalProvider";
 import { CONTACT_FORM, resolveContactForm } from "@/lib/form-defaults";
-import { getSettings, telHref, brochureHref, brochureOn } from "@/lib/content";
+import { getSettings, getTrackRecord, telHref, brochureHref, brochureOn } from "@/lib/content";
+import { countText } from "@/lib/track-record";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -26,13 +27,13 @@ const jsonLd = {
       "@type": ["EducationalOrganization", "LocalBusiness"],
       "@id": `${SITE_URL}/#organization`,
       name: "SSBWINGS",
-      alternateName: "SSB Wings",
+      alternateName: ["SSB Wings", "SSBWINGS Academy", "SSB Wings Noida"],
       url: SITE_URL,
       logo: `${SITE_URL}/logo.webp`,
       image: `${SITE_URL}/logo.webp`,
       slogan: "We give shape to your Dreams",
       description:
-        "SSB interview coaching academy in Noida mentored by ex-SSB assessors, preparing aspirants for NDA, CDS, AFCAT, TES, TGC, SSC, NCC, JAG and every Armed Forces officer entry.",
+        "SSB interview coaching academy in Noida Sector 62, Delhi NCR, mentored by retired SSB assessors, preparing aspirants for NDA, CDS, AFCAT, TES, TGC, SSC Tech, NCC Special Entry, JAG and every Armed Forces officer entry — offline with an on-campus GTO ground and hostel, and online with recorded classes.",
       telephone: "+91-9560510036",
       email: "marketing@ssbwings.com",
       address: {
@@ -53,9 +54,13 @@ const jsonLd = {
       knowsAbout: [
         "SSB interview", "Services Selection Board", "Officer Intelligence Rating (OIR)",
         "Picture Perception and Discussion Test (PPDT)", "Thematic Apperception Test (TAT)",
-        "Word Association Test (WAT)", "Situation Reaction Test (SRT)", "Group Testing Officer (GTO) tasks",
-        "SSB personal interview", "NDA", "CDS", "AFCAT", "10+2 TES", "TGC", "SSC Tech",
-        "NCC Special Entry", "JAG", "Indian Navy SSC", "Indian Coast Guard Assistant Commandant",
+        "Word Association Test (WAT)", "Situation Reaction Test (SRT)", "Self Description Test (SDT)",
+        "Group Testing Officer (GTO) tasks", "Group Planning Exercise (GPE)", "Progressive Group Task (PGT)",
+        "Half Group Task (HGT)", "Command Task", "Individual Obstacles", "Lecturette", "Group Discussion",
+        "SSB personal interview", "PIQ form", "Officer Like Qualities (OLQs)", "AFSB interview",
+        "NDA", "CDS", "AFCAT", "10+2 TES", "TGC", "SSC Tech", "NCC Special Entry", "JAG",
+        "10+2 Navy B.Tech", "Indian Navy SSC", "Indian Coast Guard Assistant Commandant",
+        "ACC", "SCO", "PC (SL)", "RVC", "AMC (NT)",
       ],
       sameAs: ["https://www.youtube.com/@ssbwings", "https://www.instagram.com/ssbwings", "https://t.me/ssbwings"],
       aggregateRating: { "@type": "AggregateRating", ratingValue: "5.0", reviewCount: "250" },
@@ -73,10 +78,11 @@ const jsonLd = {
 };
 
 export default async function SiteLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [popup, formDoc, settings] = await Promise.all([
+  const [popup, formDoc, settings, record] = await Promise.all([
     getPublished<EnquiryPopupDoc>("enquiry_popup", ENQUIRY_POPUP),
     getPublished<unknown>("contact_form", CONTACT_FORM),
     getSettings(),
+    getTrackRecord(),
   ]);
   const form = resolveContactForm(formDoc);
   return (
@@ -91,7 +97,11 @@ export default async function SiteLayout({ children }: Readonly<{ children: Reac
         <Footer />
         <WhatsAppButton />
         <CallButton href={telHref(settings.phone1)} number={settings.phone1} />
-        <ChatBot brochure={brochureHref(settings)} brochureOn={brochureOn(settings)} />
+        <ChatBot
+          brochure={brochureHref(settings)}
+          brochureOn={brochureOn(settings)}
+          counts={{ recommendations: countText(record.recommendations), alumni: countText(record.alumni) }}
+        />
         <BackToTop />
         <PreviewBar />
       </ModalProvider>

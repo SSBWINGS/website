@@ -24,7 +24,7 @@ export const PAGE_HEROES: Record<string, PageHeroDoc> = {
   courses: {
     kicker: "Choose Your Battle Plan", crumb: "Courses",
     title: `Courses Built by ${tri("Assessors")}`,
-    subtitle: "Offline immersion, live online masterclass or train-anywhere app — every programme is designed and delivered by the officers who once assessed candidates at real Boards.",
+    subtitle: "2-week offline immersion, 30-day live online batch or train-anywhere app — every SSB interview course is designed and delivered by the officers who once assessed candidates at real Boards.",
     image: "/images/hero-parade.jpg",
   },
   gallery: {
@@ -54,13 +54,13 @@ export const PAGE_HEROES: Record<string, PageHeroDoc> = {
   "mock-tests": {
     kicker: "Free practice", crumb: "Mock Tests",
     title: `SSB ${tri("Mock Tests")}`,
-    subtitle: "Sharpen your screening reasoning with a free Officer Intelligence Rating (OIR) quiz — instant scoring, no sign-up.",
+    subtitle: "Sharpen your screening reasoning with a free Officer Intelligence Rating (OIR) mock test — instant scoring, no sign-up.",
     image: "/images/hero-parade.jpg",
   },
   blog: {
     kicker: "Insights & current affairs", crumb: "Blog",
     title: `SSBWINGS ${tri("Blog")}`,
-    subtitle: "Strategy, tips and defence current affairs for SSB aspirants — straight from our ex-SSB assessors.",
+    subtitle: "SSB interview tips, strategy and defence current affairs for SSB aspirants — straight from our ex-SSB assessors.",
     image: "/images/hero-parade.jpg",
   },
   recommended: {
@@ -84,7 +84,7 @@ export const PAGE_HEROES: Record<string, PageHeroDoc> = {
   resources: {
     kicker: "Free Study Material", crumb: "Resources",
     title: `SSB ${tri("Resources")}`,
-    subtitle: "Downloadable notes, sample dossiers, PDFs and video lessons — organised by topic. Browse the folders below.",
+    subtitle: "Downloadable notes, sample dossiers, TAT, WAT and SRT practice sets, PDFs and video lessons — organised by topic. Browse the folders below.",
     image: "/images/gto-training.jpg",
   },
 };

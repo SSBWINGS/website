@@ -9,26 +9,35 @@ import CtaBanner from "@/components/CtaBannerSection";
 import JsonLd from "@/components/JsonLd";
 import { COURSES } from "@/lib/data";
 import { courseLd } from "@/lib/jsonld";
+import { getPublished } from "@/lib/content";
 
-/** Online courses and the app run remotely; everything else is on campus. */
-const modeOf = (where: string): "online" | "onsite" =>
-  /online|app|google play|android/i.test(where) ? "online" : "onsite";
+/** Online courses and the app run remotely; everything else is on campus.
+ *  Title and "where" together: the online batch's "where" is just its hours. */
+const modeOf = (c: { title: string; where: string }): "online" | "onsite" =>
+  /online|app|google play|android/i.test(`${c.title} ${c.where}`) ? "online" : "onsite";
+
+type CardText = { title?: string; desc?: string; where?: string };
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata("courses");
 }
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  // The cards as published in the admin, merged over the code cards exactly
+  // as the Courses section shows them — so search engines read what the
+  // visitor reads (titles, durations, descriptions).
+  const doc = await getPublished<{ items: CardText[] }>("courses_cards", { items: [] });
+  const cards = COURSES.map((c, i) => ({ ...c, ...(doc.items?.[i] ?? {}) }));
   return (
     <main>
       <JsonLd
-        data={COURSES.map((c) =>
+        data={cards.map((c) =>
           courseLd({
-            name: `${c.title} — SSB Interview Coaching`,
+            name: `${c.title} — SSB Interview Course`,
             description: c.desc,
             path: "/courses",
-            mode: modeOf(c.where),
-            keywords: ["SSB coaching", "SSB interview preparation", c.title],
+            mode: modeOf(c),
+            keywords: ["SSB coaching", "SSB interview preparation", "SSBWINGS SSB course", c.title],
           }),
         )}
       />

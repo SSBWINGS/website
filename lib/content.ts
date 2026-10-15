@@ -3,7 +3,8 @@ import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createPublicClient } from "@/lib/supabase/public";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { SITE } from "@/lib/data";
+import { SITE, STATS } from "@/lib/data";
+import { trackRecord, type TrackRecord } from "@/lib/track-record";
 import { mediaUrl } from "@/lib/supabase/media";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { coerceShape } from "@/lib/shape";
@@ -42,6 +43,13 @@ export type SiteSettings = typeof SITE;
 /** Site-wide settings (contact, socials, footer), CMS-overridable with defaults. */
 export async function getSettings(): Promise<SiteSettings> {
   return getPublished<SiteSettings>("settings", SITE);
+}
+
+/** Recommendations and alumni, from the admin's stat cards — the one source
+ *  every sentence about them reads from (see lib/track-record.ts). */
+export async function getTrackRecord(): Promise<TrackRecord> {
+  const doc = await getPublished<{ items: typeof STATS }>("stats", { items: STATS });
+  return trackRecord(doc.items);
 }
 
 /** tel: href from a display phone number. */

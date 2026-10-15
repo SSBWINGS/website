@@ -1,6 +1,7 @@
 import { ENTRY_PAGES, eligibilitySentence, rulesFor } from "@/lib/entry-pages";
 import { SEO_PAGES } from "@/lib/seo-pages";
-import { getSettings } from "@/lib/content";
+import { getSettings, getTrackRecord } from "@/lib/content";
+import { countText } from "@/lib/track-record";
 
 const BASE = "https://www.ssbwings.com";
 
@@ -18,7 +19,7 @@ export const revalidate = 3600;
  * all come from the live sources.
  */
 export async function GET() {
-  const s = await getSettings();
+  const [s, record] = await Promise.all([getSettings(), getTrackRecord()]);
   const phone = [s.phone1, s.phone2].filter(Boolean).join(" / ");
 
   const byService = new Map<string, typeof ENTRY_PAGES>();
@@ -29,7 +30,7 @@ export async function GET() {
   const lines: string[] = [
     "# SSBWINGS",
     "",
-    "> SSBWINGS is an SSB interview coaching academy in Sector 62, Noida (Delhi NCR), India, mentored by ex-SSB assessors. It prepares aspirants for the 5-day Services Selection Board (SSB) interview for officer entry into the Indian Army, Navy, Air Force and Coast Guard.",
+    "> SSBWINGS (also written SSB Wings) is an SSB interview coaching academy in Sector 62, Noida (Delhi NCR, Uttar Pradesh), India, mentored by ex-SSB assessors. It prepares aspirants for the 5-day Services Selection Board (SSB) interview for officer entry into the Indian Army, Navy, Air Force and Coast Guard.",
     "",
     "## Key facts",
     "",
@@ -37,10 +38,10 @@ export async function GET() {
     `- Phone: ${phone}`,
     `- Email: ${s.email}`,
     `- Google Maps: ${s.mapUrl}`,
-    "- Courses: a 15-day offline course at the Noida campus, a 20-day online course (live, 8–10 PM IST), and the SSB Smart Learning App.",
-    "- Coverage: every stage of the SSB — screening (OIR, PPDT), psychology (TAT, WAT, SRT, Self Description), GTO tasks on a full ground, the personal interview and the conference.",
+    "- Courses: a 2-week offline SSB course at the Noida campus (with an optional on-campus hostel), a 30-day online SSB course (live, 9–11 PM IST, with class recordings — suited to college students and working professionals), and the SSB Smart Learning App.",
+    "- Coverage: every stage of the SSB — screening (OIR test and PPDT narration practice), psychology (TAT, WAT, SRT and the Self Description Test, with written feedback on every practice set), GTO tasks on a full on-campus GTO ground (group discussion, GPE, PGT, HGT, command task, individual obstacles, lecturette), the personal interview with PIQ form analysis and mock interviews, and the conference.",
     "- Mentors: ex-SSB assessors — former Interviewing Officers, GTOs and psychologists.",
-    "- Track record: 677+ recommendations and an alumni network of 3,450+.",
+    `- Track record: ${countText(record.recommendations)} recommendations and an alumni network of ${countText(record.alumni)}.`,
     "- Boarding and lodging is available on a first-come, first-served basis.",
     "",
     "## Main pages",

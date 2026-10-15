@@ -36,8 +36,8 @@ export type HeroContent = {
 export const HERO_DEFAULT: HeroContent = HERO;
 
 const DEFAULT_STATS = [
-  { value: 677, label: "Recommendations" },
-  { value: 3450, label: "Alumni Family" },
+  { value: 760, label: "Recommendations" },
+  { value: 3500, label: "Alumni Family" },
   { value: 175, label: "NDA Entries" },
   { value: 10, label: "All India Rank 1" },
 ];
