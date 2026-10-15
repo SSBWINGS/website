@@ -23,7 +23,7 @@ export default async function Footer() {
               </span>
             </Link>
             <p className="mt-5 text-sm leading-relaxed text-navy-100/80">
-              India&apos;s trusted SSB interview academy — mentored by ex-SSB assessors,
+              India&apos;s trusted SSB interview coaching academy in Noida, Delhi NCR — mentored by ex-SSB assessors,
               powered by {countText(record.recommendations)} recommendations and a {countText(record.alumni)} strong alumni family of officers.
             </p>
             <p className="mt-4 flex items-center gap-2 text-sm text-gold-300">★★★★★ <span className="text-navy-100/80">5.0 Google Rating</span></p>
